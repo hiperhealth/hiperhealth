@@ -59,19 +59,22 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a id="confirmDeletion" href="" type="button" class="btn btn-danger">Delete</a>
+                <form id="confirmDeletionForm" method="post" action="">
+                    <button type="submit" class="btn btn-danger">
+                        Delete</>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
+    <script>
 document.addEventListener("DOMContentLoaded", function() {
     const deleteModal = document.getElementById('deleteModal');
     deleteModal.addEventListener('show.bs.modal', event => {
 
     const deleteButton = event.relatedTarget // Button that triggered the modal
     const modalPatientId = deleteModal.querySelector('.patient-id'); // get data-bs-uuid attribute
-    const confirmDeletionButton = deleteModal.querySelector('#confirmDeletion');
+    const confirmDeletionForm = deleteModal.querySelector('#confirmDeletionForm');
 
 
     // Extract info from data-bs-* attributes
@@ -79,9 +82,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // update modal data
     modalPatientId.textContent = patientId;
-    confirmDeletionButton.setAttribute('href', `/delete-patient/${patientId}`);
+    confirmDeletionForm.setAttribute('action', `/delete-patient/${patientId}`);
 
     })
 });
-</script>
+    </script>
 {% endblock %}

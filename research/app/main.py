@@ -291,17 +291,22 @@ def done(request: Request, sid: str) -> HTMLResponse:
 
 
 @app.get('/patient/{patient_id}', response_class=HTMLResponse)
-def patient(patient_id: str) -> HTMLResponse:
+def patient(request: Request, patient_id: str) -> HTMLResponse:
     """View all patients."""
     repo = PatientRepository()
     patient = repo.get(patient_id)
+    active_tab = request.query_params.get('active_tab', 'demographics')
 
-    context = {'title': 'Patient', 'patient': patient}
+    context = {
+        'title': 'Patient',
+        'patient': patient,
+        'active_tab': active_tab,
+    }
 
     return _render('patient.html', **context)
 
 
-@app.get(
+@app.post(
     '/delete-patient/{patient_id}',
     response_class=RedirectResponse,
     status_code=303,
