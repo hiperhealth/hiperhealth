@@ -131,8 +131,6 @@ def test_pii_detection_and_deidentification(
             f"De-identification failed for strategy '{strategy}' on {test_id}"
         )
 
-        print(text)
-        print(deidentified_text)
         for result in analyzer_results:
             original_pii_slice = text[result.start : result.end]
             deidentified_slice = deidentified_text[result.start : result.end]
