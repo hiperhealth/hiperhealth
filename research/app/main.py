@@ -249,7 +249,8 @@ def diagnosis_post(
     """Handle diagnosis POST request."""
     sess = _session_or_404(sid)
     sess['selected_diagnoses'] = selected
-    sess['evaluations'] = {'ai_diag': {}}
+    sess.setdefault('evaluations', {})
+    sess['evaluations']['ai_diag'] = {}
 
     # get form data from request from async to sync
     form = anyio.run(request.form)
@@ -298,11 +299,43 @@ def exams(request: Request, sid: str) -> HTMLResponse:
 
 
 @app.post('/exams')
-def exams_post(sid: str, selected: List[str] = Form(...)) -> RedirectResponse:
+def exams_post(
+    request: Request, sid: str, selected: List[str] = Form(...)
+) -> RedirectResponse:
     """Handle exams POST request."""
     sess = _session_or_404(sid)
     sess['selected_exams'] = selected
     sess['meta']['timestamp'] = datetime.utcnow().isoformat(timespec='seconds')
+    sess.setdefault('evaluations', {})
+    sess['evaluations']['ai_exam'] = {}
+
+    # get form data from request from async to sync
+    form = anyio.run(request.form)
+
+    # get evaluation only from selected exams
+    for exam in selected:
+        evaluation = {
+            'ratings': {
+                'accuracy': None,
+                'relevance': None,
+                'usefulness': None,
+                'coherence': None,
+                'safety': None,
+                'comments': None,
+            }
+        }
+
+        # get form values for selected exam
+        for key, value in form.items():
+            if key.startswith(exam):
+                criteria = key.split('--')[1]
+                evaluation['ratings'][criteria] = (
+                    int(value) if value.isdigit() else value
+                )
+
+        # add diagnosis evaluation to record
+        sess['evaluations']['ai_exam'][exam] = evaluation
+
     repo = PatientRepository()
     repo.create(sess)
     return RedirectResponse(f'/done?sid={sid}', status_code=303)

@@ -1,1 +1,333 @@
-[{"ai_diag": {"options": ["Acute frontal sinusitis", "Viral upper respiratory infection", "Acute bronchitis", "Pleurisy (pleural friction rub)", "Tension-type headache"], "summary": "A 38-year-old woman presents with a productive cough, frontal forehead pain suggestive of sinus involvement, and an audible rumbling noise on deep inspiration. She has no prior diagnostic workup, follows a paleo diet, exercises moderately, and reports increased stress and anxiety at work."}, "ai_exam": {"options": ["CT scan of paranasal sinuses", "Sinus radiograph (Waters\u2019 view)", "Nasal endoscopy", "Transillumination of frontal sinuses", "Frontal sinus aspiration and culture", "Anterior rhinoscopy", "Chest X-ray", "Sputum culture and sensitivity", "Complete blood count with differential", "Pulse oximetry"], "summary": "Acute frontal sinusitis typically presents with frontal headache, facial pain/pressure worsened by bending forward, purulent nasal discharge, nasal congestion, and may follow a viral upper respiratory infection. Acute bronchitis presents with a cough (often productive), chest discomfort, wheezing or rhonchi on auscultation, and sometimes low-grade fever. Both conditions are usually viral, but bacterial causes can require targeted therapy. Clinical evaluation focuses on history and physical exam; imaging and laboratory studies are reserved for atypical, severe, or prolonged cases."}, "meta": {"timestamp": "2025-07-04T12:42:06", "uuid": "19784cd7-7242-4b7e-95a8-921755d89561"}, "patient": {"age": 38, "diet": "paleo", "gender": "Female", "height_cm": 167.0, "mental_exercises": "reading before bed, sporadic yoga classes", "mental_health": "stressed about work, anxious when thinking about career path", "physical_activity": "moderate cardio 3 times per week", "previous_tests": "none", "sleep_hours": 6.0, "symptoms": "coffing, forehead pain, rumbling noise when deep breathing", "weight_kg": 60.0}, "selected_diagnoses": ["Acute frontal sinusitis", "Acute bronchitis"], "selected_exams": ["CT scan of paranasal sinuses", "Chest X-ray"]}, {"ai_diag": {"options": ["Gastroesophageal reflux disease (GERD)", "Peptic ulcer disease", "Gastritis", "Functional dyspepsia", "Gallbladder disease"], "summary": "A 45-year-old man presents with epigastric burning pain that worsens after eating, occasional regurgitation of acidic fluid, and nighttime discomfort. He has a history of occasional NSAID use for back pain and reports moderate alcohol consumption. Symptoms have persisted for 3 months despite OTC antacids."}, "ai_exam": {"options": ["Upper endoscopy (EGD)", "Helicobacter pylori testing (stool antigen or breath test)", "Barium swallow study", "Abdominal ultrasound", "Esophageal pH monitoring", "Complete blood count", "Liver function tests", "Lipase level", "Electrocardiogram (to rule out cardiac causes)", "Abdominal CT scan"], "summary": "GERD typically presents with heartburn, regurgitation, and sometimes dysphagia. Peptic ulcer disease may present with epigastric pain that improves with food (duodenal) or worsens with food (gastric). Gastritis often includes nausea and bloating. Initial evaluation focuses on symptom pattern and response to empiric therapy, with diagnostic testing reserved for alarm symptoms or treatment failure."}, "meta": {"timestamp": "2025-07-04T13:15:22", "uuid": "3a8b6c2d-1f47-4e92-b3a9-7d825e9f4c12"}, "patient": {"age": 45, "diet": "standard American", "gender": "Male", "height_cm": 178.0, "mental_exercises": "crossword puzzles occasionally", "mental_health": "generally good, some work-related stress", "physical_activity": "light walking, desk job", "previous_tests": "none", "sleep_hours": 6.5, "symptoms": "epigastric burning, acid regurgitation, nighttime discomfort", "weight_kg": 85.0, "habits": "3-4 alcoholic drinks/week, occasional NSAID use"}, "selected_diagnoses": ["Gastroesophageal reflux disease (GERD)", "Gastritis"], "selected_exams": ["Upper endoscopy (EGD)", "Helicobacter pylori testing"]}, {"ai_diag": {"options": ["Lumbar strain", "Degenerative disc disease", "Herniated nucleus pulposus", "Spinal stenosis", "Sacroiliac joint dysfunction"], "summary": "A 52-year-old female presents with 6 weeks of progressively worsening low back pain radiating to the right buttock, aggravated by prolonged standing and lifting. She reports no bowel/bladder changes but notes occasional right leg tingling. She works as a nurse and has a history of intermittent back pain episodes."}, "ai_exam": {"options": ["Lumbar spine MRI", "Lumbar spine X-rays", "EMG/nerve conduction studies", "CBC and ESR/CRP", "Bone scan", "CT scan of lumbar spine", "Physical therapy evaluation", "Straight leg raise test", "Neurological examination", "Flexion/extension views"], "summary": "Lumbar strain typically presents with localized pain and muscle spasms. Radicular symptoms suggest nerve root compression from disc herniation or stenosis. Red flags include bowel/bladder dysfunction, progressive neurological deficits, or history of malignancy. Most cases are mechanical and improve with conservative management; imaging is reserved for red flags or persistent symptoms."}, "meta": {"timestamp": "2025-07-04T14:30:45", "uuid": "5e9f2a1b-8c3d-4f76-91c2-6a347b82d0e3"}, "patient": {"age": 52, "diet": "Mediterranean", "gender": "Female", "height_cm": 163.0, "mental_exercises": "daily meditation", "mental_health": "managing work stress well", "physical_activity": "active job (nursing), some yoga", "previous_tests": "lumbar X-ray 2 years ago (mild degenerative changes)", "sleep_hours": 7.0, "symptoms": "low back pain radiating to right buttock, occasional right leg tingling", "weight_kg": 68.0, "occupation": "registered nurse"}, "selected_diagnoses": ["Lumbar strain", "Degenerative disc disease"], "selected_exams": ["Lumbar spine MRI", "Physical therapy evaluation"]}]
+[
+  {
+    "patient": {
+      "age": 38,
+      "gender": "Female",
+      "weight_kg": 60.0,
+      "height_cm": 167.0,
+      "diet": "paleo",
+      "sleep_hours": 7.0,
+      "physical_activity": "moderate cardio 3 times per week",
+      "mental_exercises": "reading before bed, sporadic yoga classes",
+      "symptoms": "cough, forehead pain, rumbling noise when deep breathing",
+      "mental_health": "stressed about work, anxious when thinking about career path",
+      "previous_tests": "none"
+    },
+    "meta": {
+      "uuid": "fa102dcd-72d1-4cb0-99fa-3042940533d9",
+      "lang": "en",
+      "timestamp": "2025-07-18T14:37:36"
+    },
+    "ai_diag": {
+      "summary": "A 38-year-old female presents with a persistent cough, frontal headache suggestive of sinus pressure, and an audible rumbling noise on deep inspiration, without prior diagnostic testing. She has moderate physical activity, a paleo diet, and reports significant work-related stress and anxiety.",
+      "options": [
+        "Viral upper respiratory infection (common cold)",
+        "Acute sinusitis",
+        "Acute bronchitis",
+        "Pleuritis/pleurisy",
+        "Community-acquired pneumonia",
+        "Allergic rhinitis",
+        "Gastroesophageal reflux\u2013related cough"
+      ]
+    },
+    "selected_diagnoses": [
+      "Acute sinusitis",
+      "Acute bronchitis",
+      "Allergic rhinitis"
+    ],
+    "evaluations": {
+      "ai_diag": {
+        "Acute sinusitis": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 8,
+            "usefulness": 10,
+            "coherence": 10,
+            "comments": "A good suggestion that should be further investigated."
+          }
+        },
+        "Acute bronchitis": {
+          "ratings": {
+            "accuracy": 7,
+            "relevance": 6,
+            "usefulness": 7,
+            "coherence": 8,
+            "comments": "Further investigation about acute bronchitis should be done."
+          }
+        },
+        "Allergic rhinitis": {
+          "ratings": {
+            "accuracy": 10,
+            "relevance": 9,
+            "usefulness": 10,
+            "coherence": 10,
+            "comments": "A very common issue that should be investigated."
+          }
+        }
+      },
+      "ai_exam": {
+        "Non-contrast sinus CT scan": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 10,
+            "usefulness": 9,
+            "coherence": 10,
+            "safety": "safe",
+            "comments": "A very coherent suggestion to check the patient's sinus."
+          }
+        },
+        "Chest radiograph (PA and lateral)": {
+          "ratings": {
+            "accuracy": 10,
+            "relevance": 10,
+            "usefulness": 10,
+            "coherence": 10,
+            "safety": "safe",
+            "comments": "This is a good suggestion. It should reveal any lung accumulated secretion."
+          }
+        },
+        "Complete blood count with differential": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 9,
+            "usefulness": 10,
+            "coherence": 8,
+            "safety": "safe",
+            "comments": ""
+          }
+        }
+      }
+    },
+    "ai_exam": {
+      "summary": "The patient\u2019s symptoms of nasal congestion, rhinorrhea, facial pressure, cough and sputum production may reflect overlapping acute sinusitis, acute bronchitis and allergic rhinitis. Acute sinusitis typically presents with facial pain/pressure, purulent discharge and nasal obstruction lasting >10 days or worsening after initial improvement. Acute bronchitis is characterized by a cough (often productive) following a viral prodrome, usually without consolidation on chest imaging. Allergic rhinitis causes sneezing, itching, clear rhinorrhea and pale, boggy nasal mucosa. Differentiating these conditions guides appropriate management\u2014bacterial vs viral, airway assessment and identification of allergic triggers.",
+      "options": [
+        "Anterior rhinoscopy",
+        "Nasal endoscopy",
+        "Non-contrast sinus CT scan",
+        "Chest radiograph (PA and lateral)",
+        "Spirometry with bronchodilator challenge",
+        "Sputum culture and sensitivity",
+        "Complete blood count with differential",
+        "Allergy skin prick testing",
+        "Serum total IgE level",
+        "Nasal smear for eosinophils"
+      ]
+    },
+    "selected_exams": [
+      "Non-contrast sinus CT scan",
+      "Chest radiograph (PA and lateral)",
+      "Complete blood count with differential"
+    ]
+  },
+  {
+    "ai_diag": {
+      "options": [
+        "Lumbar strain",
+        "Degenerative disc disease",
+        "Herniated nucleus pulposus",
+        "Spinal stenosis",
+        "Sacroiliac joint dysfunction"
+      ],
+      "summary": "A 52-year-old female presents with 6 weeks of progressively worsening low back pain radiating to the right buttock, aggravated by prolonged standing and lifting. She reports no bowel/bladder changes but notes occasional right leg tingling. She works as a nurse and has a history of intermittent back pain episodes."
+    },
+    "ai_exam": {
+      "options": [
+        "Lumbar spine MRI",
+        "Lumbar spine X-rays",
+        "EMG/nerve conduction studies",
+        "CBC and ESR/CRP",
+        "Bone scan",
+        "CT scan of lumbar spine",
+        "Physical therapy evaluation",
+        "Straight leg raise test",
+        "Neurological examination",
+        "Flexion/extension views"
+      ],
+      "summary": "Lumbar strain typically presents with localized pain and muscle spasms. Radicular symptoms suggest nerve root compression from disc herniation or stenosis. Red flags include bowel/bladder dysfunction, progressive neurological deficits, or history of malignancy. Most cases are mechanical and improve with conservative management; imaging is reserved for red flags or persistent symptoms."
+    },
+    "meta": {
+      "timestamp": "2025-07-04T14:30:45",
+      "uuid": "5e9f2a1b-8c3d-4f76-91c2-6a347b82d0e3"
+    },
+    "patient": {
+      "age": 52,
+      "diet": "Mediterranean",
+      "gender": "Female",
+      "height_cm": 163.0,
+      "mental_exercises": "daily meditation",
+      "mental_health": "managing work stress well",
+      "physical_activity": "active job (nursing), some yoga",
+      "previous_tests": "none",
+      "sleep_hours": 7.0,
+      "symptoms": "low back pain radiating to right buttock, occasional right leg tingling",
+      "weight_kg": 68.0,
+      "occupation": "registered nurse"
+    },
+    "selected_diagnoses": ["Lumbar strain", "Degenerative disc disease"],
+    "selected_exams": ["Lumbar spine MRI", "Physical therapy evaluation"],
+    "evaluations": {
+      "ai_diag": {
+        "Lumbar strain": {
+          "ratings": {
+            "accuracy": 9,
+            "relevance": 8,
+            "usefulness": 10,
+            "coherence": 9,
+            "comments": "A reasonable primary consideration given the physical activity and occupational context."
+          }
+        },
+        "Degenerative disc disease": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 7,
+            "usefulness": 8,
+            "coherence": 8,
+            "comments": "Likely contributing factor given age and history, deserves attention."
+          }
+        }
+      },
+      "ai_exam": {
+        "Lumbar spine MRI": {
+          "ratings": {
+            "accuracy": 9,
+            "relevance": 10,
+            "usefulness": 9,
+            "coherence": 10,
+            "safety": "safe",
+            "comments": "Excellent first-line imaging to assess disc pathology and rule out serious issues."
+          }
+        },
+        "Physical therapy evaluation": {
+          "ratings": {
+            "accuracy": 10,
+            "relevance": 9,
+            "usefulness": 10,
+            "coherence": 9,
+            "safety": "safe",
+            "comments": "Essential component of conservative management for mechanical back pain."
+          }
+        }
+      }
+    }
+  },
+  {
+    "patient": {
+      "age": 29,
+      "gender": "Male",
+      "weight_kg": 75.0,
+      "height_cm": 180.0,
+      "diet": "vegetarian",
+      "sleep_hours": 6.5,
+      "physical_activity": "runs 5km three times a week",
+      "mental_exercises": "crossword puzzles and journaling",
+      "symptoms": "intermittent chest discomfort, shortness of breath during exertion, occasional palpitations",
+      "mental_health": "generally stable, mild anxiety before presentations",
+      "previous_tests": "none"
+    },
+    "meta": {
+      "uuid": "c47a30b3-1f09-49c1-8725-846672d1e6ac",
+      "lang": "en",
+      "timestamp": "2025-07-15T10:12:22"
+    },
+    "ai_diag": {
+      "summary": "A 29-year-old male presents with intermittent chest discomfort, exertional shortness of breath, and occasional palpitations. He maintains regular physical activity and follows a vegetarian diet. His mental health is generally stable, with mild anxiety under pressure. No prior diagnostic evaluations have been performed.",
+      "options": [
+        "Exercise-induced asthma",
+        "Anxiety-related somatic symptoms",
+        "Atypical angina",
+        "Mitral valve prolapse",
+        "Pericarditis",
+        "Hypertrophic cardiomyopathy",
+        "Gastroesophageal reflux disease (GERD)"
+      ]
+    },
+    "selected_diagnoses": [
+      "Atypical angina",
+      "Mitral valve prolapse",
+      "Hypertrophic cardiomyopathy"
+    ],
+    "evaluations": {
+      "ai_diag": {
+        "Atypical angina": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 9,
+            "usefulness": 9,
+            "coherence": 9,
+            "comments": "This diagnosis is plausible given the symptoms and should be evaluated further."
+          }
+        },
+        "Mitral valve prolapse": {
+          "ratings": {
+            "accuracy": 7,
+            "relevance": 7,
+            "usefulness": 8,
+            "coherence": 8,
+            "comments": "Fits some symptoms, such as palpitations and chest discomfort."
+          }
+        },
+        "Hypertrophic cardiomyopathy": {
+          "ratings": {
+            "accuracy": 9,
+            "relevance": 10,
+            "usefulness": 10,
+            "coherence": 10,
+            "comments": "Highly relevant considering exertional symptoms in a young adult."
+          }
+        }
+      },
+      "ai_exam": {
+        "ECG (electrocardiogram)": {
+          "ratings": {
+            "accuracy": 10,
+            "relevance": 10,
+            "usefulness": 10,
+            "coherence": 10,
+            "safety": "safe",
+            "comments": "A basic but essential test for evaluating cardiac symptoms."
+          }
+        },
+        "Echocardiogram": {
+          "ratings": {
+            "accuracy": 9,
+            "relevance": 10,
+            "usefulness": 9,
+            "coherence": 10,
+            "safety": "needs_review",
+            "comments": "Useful to detect structural heart disease like mitral valve prolapse or HCM."
+          }
+        },
+        "Exercise stress test": {
+          "ratings": {
+            "accuracy": 8,
+            "relevance": 9,
+            "usefulness": 8,
+            "coherence": 9,
+            "safety": "safe",
+            "comments": "Important to assess symptoms during exertion and rule out angina."
+          }
+        }
+      }
+    },
+    "ai_exam": {
+      "summary": "The symptoms suggest possible structural or functional cardiac issues such as hypertrophic cardiomyopathy or mitral valve prolapse. An ECG can detect arrhythmias, an echocardiogram assesses structural abnormalities, and a stress test helps evaluate exercise-induced symptoms. These tests provide a comprehensive initial workup for young patients with exertional symptoms and no prior testing.",
+      "options": [
+        "ECG (electrocardiogram)",
+        "Echocardiogram",
+        "Exercise stress test",
+        "Cardiac MRI",
+        "Chest X-ray",
+        "Blood tests including troponin and BNP",
+        "24-hour Holter monitoring",
+        "Pulmonary function test",
+        "Gastroesophageal pH monitoring",
+        "Psychological evaluation"
+      ]
+    },
+    "selected_exams": [
+      "ECG (electrocardiogram)",
+      "Echocardiogram",
+      "Exercise stress test"
+    ]
+  }
+]
