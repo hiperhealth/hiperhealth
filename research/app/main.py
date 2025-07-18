@@ -24,6 +24,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
 
+import anyio
+
 from fastapi import FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -242,11 +244,39 @@ def diagnosis(request: Request, sid: str) -> HTMLResponse:
 
 @app.post('/diagnosis')
 def diagnosis_post(
-    sid: str, selected: List[str] = Form(...)
+    request: Request, sid: str, selected: List[str] = Form(...)
 ) -> RedirectResponse:
     """Handle diagnosis POST request."""
     sess = _session_or_404(sid)
     sess['selected_diagnoses'] = selected
+    sess['evaluations'] = {'ai_diag': {}}
+
+    # get form data from request from async to sync
+    form = anyio.run(request.form)
+
+    # get evaluation only from selected diagnoses
+    for diagnosis in selected:
+        evaluation = {
+            'ratings': {
+                'accuracy': None,
+                'relevance': None,
+                'usefulness': None,
+                'coherence': None,
+                'comments': None,
+            }
+        }
+
+        # get form values for selected diagnosis
+        for key, value in form.items():
+            if key.startswith(diagnosis):
+                criteria = key.split('--')[1]
+                evaluation['ratings'][criteria] = (
+                    int(value) if value.isdigit() else value
+                )
+
+        # add diagnosis evaluation to record
+        sess['evaluations']['ai_diag'][diagnosis] = evaluation
+
     return RedirectResponse(f'/exams?sid={sid}', status_code=303)
 
 
