@@ -11,8 +11,8 @@
         </nav>
     </div>
     <nav>
-        <div class="nav nav-tabs" id="nav-demographics-tab" role="tablist">
-            <button class="nav-link active"
+        <div class="nav nav-tabs" role="tablist">
+            <button class="nav-link {% if active_tab == 'demographics' %}active{% endif %}"
                     id="nav-demographics-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-demographics"
@@ -20,35 +20,35 @@
                     role="tab"
                     aria-controls="nav-demographics"
                     aria-selected="true">Demographics</button>
-            <button class="nav-link"
+            <button class="nav-link {% if active_tab == 'symptoms' %}active{% endif %}"
                     id="nav-symptoms-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-symptoms"
-                    type="button"
                     role="tab"
+                    type="button"
                     aria-controls="nav-symptoms"
                     aria-selected="false">Symptoms</button>
-            <button class="nav-link"
+            <button class="nav-link {% if active_tab == 'diagnosis' %}active{% endif %}"
                     id="nav-diagnosis-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-diagnosis"
-                    type="button"
                     role="tab"
+                    type="button"
                     aria-controls="nav-diagnosis"
                     aria-selected="false">Diagnosis</button>
-            <button class="nav-link"
+            <button class="nav-link {% if active_tab == 'exams' %}active{% endif %}"
                     id="nav-exams-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-exams"
-                    type="button"
                     role="tab"
+                    type="button"
                     aria-controls="nav-exams"
                     aria-selected="false">Exams</button>
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
         <!-- Demographics -->
-        <div class="tab-pane fade show active"
+        <div class="tab-pane fade {% if active_tab == 'demographics' %}show active{% endif %} "
              id="nav-demographics"
              role="tabpanel"
              aria-labelledby="nav-demographics-tab">
@@ -91,52 +91,101 @@
             </ul>
         </div>
         <!-- Demographics End -->
-        <div class="tab-pane fade"
+        <!-- Symptoms Start -->
+        <div class="tab-pane fade {% if active_tab == 'symptoms' %}show active{% endif %}"
              id="nav-symptoms"
              role="tabpanel"
              aria-labelledby="nav-symptoms-tab">
             <h3 class="mt-4">Symptoms</h3>
             <hr>
-            <ul class="list-group list-group-flush py-2 mb-4">
-                <li class="list-group-item">
-                    <span class="fw-bold">Mental Health:</span> {{ patient.patient.mental_health }}
-                </li>
-                <li class="list-group-item">
-                    <span class="fw-bold">Symptoms:</span> {{ patient.patient.symptoms }}
-                </li>
-            </ul>
-            <h3 class="mt-4">Summary</h3>
-            <hr>
-            <p class="w-75">{{ patient.ai_diag.summary }}</p>
+            <div class="container">
+                <h3 class="mt-4">Summary</h3>
+                <hr>
+                <p class="w-75">{{ patient.ai_diag.summary }}</p>
+                <h3 class="mt-4">Details</h3>
+                <hr>
+                <ul class="list-group list-group-flush py-2 mb-4">
+                    <li class="list-group-item">
+                        <span class="fw-bold">Mental Health:</span> {{ patient.patient.mental_health }}
+                    </li>
+                    <li class="list-group-item">
+                        <span class="fw-bold">Symptoms:</span> {{ patient.patient.symptoms }}
+                    </li>
+                </ul>
+            </div>
         </div>
-        <div class="tab-pane fade"
+        <!-- Symptoms End -->
+        <!-- Diagnosis Start -->
+        <div class="tab-pane fade {% if active_tab == 'diagnosis' %}show active{% endif %}"
              id="nav-diagnosis"
              role="tabpanel"
              aria-labelledby="nav-diagnosis-tab">
             <h3 class="mt-4">Diagnosis</h3>
             <hr>
-            <div class="container">
+            <div class="container pb-5">
                 <div class="row">
-                    <div class="col-4">
-                        <h4>Ai Suggested Diagnosis</h4>
-                        <ul>
-                            {% for option in patient.ai_diag.options %}<li>{{ option }}</li>{% endfor %}
-                        </ul>
-                    </div>
-                    <div class="col-4">
-                        <h4>Selected Diagnosis</h4>
-                        <ul>
-                            {% for option in patient.selected_diagnoses %}<li>{{ option }}</li>{% endfor %}
-                        </ul>
+                    <h3 class="mt-4">Summary</h3>
+                    <small class="text-black-50">The summary of the patient's condition is based on the selected diagnosis</small>
+                    <hr>
+                    <p class="w-75 mb-4">{{ patient.ai_exam.summary }}</p>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <h3 class="mt-4">Evaluation</h3>
+                        <small class="text-black-50">The evaluations for the ai suggested diagnoses</small>
+                        <hr>
+                        <!-- check if there are ai_diag options and patient.selected_diagnosis -->
+                        {% if patient.ai_diag.options and patient.selected_diagnoses %}
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr class="table-primary">
+                                        <th scope="col">Selected</th>
+                                        <th scope="col" class="th-lg">Diagnosis</th>
+                                        <th scope="col">Accuracy</th>
+                                        <th scope="col">Relevance</th>
+                                        <th scope="col">Usefulness</th>
+                                        <th scope="col">Coherence</th>
+                                        <th scope="col">Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for diagnosis in patient.ai_diag.options %}
+                                        {% if diagnosis in patient.selected_diagnoses %}
+                                            <tr class="table-success">
+                                                <th class="text-center text-success" scope="row">
+                                                    <i class="bi bi-check-square"></i>
+                                                </th>
+                                                <td>{{ diagnosis }}</td>
+                                                <td>{{ patient.evaluations.ai_diag[diagnosis].ratings.accuracy }}</td>
+                                                <td>{{ patient.evaluations.ai_diag[diagnosis].ratings.relevance }}</td>
+                                                <td>{{ patient.evaluations.ai_diag[diagnosis].ratings.usefulness }}</td>
+                                                <td>{{ patient.evaluations.ai_diag[diagnosis].ratings.coherence }}</td>
+                                                <td>{{ patient.evaluations.ai_diag[diagnosis].ratings.comments }}</td>
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <th class="text-center text-secondary" scope="row">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </th>
+                                                <td>{{ diagnosis }}</td>
+                                                <td class="text-secondary">N/A</td>
+                                                <td class="text-secondary">N/A</td>
+                                                <td class="text-secondary">N/A</td>
+                                                <td class="text-secondary">N/A</td>
+                                                <td class="text-secondary">N/A</td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
                     </div>
                 </div>
-                <h3 class="mt-4">Summary</h3>
-                <small>This summary of the patient's condition is based on the selected diagnosis</small>
-                <hr>
-                <p class="w-75">{{ patient.ai_exam.summary }}</p>
             </div>
         </div>
-        <div class="tab-pane fade"
+        <!-- Diagnosis End -->
+        <!-- Exams Start -->
+        <div class="tab-pane fade {% if active_tab == 'exams' %}show active{% endif %}"
              id="nav-exams"
              role="tabpanel"
              aria-labelledby="nav-exams-tab">
@@ -144,18 +193,60 @@
             <hr>
             <div class="container">
                 <div class="row">
-                    <div class="col-4">
-                        <h4>Ai Suggested Exams</h4>
-                        <ul>
-                            {% for option in patient.ai_exam.options %}<li>{{ option }}</li>{% endfor %}
-                        </ul>
-                    </div>
-                    <div class="col-4">
-                        <h4>Selected Exams</h4>
-                        <ul>
-                            {% for option in patient.selected_exams %}<li>{{ option }}</li>{% endfor %}
-                        </ul>
-                    </div>
+                    <h3 class="mt-4">Evaluation</h3>
+                    <small class="text-black-50">The evaluations for the ai suggested tests.</small>
+                    <hr>
+                    <!-- check if there are ai_diag options and patient.selected_diagnosis -->
+                    {% if patient.ai_exam.options and patient.selected_exams %}
+                        <table class="table table-hover">
+                            <thead>
+                                <tr class="table-primary">
+                                    <th scope="col">Selected</th>
+                                    <th scope="col" class="th-lg">Test/Exam</th>
+                                    <th scope="col">Accuracy</th>
+                                    <th scope="col">Relevance</th>
+                                    <th scope="col">Usefulness</th>
+                                    <th scope="col">Coherence</th>
+                                    <th scope="col">Safety</th>
+                                    <th scope="col">Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in patient.ai_exam.options %}
+                                    {% if exam in patient.selected_exams %}
+                                        <tr class="table-success">
+                                            <th class="text-center text-success" scope="row">
+                                                <i class="bi bi-check-square"></i>
+                                            </th>
+                                            <td>{{ exam }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.accuracy }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.relevance }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.usefulness }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.coherence }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.safety }}</td>
+                                            <td>{{ patient.evaluations.ai_exam[exam].ratings.comments }}</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <th class="text-center text-secondary" scope="row">
+                                                <i class="bi bi-x-lg"></i>
+                                            </th>
+                                            <td>{{ exam }}</td>
+                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary">N/A</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
                 </div>
             </div>
-        {% endblock %}
+        </div>
+        <!-- Exams Start -->
+    </div>
+{% endblock %}
