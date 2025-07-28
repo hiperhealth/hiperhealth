@@ -45,6 +45,14 @@ groups:
         help: Run the Research WEB App
         dir: research/app
         run: uvicorn main:app --reload
+      seed:
+        help: Generate seed data
+        dir: research/app
+        run: |
+          mkdir -p data/patients && \
+          cp ../../tests/data/patients/patients.json \
+          ./data/patients/patients.json
+          echo "Seed data generated in reserch/app/data/patients/patients.json"
 
   tests:
     tasks:

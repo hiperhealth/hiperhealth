@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h2 class="my-4">{{ title }}</h2>
-    <a href="/start" class="btn btn-outline-primary mb-3">&#43; Add Patient</a>
+    <a href="/start" class="btn btn-outline-primary mb-3"><i class="bi bi-person-plus"></i> Add Patient</a>
     {% if patients|length > 0 %}
         <div class="list-group"></div>
         <!-- list-group -->
@@ -22,7 +22,9 @@
                                 class="btn btn-sm btn-outline-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
-                                data-bs-uuid="{{ patient.meta.uuid }}">Delete Patient</button>
+                                data-bs-uuid="{{ patient.meta.uuid }}">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -48,7 +50,7 @@
             <div class="modal-body">
                 <form>
                     <div class="mb-3">
-                        <h5>Do you confirm the deletion of this patient?</h5>
+                        <h5>Are you sure you want to delete this patient?</h5>
                     </div>
                     <div class="mb-3">
                         <p>
@@ -59,19 +61,22 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a id="confirmDeletion" href="" type="button" class="btn btn-danger">Delete</a>
+                <form id="confirmDeletionForm" method="post" action="">
+                    <button type="submit" class="btn btn-danger">
+                        Delete</>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
+    <script>
 document.addEventListener("DOMContentLoaded", function() {
     const deleteModal = document.getElementById('deleteModal');
     deleteModal.addEventListener('show.bs.modal', event => {
 
     const deleteButton = event.relatedTarget // Button that triggered the modal
     const modalPatientId = deleteModal.querySelector('.patient-id'); // get data-bs-uuid attribute
-    const confirmDeletionButton = deleteModal.querySelector('#confirmDeletion');
+    const confirmDeletionForm = deleteModal.querySelector('#confirmDeletionForm');
 
 
     // Extract info from data-bs-* attributes
@@ -79,9 +84,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // update modal data
     modalPatientId.textContent = patientId;
-    confirmDeletionButton.setAttribute('href', `/delete-patient/${patientId}`);
+    confirmDeletionForm.setAttribute('action', `/delete-patient/${patientId}`);
 
     })
 });
-</script>
+    </script>
 {% endblock %}

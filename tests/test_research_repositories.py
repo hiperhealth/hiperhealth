@@ -1,46 +1,5 @@
 """Tests for the patient repository."""
 
-import random
-import shutil
-
-from pathlib import Path
-
-import pytest
-
-from research.models.repositories import PatientRepository
-
-########### FIXTURES ###########
-
-
-@pytest.fixture
-def patient_repository():
-    """Temporary patient repository fixture."""
-    # patch DATA_PATH to test data path
-    TEST_DATA_PATH = Path(__file__).parent / 'data/patients'
-    PATIENTS_DATA_PATH = TEST_DATA_PATH / 'patients.json'
-    TEMP_DATA_PATH = TEST_DATA_PATH / 'temp_patients.json'
-
-    shutil.copyfile(PATIENTS_DATA_PATH, TEMP_DATA_PATH)
-
-    # patch DATA_PATH to test data path
-    PatientRepository.DATA_PATH = TEMP_DATA_PATH
-    temporary_repository = PatientRepository()
-
-    yield temporary_repository
-
-    # clean up, delete TEMP_DATA_PATH
-    TEMP_DATA_PATH.unlink()
-
-
-@pytest.fixture
-def patient_id(patient_repository):
-    """Patient ID fixture."""
-    patients = patient_repository.all()
-    return random.choice(patients)['meta']['uuid']
-
-
-########### TEST CASES ###########
-
 
 def test_all_patients(patient_repository):
     """Test repository to get all patients."""

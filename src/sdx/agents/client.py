@@ -23,7 +23,7 @@ from sdx.schema.clinical_outputs import LLMDiagnosis
 
 load_dotenv(Path(__file__).parents[3] / '.envs' / '.env')
 
-_MODEL_NAME = os.getenv('OPENAI_MODEL', 'o4-mini-2025-04-16')
+_MODEL_NAME = os.getenv('OPENAI_MODEL', 'o4-mini')
 _client = OpenAI(api_key=os.getenv('OPENAI_API_KEY', ''))
 
 _RAW_DIR = Path('data') / 'llm_raw'
