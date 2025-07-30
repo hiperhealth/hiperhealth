@@ -95,17 +95,6 @@ def _session_or_404(sid: str) -> Dict[str, Any]:
     return _SESSIONS[sid]
 
 
-@app.get('/start', response_class=HTMLResponse)
-def start() -> HTMLResponse:
-    """Kick-off page — redirects immediately to demographics step."""
-    sess_id = str(uuid.uuid4())
-    _SESSIONS[sess_id] = {
-        'patient': {},
-        'meta': {'uuid': sess_id, 'lang': 'en'},
-    }  # Default to English
-    return RedirectResponse(f'/demographics?sid={sess_id}', status_code=302)
-
-
 @app.get('/demographics', response_class=HTMLResponse)
 def demographics(request: Request, sid: str) -> HTMLResponse:
     """Render demographics form."""
