@@ -5,6 +5,9 @@
         <!-- short model narrative -->
         <p class="alert alert-info">{{ summary }}</p>
         <form id="exams-form" method="post">
+            <div class="text-danger mb-2">
+                <span id="show-errors"></span>
+            </div>
             <input type="hidden" name="sid" value="{{ sid }}" />
             <!-- checkbox list of suggested exams -->
             {% for option in options %}
@@ -84,7 +87,7 @@
                                 <div id="{{ option | replace(' ', '_') }}-safety">
                                     <div>
                                         <label for="safety" class="text-primary form-label pl-3">Safety</label>
-                                        <small class="text-secondary">(Evaluates the the suggested test safety.)</small>
+                                        <small class="text-secondary">(Evaluates the suggested test safety.)</small>
                                         <div id="{{ option | replace(' ', '_') }}-safety-error"></div>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -150,6 +153,22 @@ document.addEventListener("DOMContentLoaded", () => {
         validateBeforeSubmitting: true,
     });
 
+    // check if at least one diagnosis is selected
+    const atLeastOneDiagnosisSelected = () => {
+        const selectedDiagnoses = document.querySelectorAll('input[type="checkbox"][name="selected"]');
+        const isSelected = [...selectedDiagnoses].some(checkbox => checkbox.checked);
+        const errorMsgElement = document.getElementById('show-errors');
+
+        if (isSelected) {
+            // clean error msg in case it was previously shown
+            errorMsgElement.innerText = '';
+            return true;
+        } else {
+           // show error message
+           errorMsgElement.innerText = 'Please select at least one suggested exam/test';
+           return false;        }
+    };
+
     // initialize array of diagnosis checkboxes
     // as an object with element (DOM) and diagnosis (name)
     const examsCheckboxes = EXAMS.map((diag, idx) => ({
@@ -210,13 +229,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 validator.removeField(selectors.coherence);
                 validator.removeGroup(selectors.safety);
             }
-
+            // everytime a checkbox changes, check if at least one diagnosis is selected
+            atLeastOneDiagnosisSelected();
         })
     });
 
     validator.onSuccess((event) => {
-        console.debug('Validation passes and form submitted', event);
-        event.target.submit();
+        event.preventDefault();
+
+        if (atLeastOneDiagnosisSelected()) {
+            // final check to validate if at least one diagnosis is selected
+            console.debug('Validation passes and form submitted');
+            event.target.submit();
+        }
+
+        console.debug('Form not valid');
     });
 
     validator.onFail((fields) => {
