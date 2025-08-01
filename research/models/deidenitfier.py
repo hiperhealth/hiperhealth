@@ -1,6 +1,6 @@
 """A module for PII detection and de-identification."""
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from presidio_analyzer import AnalyzerEngine, Pattern, PatternRecognizer
 from presidio_anonymizer import AnonymizerEngine
@@ -123,3 +123,34 @@ class Deidentifier:
             operators=operators.get(strategy),
         )
         return anonymized_result.text
+
+
+def deidentify_patient_record(
+    record: Dict, deidentifier: Deidentifier
+) -> Dict:
+    """Recursively find and de-identify string values in a patient record.
+
+    Args:
+        record: The patient data dictionary.
+        deidentifier: An instance of the Deidentifier class.
+    """
+    # Define which keys contain free-text that needs to be scanned
+    keys_to_deidentify = {
+        'symptoms',
+        'physical_activity',
+        'mental_exercises',
+        'mental_health',
+        'previous_tests',
+        'summary',
+        'comments',
+    }
+
+    for key, value in record.items():
+        if isinstance(value, dict):
+            # If the value is a dictionary, recurse into it
+            deidentify_patient_record(value, deidentifier)
+        elif isinstance(value, str) and key in keys_to_deidentify:
+            # If it's a string and its key is in our target list, de-identify
+            record[key] = deidentifier.deidentify(value)
+
+    return record

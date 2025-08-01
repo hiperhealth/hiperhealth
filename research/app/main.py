@@ -21,17 +21,22 @@ from __future__ import annotations
 import uuid
 
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List
 
 import anyio
 
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sdx.agents.diagnostics import core as diag  # OpenAI helpers
 
+from research.models.deidenitfier import (
+    Deidentifier,
+    deidentify_patient_record,
+)
 from research.models.repositories import PatientRepository
 
 APP_DIR = Path(__file__).parent
@@ -39,6 +44,12 @@ TEMPLATES = Environment(
     loader=FileSystemLoader(APP_DIR / 'templates'),
     autoescape=select_autoescape(),
 )
+
+
+@lru_cache(maxsize=None)
+def get_deidentifier() -> Deidentifier:
+    """Initialize and return a singleton instance of the Deidentifier."""
+    return Deidentifier()
 
 
 _STATIC = StaticFiles(directory=APP_DIR / 'static')
@@ -300,7 +311,10 @@ def exams(request: Request, sid: str) -> HTMLResponse:
 
 @app.post('/exams')
 def exams_post(
-    request: Request, sid: str, selected: List[str] = Form(...)
+    request: Request,
+    sid: str,
+    selected: List[str] = Form(...),
+    deidentifier: Deidentifier = Depends(get_deidentifier),
 ) -> RedirectResponse:
     """Handle exams POST request."""
     sess = _session_or_404(sid)
@@ -336,8 +350,11 @@ def exams_post(
         # add diagnosis evaluation to record
         sess['evaluations']['ai_exam'][exam] = evaluation
 
+    # De-identify all relevant fields in the session data before saving.
+    deidentified_session = deidentify_patient_record(sess.copy(), deidentifier)
+
     repo = PatientRepository()
-    repo.create(sess)
+    repo.create(deidentified_session)
     return RedirectResponse(f'/done?sid={sid}', status_code=303)
 
 
