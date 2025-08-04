@@ -149,6 +149,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for diagnosis in patient.selected_diagnoses %}
+                                        {% if diagnosis not in patient.ai_diag.options %}
+                                            <tr class="table-success">
+                                                <th class="text-center text-success" scope="row">
+                                                    <i class="bi bi-check-square"></i>
+                                                </th>
+                                                <td>
+                                                    {{ diagnosis }} <small class="fs-6 text-secondary">(Diagnosis added by user)</small>
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
                                     {% for diagnosis in patient.ai_diag.options %}
                                         {% if diagnosis in patient.selected_diagnoses %}
                                             <tr class="table-success">
@@ -168,11 +185,11 @@
                                                     <i class="bi bi-x-lg"></i>
                                                 </th>
                                                 <td>{{ diagnosis }}</td>
-                                                <td class="text-secondary">N/A</td>
-                                                <td class="text-secondary">N/A</td>
-                                                <td class="text-secondary">N/A</td>
-                                                <td class="text-secondary">N/A</td>
-                                                <td class="text-secondary">N/A</td>
+                                                <td class="text-secondary"></td>
+                                                <td class="text-secondary"></td>
+                                                <td class="text-secondary"></td>
+                                                <td class="text-secondary"></td>
+                                                <td class="text-secondary"></td>
                                             </tr>
                                         {% endif %}
                                     {% endfor %}
@@ -212,6 +229,24 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for exam in patient.selected_exams %}
+                                    {% if exam not in patient.ai_exam.options %}
+                                        <tr class="table-success">
+                                            <th class="text-center text-success" scope="row">
+                                                <i class="bi bi-check-square"></i>
+                                            </th>
+                                            <td>
+                                                {{ exam }} <small class="fs-6 text-secondary">(Exam added by user)</small>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
                                 {% for exam in patient.ai_exam.options %}
                                     {% if exam in patient.selected_exams %}
                                         <tr class="table-success">
@@ -232,12 +267,12 @@
                                                 <i class="bi bi-x-lg"></i>
                                             </th>
                                             <td>{{ exam }}</td>
-                                            <td class="text-secondary">N/A</td>
-                                            <td class="text-secondary">N/A</td>
-                                            <td class="text-secondary">N/A</td>
-                                            <td class="text-secondary">N/A</td>
-                                            <td class="text-secondary">N/A</td>
-                                            <td class="text-secondary">N/A</td>
+                                            <td class="text-secondary"></td>
+                                            <td class="text-secondary"></td>
+                                            <td class="text-secondary"></td>
+                                            <td class="text-secondary"></td>
+                                            <td class="text-secondary"></td>
+                                            <td class="text-secondary"></td>
                                         </tr>
                                     {% endif %}
                                 {% endfor %}
