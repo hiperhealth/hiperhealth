@@ -22,7 +22,7 @@ import uuid
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import anyio
 
@@ -233,7 +233,10 @@ def diagnosis(request: Request, sid: str) -> HTMLResponse:
 
 @app.post('/diagnosis')
 def diagnosis_post(
-    request: Request, sid: str, selected: List[str] = Form(...)
+    request: Request,
+    sid: str,
+    selected: Optional[List[str]] = Form([]),
+    custom: Optional[List[str]] = Form([]),
 ) -> RedirectResponse:
     """Handle diagnosis POST request."""
     sess = _session_or_404(sid)
@@ -244,28 +247,32 @@ def diagnosis_post(
     # get form data from request from async to sync
     form = anyio.run(request.form)
 
-    # get evaluation only from selected diagnoses
-    for diagnosis in selected:
-        evaluation = {
-            'ratings': {
-                'accuracy': None,
-                'relevance': None,
-                'usefulness': None,
-                'coherence': None,
-                'comments': None,
+    if selected:
+        # get evaluation only from selected diagnoses
+        for diagnosis in selected:
+            evaluation = {
+                'ratings': {
+                    'accuracy': None,
+                    'relevance': None,
+                    'usefulness': None,
+                    'coherence': None,
+                    'comments': None,
+                }
             }
-        }
 
-        # get form values for selected diagnosis
-        for key, value in form.items():
-            if key.startswith(diagnosis):
-                criteria = key.split('--')[1]
-                evaluation['ratings'][criteria] = (
-                    int(value) if value.isdigit() else value
-                )
+            # get form values for selected diagnosis
+            for key, value in form.items():
+                if key.startswith(diagnosis):
+                    criteria = key.split('--')[1]
+                    evaluation['ratings'][criteria] = (
+                        int(value) if value.isdigit() else value
+                    )
 
-        # add diagnosis evaluation to record
-        sess['evaluations']['ai_diag'][diagnosis] = evaluation
+            # add diagnosis evaluation to record
+            sess['evaluations']['ai_diag'][diagnosis] = evaluation
+
+    if custom:
+        sess['selected_diagnoses'].extend(custom)
 
     return RedirectResponse(f'/exams?sid={sid}', status_code=303)
 
@@ -289,7 +296,10 @@ def exams(request: Request, sid: str) -> HTMLResponse:
 
 @app.post('/exams')
 def exams_post(
-    request: Request, sid: str, selected: List[str] = Form(...)
+    request: Request,
+    sid: str,
+    selected: Optional[List[str]] = Form([]),
+    custom: Optional[List[str]] = Form([]),
 ) -> RedirectResponse:
     """Handle exams POST request."""
     sess = _session_or_404(sid)
@@ -301,29 +311,33 @@ def exams_post(
     # get form data from request from async to sync
     form = anyio.run(request.form)
 
-    # get evaluation only from selected exams
-    for exam in selected:
-        evaluation = {
-            'ratings': {
-                'accuracy': None,
-                'relevance': None,
-                'usefulness': None,
-                'coherence': None,
-                'safety': None,
-                'comments': None,
+    if selected:
+        # get evaluation only from selected exams
+        for exam in selected:
+            evaluation = {
+                'ratings': {
+                    'accuracy': None,
+                    'relevance': None,
+                    'usefulness': None,
+                    'coherence': None,
+                    'safety': None,
+                    'comments': None,
+                }
             }
-        }
 
-        # get form values for selected exam
-        for key, value in form.items():
-            if key.startswith(exam):
-                criteria = key.split('--')[1]
-                evaluation['ratings'][criteria] = (
-                    int(value) if value.isdigit() else value
-                )
+            # get form values for selected exam
+            for key, value in form.items():
+                if key.startswith(exam):
+                    criteria = key.split('--')[1]
+                    evaluation['ratings'][criteria] = (
+                        int(value) if value.isdigit() else value
+                    )
 
-        # add diagnosis evaluation to record
-        sess['evaluations']['ai_exam'][exam] = evaluation
+            # add diagnosis evaluation to record
+            sess['evaluations']['ai_exam'][exam] = evaluation
+
+    if custom:
+        sess['selected_exams'].extend(custom)
 
     repo = PatientRepository()
     repo.create(sess)
