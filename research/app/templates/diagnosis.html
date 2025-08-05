@@ -3,7 +3,17 @@
     <div class="wizard-step mx-auto">
         <h2 class="mb-4">AI Differential Diagnosis</h2>
         <p class="alert alert-info">{{ summary }}</p>
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#addDiagnosisModal">
+            <i class="fs-5 bi bi-clipboard-plus"></i>
+            Add Diagnosis
+        </button>
         <form id="diagnosis-form" method="post">
+            <div class="text-danger mb-2">
+                <span id="show-errors"></span>
+            </div>
             <input type="hidden" name="sid" value="{{ sid }}" />
             {% for option in options %}
                 <div id="{{ option | replace(' ', '_') }}_diag" class="card mb-2 rounded">
@@ -92,9 +102,46 @@
                     </div>
                 </div>
             {% endfor %}
-            <button class="btn btn-primary my-3">Next</button>
+            <button id="diagnosis-next" class="btn btn-primary my-3">Next</button>
         </form>
     </div>
+    <!-- Modal Add Custom Diagnosis -->
+    <div class="modal fade"
+         id="addDiagnosisModal"
+         tabindex="-1"
+         aria-labelledby="addDiagnosisModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addDiagnosisModalLabel">Add Diagnosis</h1>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary">
+                        The model generates diagnostic suggestions based on the given input data. However, these outputs may not encompass all clinically plausible hypotheses. To improve diagnostic coverage, users may manually insert additional candidate conditions supported by their clinical evaluation.
+                    </p>
+                    <div>
+                        <label class="form-label" for="custom-diagnosis">Diagnosis</label>
+                        <input class="form-control"
+                               type="text"
+                               name="custom-diagnosis"
+                               id="custom-diagnosis" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button disabled id="add-custom-diagnosis-button" class="btn btn-success">Add Diagnosis</button>
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal add custom diagnosis -->
 {% endblock %}
 {% block scripts %}
     <script>
@@ -108,6 +155,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const validator = new JustValidate('#diagnosis-form', {
         validateBeforeSubmitting: true,
     });
+
+    // check if at least one diagnosis is selected
+    const atLeastOneOptionIsSelected = () => {
+        const selectedOptions = document.querySelectorAll('input[type="checkbox"][name="selected"]');
+        const customOptions = document.querySelectorAll('input[type="checkbox"][name="custom"]');
+
+
+        if (customOptions.length > 0) { return true;}
+
+        const isSelected = [...selectedOptions].some(checkbox => checkbox.checked);
+        const errorMsgElement = document.getElementById('show-errors');
+
+        if (isSelected) {
+            // clean error msg in case it was previously shown
+            errorMsgElement.innerText = '';
+            return true;
+        } else {
+            // show error message
+           errorMsgElement.innerText = 'Please select at least one suggested diagnosis';
+           return false;        }
+    };
 
     // initialize array of diagnosis checkboxes
     // as an object with element (DOM) and diagnosis (name)
@@ -163,17 +231,75 @@ document.addEventListener("DOMContentLoaded", () => {
                 validator.removeField(selectors.coherence);
             }
 
+            // everytime a checkbox changes, check if at least one diagnosis is selected
+            atLeastOneOptionIsSelected();
         })
     });
 
+
     validator.onSuccess((event) => {
-        console.debug('Validation passes and form submitted', event);
-        event.target.submit();
+        event.preventDefault();
+
+        if (atLeastOneOptionIsSelected()) {
+            // final check to validate if at least one diagnosis is selected
+            console.debug('Validation passes and form submitted');
+            event.target.submit();
+        }
+
+        console.debug('Form not valid');
     });
 
     validator.onFail((fields) => {
         console.debug('Validation failed:', fields);
     });
+
+
+    // add user custom diagnosis
+    const createCustomOptionCard = ({diagnosis}) => {
+        const diagnosisID = diagnosis.replaceAll(' ', '-');
+
+        const template = `
+            <div id="${diagnosisID}" class="card mb-2 rounded">
+                <div class="card-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                    <div class="form-check pe-none">
+                        <input class="form-check-input" checked type="checkbox" name="custom" value="${diagnosis}" id="custom-diagnosis" />
+                        <label class="form-check-label" for="custom-diagnosis">${diagnosis}</label>
+                    </div>
+                    <div>
+                        <button onclick="this.closest('#${diagnosisID}').remove();" class="btn btn-sm btn-outline-danger" type="button">Delete</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = template.trim();
+        const newNode = tempDiv.firstChild;
+
+        const form = document.getElementById('diagnosis-form');
+        const button = form.querySelector('#diagnosis-next');
+        form.insertBefore(newNode, button);
+    }
+
+    // Handle Modal Add Diagnosis
+
+    const customDiagnosisInput = document.getElementById('custom-diagnosis');
+    const addCustomDiagnosisButton = document.getElementById('add-custom-diagnosis-button');
+
+    customDiagnosisInput.addEventListener('keyup', (event) => {
+        addCustomDiagnosisButton.disabled = event.target.value.trim().length === 0;
+    });
+
+    addCustomDiagnosisButton.addEventListener('click', () => {
+        createCustomOptionCard({diagnosis: customDiagnosisInput.value});
+        customDiagnosisInput.value = '';
+        addCustomDiagnosisButton.disabled = true;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addDiagnosisModal'));
+
+        modal.hide();
+    })
 });
     </script>
 {% endblock %}

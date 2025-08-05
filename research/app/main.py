@@ -23,7 +23,7 @@ import uuid
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import anyio
 
@@ -104,17 +104,6 @@ def _session_or_404(sid: str) -> Dict[str, Any]:
     if sid not in _SESSIONS:
         raise HTTPException(status_code=404, detail='Session expired')
     return _SESSIONS[sid]
-
-
-@app.get('/start', response_class=HTMLResponse)
-def start() -> HTMLResponse:
-    """Kick-off page — redirects immediately to demographics step."""
-    sess_id = str(uuid.uuid4())
-    _SESSIONS[sess_id] = {
-        'patient': {},
-        'meta': {'uuid': sess_id, 'lang': 'en'},
-    }  # Default to English
-    return RedirectResponse(f'/demographics?sid={sess_id}', status_code=302)
 
 
 @app.get('/demographics', response_class=HTMLResponse)
@@ -255,7 +244,10 @@ def diagnosis(request: Request, sid: str) -> HTMLResponse:
 
 @app.post('/diagnosis')
 def diagnosis_post(
-    request: Request, sid: str, selected: List[str] = Form(...)
+    request: Request,
+    sid: str,
+    selected: Optional[List[str]] = Form([]),
+    custom: Optional[List[str]] = Form([]),
 ) -> RedirectResponse:
     """Handle diagnosis POST request."""
     sess = _session_or_404(sid)
@@ -266,28 +258,32 @@ def diagnosis_post(
     # get form data from request from async to sync
     form = anyio.run(request.form)
 
-    # get evaluation only from selected diagnoses
-    for diagnosis in selected:
-        evaluation = {
-            'ratings': {
-                'accuracy': None,
-                'relevance': None,
-                'usefulness': None,
-                'coherence': None,
-                'comments': None,
+    if selected:
+        # get evaluation only from selected diagnoses
+        for diagnosis in selected:
+            evaluation = {
+                'ratings': {
+                    'accuracy': None,
+                    'relevance': None,
+                    'usefulness': None,
+                    'coherence': None,
+                    'comments': None,
+                }
             }
-        }
 
-        # get form values for selected diagnosis
-        for key, value in form.items():
-            if key.startswith(diagnosis):
-                criteria = key.split('--')[1]
-                evaluation['ratings'][criteria] = (
-                    int(value) if value.isdigit() else value
-                )
+            # get form values for selected diagnosis
+            for key, value in form.items():
+                if key.startswith(diagnosis):
+                    criteria = key.split('--')[1]
+                    evaluation['ratings'][criteria] = (
+                        int(value) if value.isdigit() else value
+                    )
 
-        # add diagnosis evaluation to record
-        sess['evaluations']['ai_diag'][diagnosis] = evaluation
+            # add diagnosis evaluation to record
+            sess['evaluations']['ai_diag'][diagnosis] = evaluation
+
+    if custom:
+        sess['selected_diagnoses'].extend(custom)
 
     return RedirectResponse(f'/exams?sid={sid}', status_code=303)
 
@@ -313,8 +309,9 @@ def exams(request: Request, sid: str) -> HTMLResponse:
 def exams_post(
     request: Request,
     sid: str,
-    selected: List[str] = Form(...),
     deidentifier: Deidentifier = Depends(get_deidentifier),
+    selected: Optional[List[str]] = Form([]),
+    custom: Optional[List[str]] = Form([]),
 ) -> RedirectResponse:
     """Handle exams POST request."""
     sess = _session_or_404(sid)
@@ -326,29 +323,33 @@ def exams_post(
     # get form data from request from async to sync
     form = anyio.run(request.form)
 
-    # get evaluation only from selected exams
-    for exam in selected:
-        evaluation = {
-            'ratings': {
-                'accuracy': None,
-                'relevance': None,
-                'usefulness': None,
-                'coherence': None,
-                'safety': None,
-                'comments': None,
+    if selected:
+        # get evaluation only from selected exams
+        for exam in selected:
+            evaluation = {
+                'ratings': {
+                    'accuracy': None,
+                    'relevance': None,
+                    'usefulness': None,
+                    'coherence': None,
+                    'safety': None,
+                    'comments': None,
+                }
             }
-        }
 
-        # get form values for selected exam
-        for key, value in form.items():
-            if key.startswith(exam):
-                criteria = key.split('--')[1]
-                evaluation['ratings'][criteria] = (
-                    int(value) if value.isdigit() else value
-                )
+            # get form values for selected exam
+            for key, value in form.items():
+                if key.startswith(exam):
+                    criteria = key.split('--')[1]
+                    evaluation['ratings'][criteria] = (
+                        int(value) if value.isdigit() else value
+                    )
 
-        # add diagnosis evaluation to record
-        sess['evaluations']['ai_exam'][exam] = evaluation
+            # add diagnosis evaluation to record
+            sess['evaluations']['ai_exam'][exam] = evaluation
+
+    if custom:
+        sess['selected_exams'].extend(custom)
 
     # De-identify all relevant fields in the session data before saving.
     deidentified_session = deidentify_patient_record(sess.copy(), deidentifier)

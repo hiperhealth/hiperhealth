@@ -4,7 +4,17 @@
         <h2 class="mb-4">AI Exam&nbsp;/ Test Suggestions</h2>
         <!-- short model narrative -->
         <p class="alert alert-info">{{ summary }}</p>
+        <button type="button"
+                class="btn btn-outline-primary mb-3"
+                data-bs-toggle="modal"
+                data-bs-target="#addExamModal">
+            <i class="fs-5 bi bi-clipboard-plus"></i>
+            Add Exam/Test
+        </button>
         <form id="exams-form" method="post">
+            <div class="text-danger mb-2">
+                <span id="show-errors"></span>
+            </div>
             <input type="hidden" name="sid" value="{{ sid }}" />
             <!-- checkbox list of suggested exams -->
             {% for option in options %}
@@ -84,7 +94,7 @@
                                 <div id="{{ option | replace(' ', '_') }}-safety">
                                     <div>
                                         <label for="safety" class="text-primary form-label pl-3">Safety</label>
-                                        <small class="text-secondary">(Evaluates the the suggested test safety.)</small>
+                                        <small class="text-secondary">(Evaluates the suggested test safety.)</small>
                                         <div id="{{ option | replace(' ', '_') }}-safety-error"></div>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -133,9 +143,43 @@
                     </div>
                 </div>
             {% endfor %}
-            <button class="btn btn-primary my-3">Finish</button>
+            <button id="exams-next" class="btn btn-primary my-3">Finish</button>
         </form>
     </div>
+    <!-- Modal Add Custom Diagnosis -->
+    <div class="modal fade"
+         id="addExamModal"
+         tabindex="-1"
+         aria-labelledby="addExamModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addExamModalLabel">Add Exam</h1>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary">
+                        The model generates exams/tests suggestions based on the given input data. However, these outputs may not encompass all clinically plausible hypotheses. To improve diagnostic coverage, users may manually insert additional candidate conditions supported by their clinical evaluation.
+                    </p>
+                    <div>
+                        <label class="form-label" for="custom-diagnosis">Exam/Test</label>
+                        <input class="form-control" type="text" name="custom-exam" id="custom-exam" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button disabled id="add-custom-exam-button" class="btn btn-success">Add Exam</button>
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal add custom diagnosis -->
 {% endblock %}
 {% block scripts %}
     <script>
@@ -149,6 +193,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const validator = new JustValidate('#exams-form', {
         validateBeforeSubmitting: true,
     });
+
+    // check if at least one diagnosis is selected
+    const atLeastOneOptionIsSelected = () => {
+        const selectedOptions = document.querySelectorAll('input[type="checkbox"][name="selected"]');
+        const customOptions = document.querySelectorAll('input[type="checkbox"][name="custom"]');
+
+
+        if (customOptions.length > 0) { return true;}
+
+        const isSelected = [...selectedOptions].some(checkbox => checkbox.checked);
+        const errorMsgElement = document.getElementById('show-errors');
+
+        if (isSelected) {
+            // clean error msg in case it was previously shown
+            errorMsgElement.innerText = '';
+            return true;
+        } else {
+           // show error message
+           errorMsgElement.innerText = 'Please select at least one suggested exam/test';
+           return false;        }
+    };
 
     // initialize array of diagnosis checkboxes
     // as an object with element (DOM) and diagnosis (name)
@@ -210,18 +275,74 @@ document.addEventListener("DOMContentLoaded", () => {
                 validator.removeField(selectors.coherence);
                 validator.removeGroup(selectors.safety);
             }
-
+            // everytime a checkbox changes, check if at least one diagnosis is selected
+            atLeastOneOptionIsSelected();
         })
     });
 
     validator.onSuccess((event) => {
-        console.debug('Validation passes and form submitted', event);
-        event.target.submit();
+        event.preventDefault();
+
+        if (atLeastOneOptionIsSelected()) {
+            // final check to validate if at least one diagnosis is selected
+            console.debug('Validation passes and form submitted');
+            event.target.submit();
+        }
+
+        console.debug('Form not valid');
     });
 
     validator.onFail((fields) => {
         console.debug('Validation failed:', fields);
     });
+
+
+    // add user custom diagnosis
+    const createCustomOptionCard = ({exam}) => {
+        const examID = exam.replaceAll(' ', '-');
+
+        const template = `
+            <div id="${examID}" class="card mb-2 rounded">
+                <div class="card-header">
+                    <div class="d-flex align-items-center justify-content-between">
+                    <div class="form-check pe-none">
+                        <input class="form-check-input" checked type="checkbox" name="custom" value="${exam}" id="custom-exam" />
+                        <label class="form-check-label" for="custom-exam">${exam}</label>
+                    </div>
+                    <div>
+                        <button onclick="this.closest('#${examID}').remove();" class="btn btn-sm btn-outline-danger" type="button">Delete</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = template.trim();
+        const newNode = tempDiv.firstChild;
+
+        const form = document.getElementById('exams-form');
+        const button = form.querySelector('#exams-next');
+        form.insertBefore(newNode, button);
+    }
+
+    // Handle Modal Add Diagnosis
+
+    const customExamInput = document.getElementById('custom-exam');
+    const addCustomExamButton = document.getElementById('add-custom-exam-button');
+
+    customExamInput.addEventListener('keyup', (event) => {
+        addCustomExamButton.disabled = event.target.value.trim().length === 0;
+    });
+
+    addCustomExamButton.addEventListener('click', () => {
+        createCustomOptionCard({exam: customExamInput.value});
+        customExamInput.value = '';
+        addCustomExamButton.disabled = true;
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addExamModal'));
+
+        modal.hide();
+    })
 });
     </script>
 {% endblock %}
