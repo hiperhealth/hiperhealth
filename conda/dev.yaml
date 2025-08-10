@@ -8,6 +8,7 @@ dependencies:
   - poetry
   - nodejs # used by semantic-release
   - tesseract
+  - libmagic
   - pip:
       # distlib issue
       - paginate==0.5.6

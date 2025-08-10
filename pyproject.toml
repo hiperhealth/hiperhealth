@@ -35,6 +35,7 @@ sqlmodel = ">=0.0.24"
 questionary = "^2.1.0"
 pillow = "^11.3.0"
 pytesseract = "^0.3.13"
+python-magic = "^0.4.27"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.2"
