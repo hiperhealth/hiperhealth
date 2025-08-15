@@ -26,11 +26,15 @@ from typing import Any, Dict, List, Optional
 
 import anyio
 
-from fastapi import FastAPI, Form, HTTPException, Request
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sdx.agents.diagnostics import core as diag  # OpenAI helpers
+from sdx.agents.extraction.wearable import (
+    WearableDataExtractorError,
+    WearableDataFileExtractor,
+)
 
 from research.models.repositories import PatientRepository
 
@@ -211,6 +215,46 @@ def tests_post(sid: str, previous_tests: str = Form(...)) -> RedirectResponse:
     """Handle tests POST request."""
     sess = _session_or_404(sid)
     sess['patient']['previous_tests'] = previous_tests
+    return RedirectResponse(f'/wearable?sid={sid}', status_code=303)
+
+
+@app.get('/wearable', response_class=HTMLResponse)
+def wearable(sid: str) -> HTMLResponse:
+    """Handle wearable GET request."""
+    return _render('wearable.html', sid=sid)
+
+
+@app.post('/wearable', response_class=HTMLResponse)
+def wearable_post(sid: str, file: UploadFile = File(...)) -> HTMLResponse:
+    """Handle wearable data file upload POST request."""
+    # sess = _session_or_404(sid)
+    sess = _session_or_404(sid)
+    context = {'sid': sid}
+    extractor = WearableDataFileExtractor()
+
+    # check if file exists before trying to use it
+    if file.size > 0:
+        # uses sdx to check if file is supported
+        if extractor.is_supported(file.file):
+            # there's a possibility of having a malformatted/corrupted file
+            # even if the file is supported so we should try to process it
+            try:
+                wearable_data = extractor.extract_wearable_data(file.file)
+                sess['wearable_data'] = wearable_data
+                return RedirectResponse(
+                    f'/diagnosis?sid={sid}', status_code=303
+                )
+            except WearableDataExtractorError as e:
+                # if we catch an error, we should show the user the error
+                # by adding it to context
+                context['error'] = str(e)
+                return _render('wearable.html', **context)
+        else:
+            # in this case the file is not supported
+            context['error'] = 'File is not supported.'
+            return _render('wearable.html', **context)
+
+    # if no file was uploaded, just continue to the next step
     return RedirectResponse(f'/diagnosis?sid={sid}', status_code=303)
 
 

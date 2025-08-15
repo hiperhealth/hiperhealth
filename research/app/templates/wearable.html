@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="wizard-step mx-auto">
+        <h2 class="my-4">Wearable Data</h2>
+        <form id="wearable-form" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="sid" value="{{ sid }}" />
+            <p>
+                Patient's wearable device data can be uploaded below. This information will be used for both current and future analysis, helping us gain a deeper understanding of the patient's condition and generate more meaningful insights.
+            </p>
+            <div class="mb-3">
+                <div class="mb-3 d-flex fs-1 justify-content-between">
+                    <i class="bi bi-smartwatch"></i>
+                    <i class="bi bi-lightning-fill"></i>
+                    <i class="bi bi-person-walking"></i>
+                    <i class="bi bi-heart-pulse"></i>
+                    <i class="bi bi-bicycle"></i>
+                    <i class="bi bi-person-arms-up"></i>
+                </div>
+                <span class="text-danger">
+                    {% if error %}{{ error }}{% endif %}
+                </span>
+                <label class="text-secondary my-1" for="formFile" class="form-label">
+                    Please, select a csv or json file containing the patient's wearable device data
+                </label>
+                <input id="file"
+                       class="form-control"
+                       name="file"
+                       type="file"
+                       accept=".json,.csv" />
+            </div>
+            {% if wearable_data %}
+                <p class="my-3 text-secondary">
+                    {{ wearable_data | length }} observation
+                    {% if wearable_data | length != 1 %}s{% endif %}
+                    loaded
+                </p>
+            {% endif %}
+            <button class="btn btn-primary">Next</button>
+        </form>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+// when document is ready
+document.addEventListener("DOMContentLoaded", () => {
+
+    // initialize just-validate instance
+    const validator = new JustValidate('#wearable-form', {
+        validateBeforeSubmitting: true,
+    });
+
+    validator.addField('#file', [
+        {
+            rule: 'required',
+            value: false,
+        },
+        {
+            rule: 'maxFilesCount',
+            value: 1,
+            errorMessage: 'Only one file can be upload. Please select only one file.',
+        },
+        {
+            rule: 'files',
+            value: {
+                files: {
+                    extensions: ['csv', 'json'],
+                }
+            },
+            errorMessage: 'Invalid file type, please select a .csv or .json file.',
+        }
+    ]);
+
+
+    validator.onSuccess((event) => {
+        console.debug("success!!")
+        event.target.submit();
+    });
+
+    validator.onFail((fields) => {
+        console.debug('Validation failed:', fields);
+    });
+
+});
+    </script>
+{% endblock %}
