@@ -7,6 +7,7 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-json
+        exclude: ^tests/data/wearable/.*\.json$
       - id: check-toml
       - id: check-xml
       - id: debug-statements
