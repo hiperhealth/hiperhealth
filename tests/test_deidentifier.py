@@ -2,7 +2,7 @@
 
 import pytest
 
-from research.models.deidenitfier import Deidentifier
+from sdx.privacy.deidenitfier import Deidentifier
 
 PII_TEST_CASES = [
     ('T1_SIMPLE_EMAIL_NAME', 'Contact Jane Doe at jane.d@example.com.', True),

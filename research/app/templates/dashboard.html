@@ -2,91 +2,103 @@
 {% block content %}
     <h2 class="my-4">{{ title }}</h2>
     <a href="/start" class="btn btn-outline-primary mb-3"><i class="bi bi-person-plus"></i> Add Patient</a>
-    {% if patients|length > 0 %}
-        <div class="list-group"></div>
-        <!-- list-group -->
-        {% for patient in patients %}
-            <div class="list-group-item list-group-item-action border border-2 rounded p-2 mb-2 w-75">
-                <a href="/patient/{{ patient.meta.uuid }}">
+    {# Check if the 'patients_with_status' list has items #}
+    {% if patients_with_status|length > 0 %}
+        <div class="list-group w-75">
+            {# 1. Loop over the correct variable: 'patients_with_status' #}
+            {% for item in patients_with_status %}
+                <div class="list-group-item list-group-item-action border border-2 rounded p-2 mb-2">
                     <div class="d-flex flex-row justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-1 text-primary">Patient {{ patient.meta.uuid [0:8] }}</h5>
+                            {# 2. Use a different link depending on completion status #}
+                            {% if item.is_complete %}
+                                <a href="/patient/{{ item.record.meta.uuid }}"
+                                   class="text-decoration-none">
+                                    <h5 class="mb-1 text-primary">Patient {{ item.record.meta.uuid[:8] }}</h5>
+                                </a>
+                            {% else %}
+                                {# This link lets the user resume an incomplete consultation #}
+                                <a href="/consultation/{{ item.record.meta.uuid }}"
+                                   class="text-decoration-none"
+                                   title="Consultation in progress. Click to continue.">
+                                    <h5 class="mb-1 text-warning">
+                                        Patient {{ item.record.meta.uuid[:8] }} <i class="bi bi-exclamation-triangle-fill ms-2"></i>
+                                    </h5>
+                                </a>
+                            {% endif %}
                             <p class="mb-1">
-                                <span class="badge text-bg-secondary">{{ patient.patient.gender }}</span>
-                                <span class="badge text-bg-secondary">{{ patient.patient.age }} years</span>
+                                {# 3. Access patient data via 'item.record' #}
+                                {% if item.record.patient.gender %}
+                                    <span class="badge text-bg-secondary">{{ item.record.patient.gender }}</span>
+                                {% endif %}
+                                {% if item.record.patient.age %}
+                                    <span class="badge text-bg-secondary">{{ item.record.patient.age }} years</span>
+                                {% endif %}
                             </p>
                         </div>
-                    </a>
-                    <div>
-                        <button type="button"
-                                class="btn btn-sm btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                                data-bs-uuid="{{ patient.meta.uuid }}">
-                            <i class="bi bi-trash"></i> Delete
-                        </button>
+                        <div>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-bs-uuid="{{ item.record.meta.uuid }}">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
-    <!-- list-group end -->
-{% endif %}
-<!-- Modal Confirm Deletion -->
-<div class="modal fade"
-     id="deleteModal"
-     tabindex="-1"
-     aria-labelledby="deleteModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="deletaModalLabel">Confirm Deletion</h1>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <h5>Are you sure you want to delete this patient?</h5>
-                    </div>
-                    <div class="mb-3">
-                        <p>
-                            <span class="fw-bold">Patient ID</span>: <span class="patient-id"></span>
-                        </p>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form id="confirmDeletionForm" method="post" action="">
-                    <button type="submit" class="btn btn-danger">
-                        Delete</>
+            {% endfor %}
+        </div>
+    {% else %}
+        {# 4. Add a helpful message when there are no patients #}
+        <div class="alert alert-info w-75" role="alert">
+            No patient records found. Click "Add Patient" to start a new consultation.
+        </div>
+    {% endif %}
+    <div class="modal fade"
+         id="deleteModal"
+         tabindex="-1"
+         aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to permanently delete this patient record?</p>
+                    <p class="text-muted">
+                        <small>Patient ID: <span class="patient-id fw-bold"></span></small>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="confirmDeletionForm" method="post" action="">
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
     <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const deleteModal = document.getElementById('deleteModal');
-    deleteModal.addEventListener('show.bs.modal', event => {
+    document.addEventListener("DOMContentLoaded", function() {
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const patientId = button.getAttribute('data-bs-uuid');
 
-    const deleteButton = event.relatedTarget // Button that triggered the modal
-    const modalPatientId = deleteModal.querySelector('.patient-id'); // get data-bs-uuid attribute
-    const confirmDeletionForm = deleteModal.querySelector('#confirmDeletionForm');
+                const modalPatientIdSpan = deleteModal.querySelector('.patient-id');
+                const confirmDeletionForm = deleteModal.querySelector('#confirmDeletionForm');
 
-
-    // Extract info from data-bs-* attributes
-    const patientId = deleteButton.getAttribute('data-bs-uuid')
-
-    // update modal data
-    modalPatientId.textContent = patientId;
-    confirmDeletionForm.setAttribute('action', `/delete-patient/${patientId}`);
-
-    })
-});
+                modalPatientIdSpan.textContent = patientId;
+                confirmDeletionForm.setAttribute('action', `/delete-patient/${patientId}`);
+            });
+        }
+    });
     </script>
 {% endblock %}

@@ -1,8 +1,13 @@
 """A module for PII detection and de-identification."""
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
-from presidio_analyzer import AnalyzerEngine, Pattern, PatternRecognizer
+from presidio_analyzer import (
+    AnalyzerEngine,
+    Pattern,
+    PatternRecognizer,
+    RecognizerResult,
+)
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
@@ -10,10 +15,10 @@ from presidio_anonymizer.entities import OperatorConfig
 class Deidentifier:
     """A class for PII detection and de-identification using Presidio."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the Presidio Analyzer and Anonymizer engines."""
         self.analyzer = AnalyzerEngine()
-        self.anonymizer = AnonymizerEngine()
+        self.anonymizer = AnonymizerEngine()  # type: ignore[no-untyped-call]
 
     def add_custom_recognizer(
         self,
@@ -21,7 +26,7 @@ class Deidentifier:
         regex_pattern: str,
         score: float = 0.85,
         language: str = 'en',
-    ):
+    ) -> None:
         """Add a custom PII entity recognizer using a regular expression.
 
         If a recognizer for the same entity_name already exists, this method
@@ -51,7 +56,7 @@ class Deidentifier:
                 continue
 
             # Keep recognizers that don't match the name of the new one.
-            if rec.supported_entity != entity_name:
+            if entity_name not in rec.supported_entities:
                 recognizers_to_keep.append(rec)
 
         # Replace the registry's list with the filtered list.
@@ -72,7 +77,7 @@ class Deidentifier:
         text: str,
         entities: Optional[List[str]] = None,
         language: str = 'en',
-    ):
+    ) -> List[RecognizerResult]:
         """Analyze text to detect and locate PII entities."""
         return self.analyzer.analyze(
             text=text, entities=entities, language=language
@@ -119,7 +124,38 @@ class Deidentifier:
 
         anonymized_result = self.anonymizer.anonymize(
             text=text,
-            analyzer_results=analyzer_results,
+            analyzer_results=analyzer_results,  # type: ignore[arg-type]
             operators=operators.get(strategy),
         )
         return anonymized_result.text
+
+
+def deidentify_patient_record(
+    record: Dict[str, object], deidentifier: Deidentifier
+) -> Dict[str, object]:
+    """Recursively find and de-identify string values in a patient record.
+
+    Args:
+        record: The patient data dictionary.
+        deidentifier: An instance of the Deidentifier class.
+    """
+    # Define which keys contain free-text that needs to be scanned
+    keys_to_deidentify = {
+        'symptoms',
+        'physical_activity',
+        'mental_exercises',
+        'mental_health',
+        'previous_tests',
+        'summary',
+        'comments',
+    }
+
+    for key, value in record.items():
+        if isinstance(value, dict):
+            # If the value is a dictionary, recurse into it
+            deidentify_patient_record(value, deidentifier)
+        elif isinstance(value, str) and key in keys_to_deidentify:
+            # If it's a string and its key is in our target list, de-identify
+            record[key] = deidentifier.deidentify(value)
+
+    return record

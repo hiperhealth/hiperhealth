@@ -48,14 +48,15 @@ class RepositoryInterface(ABC):
 class PatientRepository(RepositoryInterface):
     """Implement the repository interface for Patient."""
 
-    DATA_PATH = (
-        Path(__file__).parent.parent / 'app/data/patients/patients.json'
-    )
+    # DATA_PATH = (
+    #     Path(__file__).parent.parent / 'app/data/patients/patients.json'
+    # )
 
     patients: list[Patient]
 
-    def __init__(self) -> None:
+    def __init__(self, data_path: Path) -> None:
         """Load patients from file."""
+        self.DATA_PATH = data_path
         self.DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
 
         if self.DATA_PATH.exists():
