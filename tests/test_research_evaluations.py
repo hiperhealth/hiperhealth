@@ -2,9 +2,14 @@
 
 import uuid
 
+from research.app.main import app, get_repository
+
 
 def test_diagnosis_post_evaluation_form(client, patient_repository):
     """Test the diagnosis evaluation form."""
+    # Override the app's dependency with the test repository
+    app.dependency_overrides[get_repository] = lambda: patient_repository
+
     patient_id = str(uuid.uuid4())
     patient_record = {
         'patient': {},
@@ -85,9 +90,15 @@ def test_diagnosis_post_evaluation_form(client, patient_repository):
     for diagnosis in not_selected:
         assert diagnosis not in patient['evaluations']['ai_diag']
 
+    # Clean up the override after the test
+    app.dependency_overrides.clear()
+
 
 def test_exams_post_evaluation_form(client, patient_repository):
     """Test the exams evaluation form."""
+    # Override the app's dependency with the test repository
+    app.dependency_overrides[get_repository] = lambda: patient_repository
+
     patient_id = str(uuid.uuid4())
     patient_record = {
         'patient': {},
@@ -167,3 +178,6 @@ def test_exams_post_evaluation_form(client, patient_repository):
     )
     for exam in not_selected:
         assert exam not in patient['evaluations']['ai_exam']
+
+    # Clean up the override after the test
+    app.dependency_overrides.clear()
