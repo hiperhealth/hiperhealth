@@ -75,21 +75,19 @@ def api_key_openai(env: dict[str, str | None]) -> str:
 @pytest.fixture
 def patient_repository():
     """Temporary patient repository fixture."""
-    # patch DATA_PATH to test data path
-    TEST_DATA_PATH = Path(__file__).parent / 'data/patients'
-    PATIENTS_DATA_PATH = TEST_DATA_PATH / 'patients.json'
-    TEMP_DATA_PATH = TEST_DATA_PATH / 'temp_patients.json'
+    # Setup a temporary data file for tests
+    test_data_dir = Path(__file__).parent / 'data' / 'patients'
+    original_data_path = test_data_dir / 'patients.json'
+    temp_data_path = test_data_dir / 'temp_patients.json'
 
-    shutil.copyfile(PATIENTS_DATA_PATH, TEMP_DATA_PATH)
+    shutil.copyfile(original_data_path, temp_data_path)
 
-    # patch DATA_PATH to test data path
-    PatientRepository.DATA_PATH = TEMP_DATA_PATH
-    temporary_repository = PatientRepository()
-
+    # Provide the repository instance with the correct path
+    temporary_repository = PatientRepository(data_path=temp_data_path)
     yield temporary_repository
 
-    # clean up, delete TEMP_DATA_PATH
-    TEMP_DATA_PATH.unlink()
+    # Teardown: remove the temporary file
+    temp_data_path.unlink()
 
 
 @pytest.fixture
