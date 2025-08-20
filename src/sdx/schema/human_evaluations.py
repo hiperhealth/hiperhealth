@@ -7,7 +7,7 @@ from typing import Dict, Literal, Optional
 
 from pydantic import BaseModel
 
-from sdx.schema.fhir import BaseLanguage
+from sdx.schema.fhirx import BaseLanguage
 
 
 class AIOutput(BaseLanguage, BaseModel):

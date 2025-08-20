@@ -25,9 +25,9 @@ from datetime import date, datetime
 from typing import Any, Dict
 
 import pytest
-import sdx.models.sqla.fhir as orm_models
+import sdx.models.sqla.fhirx as orm_models
 
-from sdx.models.sqla.fhir import Base
+from sdx.models.sqla.fhirx import Base
 from sqlalchemy import (
     JSON,
     Boolean,

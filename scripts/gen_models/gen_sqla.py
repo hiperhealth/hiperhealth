@@ -40,7 +40,7 @@ OUTPUT_PATH = (
     / 'sdx'
     / 'models'
     / 'sqla'
-    / 'fhir.py'
+    / 'fhirx.py'
 )
 
 

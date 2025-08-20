@@ -8,6 +8,19 @@ authors = [
 ]
 license = "BSD 3 Clause"
 requires-python = ">=3.9,<3.13"
+dependencies = [
+    "anamnesisai >=0.2.1",
+    "fhir.resources >=8.1.0",
+    # "rago >=0.14.3",  # requires python ">=3.11,<3.13"
+    "pypdf >=5.4.0",
+    "sqlalchemy >=2.0.41",
+    "atpublic >=6",
+    "sqlmodel >=0.0.24",
+    "questionary >=2.1.0",
+    "pillow >=11.3.0",
+    "pytesseract >=0.3.13",
+    "python-magic >=0.4.27",
+]
 
 [build-system]
 requires = ["poetry-core>=2", "poetry>=2"]
@@ -25,18 +38,6 @@ exclude = [
   ".env*",
 ]
 
-[tool.poetry.dependencies]
-anamnesisai = ">=0.2.1"
-rago = ">=0.13.0"
-pypdf = ">=5.4.0"
-sqlalchemy = "^2.0.41"
-atpublic = ">=6"
-sqlmodel = ">=0.0.24"
-questionary = "^2.1.0"
-pillow = "^11.3.0"
-pytesseract = "^0.3.13"
-python-magic = "^0.4.27"
-
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.3.2"
 pre-commit = ">=3.3.2"
@@ -44,7 +45,7 @@ ruff = ">=0.2.0"
 mypy = ">=1.5.0"
 bandit = ">=1.7.5"
 vulture = ">=2.7"
-ipython = "<8"
+ipython = ">=8"
 ipykernel = ">=6.0.0"
 Jinja2 = ">=3.1.2"
 mkdocs = ">=1.4.3"
@@ -56,7 +57,7 @@ mkdocs-material = ">=9.1.15"
 mkdocstrings = ">=0.21.2"
 mkdocstrings-python = ">= 1.1.2"
 mkdocs-gen-files = ">=0.5.0"
-makim = "1.20.0"
+makim = "1.27.0"
 # 'PosixPath' object has no attribute 'endswith'
 virtualenv = "<=20.25.1"
 fastapi = ">=0.115"
@@ -79,6 +80,13 @@ warn_unused_configs = true
 exclude = ["scripts/"]
 plugins = [
   "pydantic.mypy",
+]
+
+[[tool.mypy.overrides]]
+module = "sdx.schema.fhirx"
+disable_error_code = [
+  "name-defined",
+  "valid-type",
 ]
 
 [tool.pytest.ini_options]

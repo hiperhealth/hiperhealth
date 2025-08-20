@@ -9,7 +9,7 @@ from types import ModuleType
 from typing import Dict, Type
 
 from pydantic import BaseModel
-from sdx.schema.fhir import BaseLanguage
+from sdx.schema.fhirx import BaseLanguage
 
 # Package paths to scan for Pydantic models
 PACKAGE_PATHS = [
