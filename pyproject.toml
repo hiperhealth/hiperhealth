@@ -20,6 +20,7 @@ dependencies = [
     "pillow >=11.3.0",
     "pytesseract >=0.3.13",
     "python-magic >=0.4.27",
+    "presidio-analyzer (>=2.2.359,<3.0.0)",
 ]
 
 [build-system]
