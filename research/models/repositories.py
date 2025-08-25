@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-import json
-
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any, TypeVar
-from uuid import UUID
+from typing import Any, Dict, List, TypeVar
+
+from sdx.models.sqlmodel.fhirx import Patient
+from sqlmodel import Session, select
 
 T = TypeVar('T')
 # Patient type is an alias for now
 # TODO: swap for Pydantic in future update
 # once we have a better defined schema
-Patient = dict[str, Any]
+# Patient = dict[str, Any]
 
 
 class RepositoryInterface(ABC):
@@ -46,68 +45,53 @@ class RepositoryInterface(ABC):
 
 
 class PatientRepository(RepositoryInterface):
-    """Implement the repository interface for Patient."""
+    """A repository for managing Patient data."""
 
-    # DATA_PATH = (
-    #     Path(__file__).parent.parent / 'app/data/patients/patients.json'
-    # )
+    def get(self, patient_id: str, session: Session) -> Dict[str, Any] | None:
+        """Retrieve a patient record by its ID."""
+        patient = session.get(Patient, patient_id)
+        return patient.model_dump() if patient else None
 
-    patients: list[Patient]
+    def all(self, session: Session) -> List[Dict[str, Any]]:
+        """Retrieve all patient records."""
+        statement = select(Patient)
+        results = session.exec(statement)
+        patients = results.all()
+        return [p.model_dump() for p in patients]
 
-    def __init__(self, data_path: Path) -> None:
-        """Load patients from file."""
-        self.DATA_PATH = data_path
-        self.DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+    def create(
+        self, patient_record: Dict[str, Any], session: Session
+    ) -> Dict[str, Any]:
+        """Create a new patient record."""
+        patient_data = patient_record.get('patient', {})
+        patient_data['id'] = patient_record.get('meta', {}).get('uuid')
 
-        if self.DATA_PATH.exists():
-            # loads existing database
-            with self.DATA_PATH.open('r') as f:
-                # TODO: swap for parquet in future updates
-                self.patients = json.load(f)
-        else:
-            # initializes empty database
-            with self.DATA_PATH.open('w') as f:
-                self.patients = []
-                json.dump(self.patients, f)
+        db_patient = Patient.model_validate(patient_data)
+        session.add(db_patient)
+        session.commit()
+        session.refresh(db_patient)
+        return db_patient.model_dump()
 
-    def all(self) -> list[Patient]:
-        """Return all patients."""
-        return self.patients
+    def update(
+        self, patient_id: str, patient_record: Dict[str, Any], session: Session
+    ) -> Dict[str, Any]:
+        """Update an existing patient record."""
+        db_patient = session.get(Patient, patient_id)
+        if not db_patient:
+            return None
 
-    def get(self, id: UUID) -> Patient | None:
-        """Return a single patient if exists."""
-        for patient in self.patients:
-            if patient['meta']['uuid'] == id:
-                return patient
-        return None
+        patient_data = patient_record.get('patient', {})
+        for key, value in patient_data.items():
+            setattr(db_patient, key, value)
 
-    def create(self, data: Patient) -> Patient:
-        """Create a new patient."""
-        self.patients.append(data)
-        with open(self.DATA_PATH, 'w') as f:
-            json.dump(self.patients, f)
-        return data
+        session.add(db_patient)
+        session.commit()
+        session.refresh(db_patient)
+        return db_patient.model_dump()
 
-    def update(self, id: UUID, data: Patient) -> bool:
-        """Update a patient. Returns true if successful."""
-        for index, patient in enumerate(self.patients):
-            if patient['meta']['uuid'] == id:
-                self.patients[index] = data
-                with open(self.DATA_PATH, 'w') as f:
-                    json.dump(self.patients, f)
-                return True
-
-        # return false if patient does not exist
-        return False
-
-    def delete(self, id: UUID) -> bool:
-        """Delete a patient. Returns true if successful."""
-        for index, patient in enumerate(self.patients):
-            if patient['meta']['uuid'] == id:
-                del self.patients[index]
-                with open(self.DATA_PATH, 'w') as f:
-                    json.dump(self.patients, f)
-                return True
-
-        # return false if patient does not exist
-        return False
+    def delete(self, patient_id: str, session: Session) -> None:
+        """Delete a patient record."""
+        patient = session.get(Patient, patient_id)
+        if patient:
+            session.delete(patient)
+            session.commit()
