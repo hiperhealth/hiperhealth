@@ -149,3 +149,4 @@ cython_debug/
 # vscode
 .vscode/
 research/app/data/
+research/app/research_app.db
