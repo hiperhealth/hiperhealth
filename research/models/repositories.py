@@ -5,8 +5,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, TypeVar
 
-from sdx.models.sqlmodel.fhirx import Patient
-from sqlmodel import Session, select
+from sqlmodel import Session
+
+from ..app.db import ResearchPatientRecord
 
 T = TypeVar('T')
 # Patient type is an alias for now
@@ -49,49 +50,41 @@ class PatientRepository(RepositoryInterface):
 
     def get(self, patient_id: str, session: Session) -> Dict[str, Any] | None:
         """Retrieve a patient record by its ID."""
-        patient = session.get(Patient, patient_id)
-        return patient.model_dump() if patient else None
+        record = session.get(ResearchPatientRecord, patient_id)
+        return record.data if record else None
 
     def all(self, session: Session) -> List[Dict[str, Any]]:
         """Retrieve all patient records."""
-        statement = select(Patient)
-        results = session.exec(statement)
-        patients = results.all()
-        return [p.model_dump() for p in patients]
+        records = session.query(ResearchPatientRecord).all()
+        return [record.data for record in records]
 
     def create(
         self, patient_record: Dict[str, Any], session: Session
     ) -> Dict[str, Any]:
         """Create a new patient record."""
-        patient_data = patient_record.get('patient', {})
-        patient_data['id'] = patient_record.get('meta', {}).get('uuid')
-
-        db_patient = Patient.model_validate(patient_data)
-        session.add(db_patient)
+        patient_id = patient_record.get('meta', {}).get('uuid')
+        db_record = ResearchPatientRecord(id=patient_id, data=patient_record)
+        session.add(db_record)
         session.commit()
-        session.refresh(db_patient)
-        return db_patient.model_dump()
+        session.refresh(db_record)
+        return db_record.data
 
     def update(
         self, patient_id: str, patient_record: Dict[str, Any], session: Session
     ) -> Dict[str, Any]:
         """Update an existing patient record."""
-        db_patient = session.get(Patient, patient_id)
-        if not db_patient:
-            return None
-
-        patient_data = patient_record.get('patient', {})
-        for key, value in patient_data.items():
-            setattr(db_patient, key, value)
-
-        session.add(db_patient)
-        session.commit()
-        session.refresh(db_patient)
-        return db_patient.model_dump()
+        db_record = session.get(ResearchPatientRecord, patient_id)
+        if db_record:
+            db_record.data = patient_record
+            session.add(db_record)
+            session.commit()
+            session.refresh(db_record)
+            return db_record.data
+        return None
 
     def delete(self, patient_id: str, session: Session) -> None:
         """Delete a patient record."""
-        patient = session.get(Patient, patient_id)
-        if patient:
-            session.delete(patient)
+        record = session.get(ResearchPatientRecord, patient_id)
+        if record:
+            session.delete(record)
             session.commit()
