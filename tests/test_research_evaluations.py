@@ -5,7 +5,7 @@ import uuid
 from research.app.main import app, get_repository
 
 
-def test_diagnosis_post_evaluation_form(client, patient_repository):
+def test_diagnosis_post_evaluation_form(client, patient_repository, session):
     """Test the diagnosis evaluation form."""
     # Override the app's dependency with the test repository
     app.dependency_overrides[get_repository] = lambda: patient_repository
@@ -23,7 +23,7 @@ def test_diagnosis_post_evaluation_form(client, patient_repository):
             ]
         },
     }
-    patient_repository.create(patient_record)
+    patient_repository.create(patient_record, session=session)
 
     form_data = {
         'selected': ['fake diagnosis option 1', 'fake diagnosis option 4'],
@@ -50,7 +50,7 @@ def test_diagnosis_post_evaluation_form(client, patient_repository):
     }
 
     # assert that there's no evaluation yet
-    patient = patient_repository.get(patient_id)
+    patient = patient_repository.get(patient_id, session=session)
     assert 'evaluations' not in patient
 
     # post form data
@@ -62,7 +62,7 @@ def test_diagnosis_post_evaluation_form(client, patient_repository):
     assert response.status_code == 303
 
     # make form data was saved correctly
-    patient = patient_repository.get(patient_id)
+    patient = patient_repository.get(patient_id, session=session)
     for diagnosis in form_data['selected']:
         # check if selected dianosis was saved in evaluations
         assert diagnosis in patient['evaluations']['ai_diag']
@@ -94,7 +94,7 @@ def test_diagnosis_post_evaluation_form(client, patient_repository):
     app.dependency_overrides.clear()
 
 
-def test_exams_post_evaluation_form(client, patient_repository):
+def test_exams_post_evaluation_form(client, patient_repository, session):
     """Test the exams evaluation form."""
     # Override the app's dependency with the test repository
     app.dependency_overrides[get_repository] = lambda: patient_repository
@@ -113,7 +113,7 @@ def test_exams_post_evaluation_form(client, patient_repository):
             ]
         },
     }
-    patient_repository.create(patient_record)
+    patient_repository.create(patient_record, session=session)
 
     form_data = {
         'selected': ['fake exam/test option 1', 'fake exam/test option 4'],
@@ -144,7 +144,7 @@ def test_exams_post_evaluation_form(client, patient_repository):
     }
 
     # assert that there's no evaluation yet
-    patient = patient_repository.get(patient_id)
+    patient = patient_repository.get(patient_id, session=session)
     assert 'evaluations' not in patient
 
     # post form data
@@ -156,7 +156,7 @@ def test_exams_post_evaluation_form(client, patient_repository):
     assert response.status_code == 303
 
     # make form data was saved correctly
-    patient = patient_repository.get(patient_id)
+    patient = patient_repository.get(patient_id, session=session)
     for exam in form_data['selected']:
         # check if selected dianosis was saved in evaluations
         assert exam in patient['evaluations']['ai_exam']

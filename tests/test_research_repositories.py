@@ -28,8 +28,8 @@ def test_create_patient(repo: PatientRepository, session: Session):
 
     created_patient = repo.create(new_patient_record, session=session)
     assert created_patient is not None
-    assert created_patient['id'] == patient_uuid
-    assert created_patient['gender'] == 'male'
+    assert created_patient['meta']['uuid'] == patient_uuid
+    assert created_patient['patient']['gender'] == 'male'
 
 
 def test_get_patient(repo: PatientRepository, session: Session):
@@ -42,17 +42,17 @@ def test_get_patient(repo: PatientRepository, session: Session):
 
     retrieved_patient = repo.get(patient_uuid, session=session)
     assert retrieved_patient is not None
-    assert retrieved_patient['id'] == patient_uuid
+    assert retrieved_patient['meta']['uuid'] == patient_uuid
 
 
 def test_all(repo: PatientRepository, session: Session):
     """Test the all method of the repository."""
     repo.create(
-        {'patient': {'gender': 'male'}, 'meta': {'uuid': 'test-uuid-3'}},
+        {'patient': {'gender': 'male'}, 'meta': {'uuid': 'test-uuid-1'}},
         session=session,
     )
     repo.create(
-        {'patient': {'gender': 'female'}, 'meta': {'uuid': 'test-uuid-4'}},
+        {'patient': {'gender': 'female'}, 'meta': {'uuid': 'test-uuid-2'}},
         session=session,
     )
 
@@ -74,7 +74,7 @@ def test_update_patient(repo: PatientRepository, session: Session):
     repo.update(patient_uuid, update_data, session=session)
 
     retrieved_patient = repo.get(patient_uuid, session=session)
-    assert retrieved_patient['gender'] == 'male'
+    assert retrieved_patient['patient']['gender'] == 'male'
 
 
 def test_delete_patient(repo: PatientRepository, session: Session):
