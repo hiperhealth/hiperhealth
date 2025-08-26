@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import random
-import shutil
 import warnings
 
 from pathlib import Path
@@ -14,7 +13,9 @@ import pytest
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
+from sqlmodel import Session, SQLModel, create_engine
 
+from research.app import db
 from research.app.main import app
 from research.models.repositories import PatientRepository
 
@@ -72,22 +73,41 @@ def api_key_openai(env: dict[str, str | None]) -> str:
     return api_key
 
 
+@pytest.fixture(name='session')
+def session_fixture():
+    """Create a new database session for each test."""
+    engine = create_engine(
+        'sqlite:///test.db', connect_args={'check_same_thread': False}
+    )
+    SQLModel.metadata.create_all(engine)
+    with Session(engine) as session:
+        yield session
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(name='client')
+def client_fixture(session: Session):
+    """Create a new test client for each test."""
+
+    def get_session_override():
+        return session
+
+    app.dependency_overrides[db.get_session] = get_session_override
+    client = TestClient(app)
+    yield client
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def repo() -> PatientRepository:
+    """Return a patient repository."""
+    return PatientRepository()
+
+
 @pytest.fixture
 def patient_repository():
     """Temporary patient repository fixture."""
-    # Setup a temporary data file for tests
-    test_data_dir = Path(__file__).parent / 'data' / 'patients'
-    original_data_path = test_data_dir / 'patients.json'
-    temp_data_path = test_data_dir / 'temp_patients.json'
-
-    shutil.copyfile(original_data_path, temp_data_path)
-
-    # Provide the repository instance with the correct path
-    temporary_repository = PatientRepository(data_path=temp_data_path)
-    yield temporary_repository
-
-    # Teardown: remove the temporary file
-    temp_data_path.unlink()
+    return PatientRepository()
 
 
 @pytest.fixture
