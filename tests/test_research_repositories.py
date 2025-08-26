@@ -4,21 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 
 from research.models.repositories import PatientRepository
 
 # Use an in-memory SQLite database for test isolation and speed.
 engine = create_engine('sqlite:///:memory:')
-
-
-@pytest.fixture(name='session')
-def session_fixture():
-    """Create a new database session for each test."""
-    SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        yield session
-    SQLModel.metadata.drop_all(engine)
 
 
 @pytest.fixture(name='repo')
@@ -67,6 +58,8 @@ def test_all(repo: PatientRepository, session: Session):
 
     all_patients = repo.all(session=session)
     assert len(all_patients) == 2
+    assert 'test-uuid-1' in [p['meta']['uuid'] for p in all_patients]
+    assert 'test-uuid-2' in [p['meta']['uuid'] for p in all_patients]
 
 
 def test_update_patient(repo: PatientRepository, session: Session):
