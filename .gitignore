@@ -149,4 +149,3 @@ cython_debug/
 # vscode
 .vscode/
 research/app/data/
-migrations/versions/
