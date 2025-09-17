@@ -46,13 +46,10 @@ groups:
         dir: research/app
         run: uvicorn main:app --reload
       seed:
-        help: Generate seed data
-        dir: research/app
+        help: Run the script to migrate legacy patient data to the DB
+        dir: scripts
         run: |
-          mkdir -p data/patients && \
-          cp ../../tests/data/patients/patients.json \
-          ./data/patients/patients.json
-          echo "Seed data generated in reserch/app/data/patients/patients.json"
+          python migrate_json_to_db.py
 
   tests:
     tasks:
@@ -120,3 +117,19 @@ groups:
         run: |
           python scripts/gen_models/gen_sqla.py
           python scripts/gen_models/gen_sqlmodel.py
+
+  db:
+    help: Database related tasks
+    tasks:
+      setup:
+        help: Creates and migrates the database to the latest version
+        run: alembic upgrade head
+      revision:
+        help: Autogenerates a new database revision script
+        args:
+          m:
+            help: The message for the revision
+            type: string
+            required: true
+        run: |
+          alembic revision --autogenerate -m "{{ args.m }}"
