@@ -8,8 +8,8 @@ The workflow reproduces *exactly* the CLI steps:
 3. Symptoms
 4. Mental health
 5. Previous tests
-6. AI differential diagnosis → physician selects
-7. AI exam suggestions → physician selects
+6. AI differential diagnosis â†' physician selects
+7. AI exam suggestions â†' physician selects
 8. Persist record & show confirmation
 
 This refactored version ensures data is persisted at each step using a
@@ -17,17 +17,14 @@ repository pattern, preventing data loss on server restart. State is
 derived from the patient data itself.
 """
 
-from __future__ import annotations
-
 import io
+import sys
 import uuid
 
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-import anyio
+from typing import Any, Dict, Optional
 
 from fastapi import (
     Depends,
@@ -41,94 +38,194 @@ from fastapi import (
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from sdx.agents.diagnostics import core as diag  # OpenAI helpers
-from sdx.agents.extraction.medical_reports import (
-    MedicalReportExtractorError,
-    MedicalReportFileExtractor,
-)
-from sdx.agents.extraction.wearable import (
-    WearableDataExtractorError,
-    WearableDataFileExtractor,
-)
+
+# Now import the project-specific modules
+from sdx.agents.diagnostics import core as diag
+from sdx.agents.extraction.wearable import WearableDataFileExtractor
+from sdx.models.sqla.research import Patient
 from sdx.privacy.deidenitfier import (
     Deidentifier,
     deidentify_patient_record,
 )
+from sqlalchemy.orm import Session
 
-from research.models.repositories import PatientRepository
+from research.app.database import SessionLocal
+from research.models.repositories import ResearchRepository
+
+# Add the project's 'src' and 'research' directories to the Python path
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.append(str(PROJECT_ROOT / 'src'))
+sys.path.append(str(PROJECT_ROOT))
 
 APP_DIR = Path(__file__).parent
-PATIENTS_JSON_PATH = APP_DIR / 'data' / 'patients' / 'patients.json'
-
 TEMPLATES = Environment(
     loader=FileSystemLoader(APP_DIR / 'templates'),
     autoescape=select_autoescape(),
 )
 
 
+# --- Database Dependency Setup ---
+def get_db():
+    """Get a database session."""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @lru_cache(maxsize=None)
 def get_deidentifier() -> Deidentifier:
-    """Initialize and return a singleton instance of the Deidentifier."""
+    """Get a cached deidentifier instance."""
     return Deidentifier()
 
 
-# Helper function to get a repository instance
-def get_repository() -> PatientRepository:
-    """Get an instance of the PatientRepository."""
-    print(PATIENTS_JSON_PATH)
-    return PatientRepository(data_path=PATIENTS_JSON_PATH)
+def get_repository(
+    db: Session = Depends(get_db),
+) -> ResearchRepository:
+    """Get a repository instance with a database session."""
+    return ResearchRepository(db_session=db)
 
 
+# --- App Initialization ---
 _STATIC = StaticFiles(directory=APP_DIR / 'static')
-
-app = FastAPI(title='TeleHealthCareAI — Physician Portal')
+app = FastAPI(title='TeleHealthCareAI â€" Physician Portal')
 app.mount('/static', _STATIC, name='static')
 
 
+# --- Helper Functions ---
 def _render(template: str, **context: Any) -> HTMLResponse:
-    """Render a Jinja template located in *templates/*."""
     tpl = TEMPLATES.get_template(template)
     return HTMLResponse(tpl.render(**context))
 
 
-def _get_next_step(patient: Dict[str, Any]) -> str:
-    """Determine the next step in the consultation by checking missing data.
+def patient_to_dict(patient: Patient) -> Dict[str, Any]:
+    """Convert a Patient ORM object to a dictionary for template rendering."""
+    if not patient:
+        return {}
 
-    This is the core of the "Data Derivation" approach.
-    """
-    patient_data = patient.get('patient', {})
-    if 'age' not in patient_data:
+    consultation = patient.consultations[-1] if patient.consultations else None
+
+    patient_dict = {
+        'meta': {
+            'uuid': patient.uuid,
+            'lang': consultation.lang if consultation else None,
+            'timestamp': (
+                consultation.timestamp.isoformat()
+                if consultation and consultation.timestamp
+                else None
+            ),
+        },
+        'patient': {
+            'age': patient.age,
+            'gender': patient.gender,
+        },
+        'selected_diagnoses': [
+            assoc.diagnosis.name for assoc in consultation.selected_diagnoses
+        ]
+        if consultation
+        else [],
+        'selected_exams': [
+            assoc.exam.name for assoc in consultation.selected_exams
+        ]
+        if consultation
+        else [],
+        'ai_diag': consultation.ai_diag_raw if consultation else {},
+        'ai_exam': consultation.ai_exam_raw if consultation else {},
+        'evaluations': {
+            'ai_diag': {
+                assoc.diagnosis.name: {
+                    'ratings': {
+                        'accuracy': assoc.accuracy,
+                        'relevance': assoc.relevance,
+                        'usefulness': assoc.usefulness,
+                        'coherence': assoc.coherence,
+                        'comments': assoc.comments,
+                    }
+                }
+                for assoc in consultation.selected_diagnoses
+            }
+            if consultation
+            else {},
+            'ai_exam': {
+                assoc.exam.name: {
+                    'ratings': {
+                        'accuracy': assoc.accuracy,
+                        'relevance': assoc.relevance,
+                        'usefulness': assoc.usefulness,
+                        'coherence': assoc.coherence,
+                        'safety': assoc.safety,
+                        'comments': assoc.comments,
+                    }
+                }
+                for assoc in consultation.selected_exams
+            }
+            if consultation
+            else {},
+        },
+    }
+
+    if consultation:
+        consultation_fields = [
+            'weight_kg',
+            'height_cm',
+            'diet',
+            'sleep_hours',
+            'physical_activity',
+            'mental_exercises',
+            'symptoms',
+            'mental_health',
+            'previous_tests',
+            'wearable_data',
+        ]
+        for field in consultation_fields:
+            if hasattr(consultation, field):
+                patient_dict['patient'][field] = getattr(consultation, field)
+
+    return patient_dict
+
+
+def _get_next_step(patient: Patient) -> str:
+    """Determine the next step by checking for missing data."""
+    if not patient.consultations:
         return 'demographics'
-    if 'diet' not in patient_data:
+
+    consultation = patient.consultations[-1]
+
+    if patient.age is None:
+        return 'demographics'
+    if consultation.diet is None:
         return 'lifestyle'
-    if 'symptoms' not in patient_data:
+    if consultation.symptoms is None:
         return 'symptoms'
-    if 'mental_health' not in patient_data:
+    if consultation.mental_health is None:
         return 'mental'
-    if 'fhir_reports' not in patient_data:
-        return 'tests'
-    if 'wearable_data' not in patient_data:
+    # 'tests' step is a placeholder in this version
+    if consultation.wearable_data is None:
         return 'wearable'
-    if 'selected_diagnoses' not in patient:
+    if not consultation.selected_diagnoses:
         return 'diagnosis'
-    if 'selected_exams' not in patient:
+    if not consultation.selected_exams:
         return 'exams'
     return 'complete'
 
 
+# --- FastAPI Endpoints ---
+
+
 @app.get('/', response_class=HTMLResponse)
 def dashboard(
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Dashboard page view with all recorded patients."""
-    patients = repo.all()
-    # Augment patient data with completion status for the template
+    """Display the main dashboard with a list of patients."""
+    patients = repo.list_patients()
     patients_with_status = []
     for p in patients:
         next_step = _get_next_step(p)
         is_complete = next_step == 'complete'
-        patients_with_status.append({'record': p, 'is_complete': is_complete})
-
+        patients_with_status.append(
+            {'record': patient_to_dict(p), 'is_complete': is_complete}
+        )
     context = {
         'title': 'Dashboard',
         'patients_with_status': patients_with_status,
@@ -136,76 +233,62 @@ def dashboard(
     return _render('dashboard.html', **context)
 
 
-@app.get('/start', response_class=HTMLResponse)
-def landing(request: Request) -> HTMLResponse:
-    """Show language selector."""
-    return _render('language.html', request=request)
-
-
 @app.post('/start', response_class=RedirectResponse, status_code=303)
 def start_new_consultation(
     lang: str = Form(...),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Create a new, empty patient record and redirect to the first step."""
-    patient_id = str(uuid.uuid4())
+    """Start a new consultation and redirect to the first step."""
+    patient_uuid = str(uuid.uuid4())
     new_patient_record = {
+        'meta': {'uuid': patient_uuid, 'lang': lang},
         'patient': {},
-        'meta': {'uuid': patient_id, 'lang': lang},
     }
-
-    # The patient_id is already inside the record, so we don't pass it here.
-    repo.create(new_patient_record)
-
-    # Redirect to the central gatekeeper to start the flow
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    repo.create_patient_and_consultation(new_patient_record)
+    return RedirectResponse(
+        url=f'/consultation/{patient_uuid}', status_code=303
+    )
 
 
 @app.get('/consultation/{patient_id}', response_class=RedirectResponse)
 def consultation_gatekeeper(
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Central redirector. Fetch patient, determine next step, and redirect."""
-    patient = repo.get(patient_id)
+    """Redirect user to the correct step in the consultation wizard."""
+    patient = repo.get_patient_by_uuid(patient_id)
     if not patient:
         raise HTTPException(
-            status_code=404,
-            detail='Patient record not found.',
+            status_code=404, detail='Patient record not found.'
         )
 
     next_step = _get_next_step(patient)
     if next_step == 'complete':
-        # If the consultation is done, go to the patient detail view
         return RedirectResponse(url=f'/patient/{patient_id}', status_code=303)
 
-    # Redirect to the next required step in the wizard
     return RedirectResponse(
-        url=f'/{next_step}?patient_id={patient_id}',
-        status_code=303,
+        f'/{next_step}?patient_id={patient_id}', status_code=303
     )
 
 
-@app.get('/select-language', response_class=HTMLResponse)
-def select_language(request: Request) -> HTMLResponse:
-    """Display language selection form."""
-    return _render('language.html', request=request)
+# --- Form Step Endpoints ---
 
 
 @app.get('/demographics', response_class=HTMLResponse)
 def demographics(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Render demographics form."""
-    patient = repo.get(patient_id)
+    """Display the demographics form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'demographics.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
@@ -216,34 +299,34 @@ def demographics_post(
     gender: str = Form(...),
     weight_kg: float = Form(...),
     height_cm: float = Form(...),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle demographics POST."""
-    patient = repo.get(patient_id)
-    patient['patient'].update(
-        age=age,
-        gender=gender,
-        weight_kg=weight_kg,
-        height_cm=height_cm,
-    )
-    repo.update(patient_id, patient)
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    """Save demographics data."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    patient.age = age
+    patient.gender = gender
+    consultation = patient.consultations[-1]
+    consultation.weight_kg = weight_kg
+    consultation.height_cm = height_cm
+    repo.db.commit()
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/lifestyle', response_class=HTMLResponse)
 def lifestyle(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle lifestyle GET request."""
-    patient = repo.get(patient_id)
+    """Display the lifestyle form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'lifestyle.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
@@ -254,34 +337,34 @@ def lifestyle_post(
     sleep_hours: float = Form(...),
     physical_activity: str = Form(...),
     mental_exercises: str = Form(...),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle lifestyle POST request."""
-    patient = repo.get(patient_id)
-    patient['patient'].update(
-        diet=diet,
-        sleep_hours=sleep_hours,
-        physical_activity=physical_activity,
-        mental_exercises=mental_exercises,
-    )
-    repo.update(patient_id, patient)
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    """Save lifestyle data."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    consultation = patient.consultations[-1]
+    consultation.diet = diet
+    consultation.sleep_hours = sleep_hours
+    consultation.physical_activity = physical_activity
+    consultation.mental_exercises = mental_exercises
+    repo.db.commit()
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/symptoms', response_class=HTMLResponse)
 def symptoms(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle symptoms GET request."""
-    patient = repo.get(patient_id)
+    """Display the symptoms form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'symptoms.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
@@ -289,29 +372,31 @@ def symptoms(
 def symptoms_post(
     patient_id: str,
     symptoms: str = Form(...),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle symptoms POST request."""
-    patient = repo.get(patient_id)
-    patient['patient']['symptoms'] = symptoms
-    repo.update(patient_id, patient)
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    """Save symptoms data."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    consultation = patient.consultations[-1]
+    consultation.symptoms = symptoms
+    repo.db.commit()
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/mental', response_class=HTMLResponse)
 def mental(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle mental GET request."""
-    patient = repo.get(patient_id)
+    """Display the mental health form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'mental.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
@@ -319,29 +404,31 @@ def mental(
 def mental_post(
     patient_id: str,
     mental_health: str = Form(...),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle mental POST request."""
-    patient = repo.get(patient_id)
-    patient['patient']['mental_health'] = mental_health
-    repo.update(patient_id, patient)
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    """Save mental health data."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    consultation = patient.consultations[-1]
+    consultation.mental_health = mental_health
+    repo.db.commit()
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/tests', response_class=HTMLResponse)
 def tests(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle tests GET request."""
-    patient = repo.get(patient_id)
+    """Display the previous tests form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'tests.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
@@ -349,164 +436,75 @@ def tests(
 async def tests_post(
     patient_id: str = Form(...),
     has_reports: str = Form(...),
-    reports: List[UploadFile] = File(None),
-    action: str = Form('upload'),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle tests POST request."""
-    patient = repo.get(patient_id)
-    if not patient:
-        raise HTTPException(404, 'Patient not found')
-
-    # Intialize fhir_reports if not existing
-    patient_data = patient.setdefault('patient', {})
-    patient_data.setdefault('fhir_reports', [])
-    seen_filenames = set(
-        r.get('filename', '').lower()
-        for r in patient_data['fhir_reports']
-        if isinstance(r, dict) and 'filename' in r
-    )
-
-    if has_reports == 'no':
-        # Skip step as complete
-        patient_data['fhir_reports'] = []
-        repo.update(patient_id, patient)
-        return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
-
-    extractor = MedicalReportFileExtractor()
-    context = {
-        'patient_id': patient_id,
-        'patient_data': patient_data,
-        'lang': patient['meta'].get('lang', 'en'),
-    }
-
-    if action == 'upload' and reports:
-        if reports:
-            for report in reports:
-                if not report.filename:
-                    continue
-
-                name = report.filename.lower()
-                if name in seen_filenames:
-                    context = {
-                        'patient_id': patient_id,
-                        'patient_data': patient_data,
-                        'lang': patient['meta'].get('lang', 'en'),
-                        'error': (
-                            f'File named "{report.filename}" has already been'
-                            ' uploaded. Please select a different file.'
-                        ),
-                    }
-                    return _render('tests.html', **context)
-
-                # Validate file types
-                if (
-                    report.content_type not in extractor.allowed_mimetypes
-                    or not any(
-                        name.endswith(f'.{ext}')
-                        for ext in extractor.allowed_extensions
-                    )
-                ):
-                    context['error'] = (
-                        'Only PDF, PNG, JPG, JPEG files are allowed as '
-                        'Medical Reports.'
-                    )
-                    return _render('tests.html', **context)
-
-                try:
-                    data = await report.read()
-                    fhir = extractor.extract_report_data(io.BytesIO(data))
-                    # add filename to the extracted data
-                    if isinstance(fhir, dict):
-                        fhir['filename'] = report.filename
-                    patient_data['fhir_reports'].append(fhir)
-                    seen_filenames.add(name)
-                except MedicalReportExtractorError as e:
-                    context['error'] = (
-                        f'Error extracting report {report.filename}: {e}'
-                    )
-                    return _render('tests.html', **context)
-                except Exception as e:
-                    context['error'] = (
-                        f'Unexpected error processing file {report.filename}: '
-                        f'{e}'
-                    )
-                    return _render('tests.html', **context)
-
-        repo.update(patient_id, patient)
-        return _render('tests.html', **context)
-
-    # If user chooses to continue with the current uploads
-    if action == 'continue':
-        repo.update(patient_id, patient)
-        return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
-
-    return _render('tests.html', **context)
+    """Handle previous tests data (placeholder)."""
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/wearable', response_class=HTMLResponse)
 def wearable(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle wearable GET data."""
-    patient = repo.get(patient_id)
+    """Display the wearable data upload form."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
     return _render(
         'wearable.html',
         request=request,
         patient_id=patient_id,
-        lang=patient['meta'].get('lang', 'en'),
-        patient_data=patient.get('patient', {}),
+        lang=record['meta']['lang'],
+        patient_data=record['patient'],
     )
 
 
-@app.post('/wearable', response_class=HTMLResponse)
-def wearable_post(
+@app.post('/wearable')
+async def wearable_post(
     patient_id: str,
     file: Optional[UploadFile] = File(None),
     skip: Optional[str] = Form(None),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle wearable data file upload POST request."""
-    patient = repo.get(patient_id)
-    context = {'patient_id': patient_id}
+    """Handle wearable data upload or skip."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    consultation = patient.consultations[-1]
 
-    # check if user chooses to skip
     if skip:
-        # setting empty werable data to indicate this step is complete
-        patient['patient']['wearable_data'] = []
-        repo.update(patient_id, patient)
+        consultation.wearable_data = []  # Mark as skipped
+        repo.db.commit()
         return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
-    # TODO: use depends to inject the extractor
-    extractor = WearableDataFileExtractor()
-
-    # check if file exists before trying to use it
     if file and file.size > 0:
-        # uses sdx to check if file is supported
-        if extractor.is_supported(file.file):
-            # there's a possibility of having a malformatted/corrupted file
-            # even if the file is supported so we should try to process it
-            try:
-                wearable_data = extractor.extract_wearable_data(file.file)
-                patient['patient']['wearable_data'] = wearable_data
-                repo.update(patient_id, patient)
-                return RedirectResponse(
-                    f'/consultation/{patient_id}', status_code=303
-                )
-            except WearableDataExtractorError as e:
-                # if we catch an error, we should show the user the error
-                # by adding it to contex
-                context['error'] = str(e)
-                return _render('wearable.html', **context)
-        else:
-            # in this case the file is not supported
-            context['error'] = 'File is not supported.'
+        extractor = WearableDataFileExtractor()
+        try:
+            file_content = await file.read()
+            wearable_data = extractor.extract_wearable_data(
+                io.BytesIO(file_content)
+            )
+            consultation.wearable_data = wearable_data
+            repo.db.commit()
+            return RedirectResponse(
+                f'/consultation/{patient_id}', status_code=303
+            )
+        except Exception as e:
+            record = patient_to_dict(patient)
+            context = {
+                'patient_id': patient_id,
+                'lang': record['meta']['lang'],
+                'patient_data': record['patient'],
+                'error': str(e),
+            }
             return _render('wearable.html', **context)
 
-    # if no file was uploaded and no skip occurs, show error
-    context['error'] = 'Please either upload a file or skip this step.'
+    record = patient_to_dict(patient)
+    context = {
+        'patient_id': patient_id,
+        'lang': record['meta']['lang'],
+        'patient_data': record['patient'],
+        'error': 'Please either upload a file or skip this step.',
+    }
     return _render('wearable.html', **context)
 
 
@@ -514,19 +512,20 @@ def wearable_post(
 def diagnosis(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle diagnosis GET request."""
-    patient = repo.get(patient_id)
-    lang = patient['meta'].get('lang', 'en')
+    """Display AI-generated diagnosis suggestions."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
+    lang = record['meta']['lang']
+
     ai = diag.differential(
-        patient['patient'],
-        language=lang,
-        session_id=patient_id,
+        record['patient'], language=lang, session_id=patient_id
     )
 
-    patient['ai_diag'] = ai.model_dump()
-    repo.update(patient_id, patient)
+    consultation = patient.consultations[-1]
+    consultation.ai_diag_raw = ai.model_dump()
+    repo.db.commit()
 
     return _render(
         'diagnosis.html',
@@ -539,68 +538,53 @@ def diagnosis(
 
 
 @app.post('/diagnosis')
-def diagnosis_post(
+async def diagnosis_post(
     request: Request,
     patient_id: str,
-    selected: Optional[List[str]] = Form([]),
-    custom: Optional[List[str]] = Form([]),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle diagnosis POST request."""
-    patient = repo.get(patient_id)
-    patient['selected_diagnoses'] = selected
-    patient.setdefault('evaluations', {})['ai_diag'] = {}
+    """Save selected diagnoses and evaluations."""
+    form_data = await request.form()
+    selected = form_data.getlist('selected')
+    custom = form_data.getlist('custom')
 
-    form_data = anyio.run(request.form)
+    record = patient_to_dict(repo.get_patient_by_uuid(patient_id))
+    record['selected_diagnoses'] = selected + custom
+    record['evaluations'] = {'ai_diag': {}, 'ai_exam': {}}
 
-    if selected:
-        # get evaluation only from selected diagnoses
-        for diagnosis in selected:
-            evaluation = {
-                'ratings': {
-                    'accuracy': None,
-                    'relevance': None,
-                    'usefulness': None,
-                    'coherence': None,
-                    'comments': None,
-                }
+    for diagnosis in selected:
+        record['evaluations']['ai_diag'][diagnosis] = {
+            'ratings': {
+                'accuracy': form_data.get(f'{diagnosis}--accuracy'),
+                'relevance': form_data.get(f'{diagnosis}--relevance'),
+                'usefulness': form_data.get(f'{diagnosis}--usefulness'),
+                'coherence': form_data.get(f'{diagnosis}--coherence'),
+                'comments': form_data.get(f'{diagnosis}--comments'),
             }
+        }
 
-            # get form values for selected diagnosis
-            for key, value in form_data.items():
-                if key.startswith(diagnosis):
-                    criteria = key.split('--')[1]
-                    evaluation['ratings'][criteria] = (
-                        int(value) if value.isdigit() else value
-                    )
-
-            # add diagnosis evaluation to record
-            patient['evaluations']['ai_diag'][diagnosis] = evaluation
-
-    if custom:
-        patient['selected_diagnoses'].extend(custom)
-
-    repo.update(patient_id, patient)
-    return RedirectResponse(url=f'/consultation/{patient_id}', status_code=303)
+    repo.update_consultation(patient_id, record)
+    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
 
 
 @app.get('/exams', response_class=HTMLResponse)
 def exams(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle exams GET request."""
-    patient = repo.get(patient_id)
-    lang = patient['meta'].get('lang', 'en')
+    """Display AI-generated exam suggestions."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    record = patient_to_dict(patient)
+    lang = record['meta']['lang']
+
     ai = diag.exams(
-        patient['selected_diagnoses'],
-        language=lang,
-        session_id=patient_id,
+        record['selected_diagnoses'], language=lang, session_id=patient_id
     )
 
-    patient['ai_exam'] = ai.model_dump()
-    repo.update(patient_id, patient)
+    consultation = patient.consultations[-1]
+    consultation.ai_exam_raw = ai.model_dump()
+    repo.db.commit()
 
     return _render(
         'exams.html',
@@ -613,58 +597,35 @@ def exams(
 
 
 @app.post('/exams')
-def exams_post(
+async def exams_post(
     request: Request,
     patient_id: str,
-    selected: Optional[List[str]] = Form([]),
-    custom: Optional[List[str]] = Form([]),
     deidentifier: Deidentifier = Depends(get_deidentifier),
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
-    """Handle exams POST request."""
-    patient = repo.get(patient_id)
-    patient['selected_exams'] = selected
-    patient['meta']['timestamp'] = datetime.utcnow().isoformat(
-        timespec='seconds'
-    )
-    patient.setdefault('evaluations', {})['ai_exam'] = {}
+    """Save selected exams, evaluations, and finalize the record."""
+    form_data = await request.form()
+    selected = form_data.getlist('selected')
+    custom = form_data.getlist('custom')
 
-    form_data = anyio.run(request.form)
+    record = patient_to_dict(repo.get_patient_by_uuid(patient_id))
+    record['selected_exams'] = selected + custom
+    record['meta']['timestamp'] = datetime.utcnow()
 
-    if selected:
-        # get evaluation only from selected exams
-        for exam in selected:
-            evaluation = {
-                'ratings': {
-                    'accuracy': None,
-                    'relevance': None,
-                    'usefulness': None,
-                    'coherence': None,
-                    'safety': None,
-                    'comments': None,
-                }
+    for exam in selected:
+        record['evaluations']['ai_exam'][exam] = {
+            'ratings': {
+                'accuracy': form_data.get(f'{exam}--accuracy'),
+                'relevance': form_data.get(f'{exam}--relevance'),
+                'usefulness': form_data.get(f'{exam}--usefulness'),
+                'coherence': form_data.get(f'{exam}--coherence'),
+                'safety': form_data.get(f'{exam}--safety'),
+                'comments': form_data.get(f'{exam}--comments'),
             }
+        }
 
-            # get form values for selected exam
-            for key, value in form_data.items():
-                if key.startswith(exam):
-                    criteria = key.split('--')[1]
-                    evaluation['ratings'][criteria] = (
-                        int(value) if value.isdigit() else value
-                    )
-
-            # add diagnosis evaluation to record
-            patient['evaluations']['ai_exam'][exam] = evaluation
-
-    if custom:
-        patient['selected_exams'].extend(custom)
-
-    # De-identify all relevant fields in the patient record before update.
-    deidentified_patient_record = deidentify_patient_record(
-        patient, deidentifier
-    )
-
-    repo.update(patient_id, deidentified_patient_record)
+    deidentified_record = deidentify_patient_record(record, deidentifier)
+    repo.update_consultation(patient_id, deidentified_record)
     return RedirectResponse(f'/done?patient_id={patient_id}', status_code=303)
 
 
@@ -672,15 +633,15 @@ def exams_post(
 def done(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Handle done GET request."""
-    patient = repo.get(patient_id)
+    """Display the final confirmation page."""
+    patient = repo.get_patient_by_uuid(patient_id)
     return _render(
         'done.html',
         request=request,
-        record=patient,
-        lang=patient['meta'].get('lang', 'en'),
+        record=patient_to_dict(patient),
+        lang=patient.consultations[-1].lang,
     )
 
 
@@ -688,20 +649,19 @@ def done(
 def patient(
     request: Request,
     patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """View a single patient record."""
-    patient = repo.get(patient_id)
+    """Display the full details of a completed patient record."""
+    patient = repo.get_patient_by_uuid(patient_id)
     if not patient:
         raise HTTPException(status_code=404, detail='Patient not found')
 
     active_tab = request.query_params.get('active_tab', 'demographics')
     context = {
         'title': 'Patient',
-        'patient': patient,
+        'patient': patient_to_dict(patient),
         'active_tab': active_tab,
     }
-
     return _render('patient.html', **context)
 
 
@@ -711,10 +671,8 @@ def patient(
     status_code=303,
 )
 def delete_patient(
-    request: Request,
-    patient_id: str,
-    repo: PatientRepository = Depends(get_repository),
+    patient_id: str, repo: ResearchRepository = Depends(get_repository)
 ) -> RedirectResponse:
-    """Delete one patient by id."""
-    repo.delete(patient_id)
+    """Delete a patient record."""
+    repo.delete_patient(patient_id)
     return RedirectResponse(url='/', status_code=303)
