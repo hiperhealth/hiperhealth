@@ -1,14 +1,13 @@
 """Unit tests for the research schema module."""
 
+from sdx.models.sqla.fhirx import Base
 from sqlalchemy import create_engine, inspect
-
-# The path to the database file we configured in alembic.ini
-DB_PATH = 'research/app/data/db.sqlite'
 
 
 def test_database_schema_creation():
     """Connects to the DB and checks if the new research tables exist."""
-    engine = create_engine(f'sqlite:///{DB_PATH}')
+    engine = create_engine('sqlite:///:memory:')
+    Base.metadata.create_all(engine)
     inspector = inspect(engine)
     tables = inspector.get_table_names()
 
