@@ -8,8 +8,8 @@ The workflow reproduces *exactly* the CLI steps:
 3. Symptoms
 4. Mental health
 5. Previous tests
-6. AI differential diagnosis â†' physician selects
-7. AI exam suggestions â†' physician selects
+6. AI differential diagnosis → physician selects
+7. AI exam suggestions → physician selects
 8. Persist record & show confirmation
 
 This refactored version ensures data is persisted at each step using a
