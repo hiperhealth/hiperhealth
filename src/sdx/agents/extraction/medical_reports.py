@@ -24,7 +24,7 @@ from typing import (
 import magic
 import pytesseract
 
-from anamnesisai.openai import extract_fhir
+from anamnesisai import AnamnesisAI
 from PIL import Image
 from pypdf import PdfReader
 from pypdf.errors import EmptyFileError, PdfStreamError
@@ -211,9 +211,11 @@ class MedicalReportFileExtractor(BaseMedicalReportExtractor[FileInput]):
         key = api_key or os.environ.get('OPENAI_API_KEY')
         if not key:
             raise EnvironmentError('Missing OpenAI API key')
-        resources = extract_fhir(text_content, key)
+
+        anaai = AnamnesisAI(backend='openai', api_key=key)
+        resources = anaai.extract_fhir(text_content)
         result: Dict[str, Any] = make_json_serializable(
-            {t: res.model_dump() for t, res in resources.items()}
+            {res.__class__.__name__: res.model_dump() for res in resources[0]}
         )
         return result
 
