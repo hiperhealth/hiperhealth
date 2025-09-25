@@ -1,4 +1,4 @@
-name: main
+name: build
 
 on:
   push:
@@ -8,45 +8,58 @@ on:
 
 jobs:
   check-branch:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+
     timeout-minutes: 2
     concurrency:
-      group: check-pr-${{ github.ref }}
+      group: ci-check-branch-${{ github.ref }}
       cancel-in-progress: true
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        if: ${{ github.event_name == 'pull_request' }}
         with:
           fetch-depth: 0
 
       - name: Check if the PR's branch is updated
+        if: ${{ github.event_name == 'pull_request' }}
         uses: osl-incubator/gh-check-pr-is-updated@1.0.0
         with:
           remote_branch: origin/main
           pr_sha: ${{ github.event.pull_request.head.sha }}
 
-  test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    concurrency:
-      group: ci-${{ github.event_name }}-${{ github.ref }}
-      cancel-in-progress: true
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python_version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+        os:
+          - "ubuntu"
+          - "macos"
+          - "windows"
+
+    runs-on: ${{ matrix.os }}-latest
+    timeout-minutes: 20
 
     defaults:
       run:
         shell: bash -l {0}
 
+    concurrency:
+      group: ci-tests-${{ matrix.os }}-${{ matrix.python_version }}-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache Conda Packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.conda/envs/sdx
-          key: ubuntu-latest-conda-${{ hashFiles('conda/dev.yaml') }}
-          restore-keys: |
-            ubuntu-latest-conda-
+      - name: prepare conda env file for windows
+        if: ${{ matrix.os == 'windows' }}
+        run: cp conda/dev-win.yaml conda/dev.yaml
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -56,17 +69,65 @@ jobs:
           activate-environment: sdx
           auto-update-conda: true
           conda-solver: libmamba
+          python-version: "${{ matrix.python_version }}"
+
+      - name: Check Poetry lock
+        run: poetry check
 
       - name: Install dependencies
         run: |
+          poetry config virtualenvs.create false
           poetry install
 
-      - name: Run tests
+      - name: Run unit tests
+        run: makim tests.unit
+
+      - name: Semantic Release PR Title Check
+        uses: osl-incubator/semantic-release-pr-title-check@v1.4.1
+        if: success() || failure()
+        with:
+          convention-name: conventionalcommits
+
+      - name: Setup tmate session
+        if: "${{ failure() && (contains(github.event.pull_request.labels.*.name, 'ci:enable-debugging')) }}"
+        uses: mxschmitt/action-tmate@v3
+
+  linter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    concurrency:
+      group: ci-linter-docs-${{ matrix.os }}-${{ matrix.python_version }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          environment-file: conda/dev.yaml
+          channels: conda-forge,nodefaults
+          activate-environment: sdx
+          auto-update-conda: true
+          conda-solver: libmamba
+          python-version: "3.9"
+
+      - name: Install dependencies
         run: |
-          makim tests.unit
+          poetry config virtualenvs.create false
+          poetry install
 
       - name: Run style checks
         if: success() || failure()
         run: |
           pre-commit install
           makim tests.linter
+
+      - name: Setup tmate session
+        if: "${{ failure() && (contains(github.event.pull_request.labels.*.name, 'ci:enable-debugging')) }}"
+        uses: mxschmitt/action-tmate@v3
