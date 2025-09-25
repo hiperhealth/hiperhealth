@@ -31,5 +31,6 @@ jobs:
             verify SOLID principle violations;
             code should be objective;
             code should avoid redundance;
+            provide concise review and focus on the key and critical parts, otherwise the review would be very extensive.
           github_token: ${{ github.token }}
           github_pr_id: ${{ github.event.pull_request.number }}
