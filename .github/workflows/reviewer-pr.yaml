@@ -21,7 +21,7 @@ jobs:
 
       # Use a pinned release of your action (not ./)
       - name: Review PR
-        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.7
+        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.8
         with:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           openai_model: gpt-5
@@ -34,3 +34,10 @@ jobs:
             provide concise review and focus on the key and critical parts, otherwise the review would be very extensive.
           github_token: ${{ github.token }}
           github_pr_id: ${{ github.event.pull_request.number }}
+          exclude_path: |
+            poetry.lock
+            *.png
+            *.jpg
+            *.jpeg
+            *.pkl
+            *.sqlite
