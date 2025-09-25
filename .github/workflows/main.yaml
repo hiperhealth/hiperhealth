@@ -33,7 +33,6 @@ jobs:
       fail-fast: false
       matrix:
         python_version:
-          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
@@ -56,10 +55,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: prepare conda env file for windows
-        if: ${{ matrix.os == 'windows' }}
-        run: cp conda/dev-win.yaml conda/dev.yaml
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -115,7 +110,7 @@ jobs:
           activate-environment: sdx
           auto-update-conda: true
           conda-solver: libmamba
-          python-version: "3.9"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
