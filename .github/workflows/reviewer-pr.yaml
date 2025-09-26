@@ -1,3 +1,4 @@
+# .github/workflows/review-pr.yml
 name: Review PR with ChatGPT (secure)
 on:
   pull_request_target:
@@ -12,21 +13,19 @@ jobs:
   review:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      # SAFE: checkout the base repo at the base SHA (not attacker code)
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.base.sha }}
 
-      # Use a pinned release of your action (not ./)
       - name: Review PR
-        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.9
+        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.16
         with:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           openai_model: gpt-5
           openai_temperature: "0.0"
-          openai_max_tokens: "16000"
+          openai_max_tokens: "128000"
           openai_extra_criteria: |
             verify SOLID principle violations;
             code should be objective;
@@ -40,3 +39,8 @@ jobs:
             **/*.{lock,lockb}
             package-lock.json, yarn.lock, pnpm-lock.yaml, Pipfile.lock, Cargo.lock, Gemfile.lock
             **/*.ipynb
+        env:
+          OPENAI_MAX_COMPLETION_TOKENS: "128000"
+          OPENAI_MAX_INPUT_TOKENS: "400000"
+          OPENAI_REASONING: "on"
+          LOG_LEVEL: "DEBUG"
