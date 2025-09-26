@@ -1,5 +1,6 @@
 """
 Shared OpenAI helper used by all agents.
+
 * Forces JSON responses (`response_format={"type": "json_object"}`).
 * Validates with ``LLMDiagnosis.from_llm``.
 * Persists every raw reply under ``data/llm_raw/<sid>_<UTC>.json``.
@@ -101,17 +102,7 @@ def chat(
     *,
     session_id: str | None = None,
 ) -> LLMDiagnosis:
-    """
-    Send system/user prompts to the LLM, validate structure and safety, and
-    return a parsed ``LLMDiagnosis``.
-
-    - Enforces JSON responses via response_format.
-    - Persists the raw JSON reply to disk.
-    - Validates with ``LLMDiagnosis.from_llm`` (Pydantic).
-    - Applies a topic-based guard to block unsafe outputs.
-
-    """
-
+    """Send system / user prompts and return a validated ``LLMDiagnosis``."""
     rsp = _client.chat.completions.create(
         model=_MODEL_NAME,
         response_format={'type': 'json_object'},

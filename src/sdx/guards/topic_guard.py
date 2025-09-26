@@ -46,7 +46,7 @@ def _select_device() -> int:
         torch is not None
         and hasattr(torch, 'cuda')
         and torch.cuda.is_available()
-    ):  # type: ignore[truthy-bool]
+    ):
         return 0
     return -1
 
@@ -72,7 +72,7 @@ def detect_topics(
     if not text or not labels:
         return []
     classifier = _get_classifier()
-    result: Dict[str, List[Any]] = classifier(  # type: ignore[call-arg]
+    result: Dict[str, List[Any]] = classifier(
         text,
         list(labels),
         multi_label=True,
