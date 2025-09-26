@@ -15,6 +15,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "esloch",
+      "name": "Sandro Loch",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3450741?v=4",
+      "profile": "https://www.linkedin.com/in/sandro-loch-988a7611b/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
