@@ -1,9 +1,7 @@
 # sdx
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)![Mkdocs](https://img.shields.io/badge/Documentation%20engine-Mkdocs-orange)
@@ -41,6 +39,7 @@ Thanks goes to these wonderful people:
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://xmnlab.github.io"><img src="https://avatars.githubusercontent.com/u/5209757?v=4?s=100" width="100px;" alt="Ivan Ogasawara"/><br /><sub><b>Ivan Ogasawara</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=xmnlab" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/sandro-loch-988a7611b/"><img src="https://avatars.githubusercontent.com/u/3450741?v=4?s=100" width="100px;" alt="Sandro Loch"/><br /><sub><b>Sandro Loch</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=esloch" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
