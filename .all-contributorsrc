@@ -1,0 +1,12 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributorsPerLine": 7,
+  "projectName": "sdx",
+  "projectOwner": "sdx-org",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
