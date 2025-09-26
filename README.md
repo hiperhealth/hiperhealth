@@ -28,7 +28,7 @@ TBD
 This package was created with
 [scicookie](https://github.com/osl-incubator/scicookie) project template.
 
-## Contributors ✨
+## Contributors
 
 Thanks goes to these wonderful people:
 
