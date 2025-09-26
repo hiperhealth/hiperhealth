@@ -23,3 +23,8 @@ TBD
 
 This package was created with
 [scicookie](https://github.com/osl-incubator/scicookie) project template.
+
+## Contributors
+
+Thanks goes to these wonderful people
+([emoji key](https://allcontributors.org/docs/en/emoji-key)):
