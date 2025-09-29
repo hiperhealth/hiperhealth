@@ -20,12 +20,13 @@ jobs:
           ref: ${{ github.event.pull_request.base.sha }}
 
       - name: Review PR
-        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.16
+        uses: osl-incubator/github-actions-chatgpt-pr-reviewer@1.0.17
         with:
           openai_api_key: ${{ secrets.OPENAI_API_KEY }}
           openai_model: gpt-5
           openai_temperature: "0.0"
           openai_max_tokens: "128000"
+          openai_max_completion_tokens: "128000"
           openai_extra_criteria: |
             verify SOLID principle violations;
             code should be objective;
