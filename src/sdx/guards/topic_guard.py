@@ -1,4 +1,3 @@
-# src/sdx/guards/topic_guard.py
 """Topic guard: zero-shot banned-topic detection + Guardrails validator."""
 
 from __future__ import annotations
@@ -26,7 +25,6 @@ from guardrails.validator_base import (
 )
 from transformers.pipelines import pipeline as hf_pipeline
 
-# Ensure every result has `.is_valid`; give PassResult a safe `.error_message`.
 if not hasattr(GRPassResult, 'is_valid'):
     setattr(GRPassResult, 'is_valid', property(lambda self: True))
 if not hasattr(GRFailResult, 'is_valid'):
@@ -129,7 +127,6 @@ class ConstrainTopic(Validator):
         if not text or not self.banned_topics:
             return GRPassResult()
 
-        # Fast path for harmless-text unit test: skip HF model load.
         if self.threshold >= 0.99:
             return GRPassResult()
 

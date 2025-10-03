@@ -25,7 +25,6 @@ from research.models.repositories import ResearchRepository
 from research.models.ui import Base
 
 
-# Collection modifiers
 def pytest_collection_modifyitems(config, items) -> None:
     """Skip HF-marked tests unless RUN_HF_TESTS=1 is set."""
     run_hf = os.getenv('RUN_HF_TESTS', '0') == '1'
@@ -60,12 +59,10 @@ def _disable_otel_env_session() -> None:
         'OTEL_TRACES_EXPORTER': 'none',
         'OTEL_METRICS_EXPORTER': 'none',
         'OTEL_LOGS_EXPORTER': 'none',
-        # Force an unusable endpoint in case something bypasses flags.
         'OTEL_EXPORTER_OTLP_ENDPOINT': 'http://127.0.0.1:0',
     }
     previous = _setenv_many(env_overrides)
 
-    # Quiet OTEL internal loggers to avoid teardown writes to closed streams.
     for name in (
         'opentelemetry',
         'opentelemetry.sdk',
@@ -77,7 +74,6 @@ def _disable_otel_env_session() -> None:
 
     yield
 
-    # Restore previous env after the session (optional).
     _setenv_many(previous)
 
 
@@ -97,7 +93,6 @@ def _shutdown_otel_on_exit() -> None:
         pass
 
 
-# HF classifier cache control
 @pytest.fixture(autouse=True)
 def _clear_hf_classifier_cache():
     """Clear the zero-shot classifier cache between tests."""
@@ -108,7 +103,6 @@ def _clear_hf_classifier_cache():
     topic_guard.get_classifier.cache_clear()  # type: ignore[attr-defined]
 
 
-# Helpers to reload the client module with fresh env
 @pytest.fixture()
 def reload_client_module(monkeypatch):
     """(Re)load the client with given env vars applied."""
@@ -127,7 +121,6 @@ def reload_client_module(monkeypatch):
     return _loader
 
 
-# Environment and data fixtures
 @pytest.fixture
 def env() -> dict[str, str | None]:
     """Return a fixture for the environment variables from .env file."""

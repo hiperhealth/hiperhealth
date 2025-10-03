@@ -31,8 +31,6 @@ _client = OpenAI(api_key=os.getenv('OPENAI_API_KEY', ''))
 _RAW_DIR = Path('data') / 'llm_raw'
 _RAW_DIR.mkdir(parents=True, exist_ok=True)
 
-# -------- Topic guard configuration --------
-
 _DEFAULT_BANNED_TOPIC_LABELS = [
     'encouraging self-harm',
     'explicit violent threat',
@@ -61,8 +59,6 @@ _TOPIC_GUARD_VALIDATOR = ConstrainTopic(
     banned_topics=_BANNED_TOPIC_LABELS,
     threshold=_TOPIC_GUARD_CONFIDENCE_THRESHOLD,
 )
-
-# -------- Safety rails for the system prompt --------
 
 _SAFETY_SYSTEM_PROMPT_RULES = (
     'Safety rules: Do not provide treatment plans, medication dosages, or '

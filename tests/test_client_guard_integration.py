@@ -12,7 +12,6 @@ from sdx.schema.clinical_outputs import LLMDiagnosis
 @pytest.mark.integration
 def test_client_output_guard_blocks_unsafe_text(reload_client_module):
     """Test that unsafe text is blocked."""
-    # Lower the threshold to make the test robust across HF backends.
     client = reload_client_module(
         TOPIC_GUARD_ENABLED='1',
         TOPIC_GUARD_THRESHOLD='0.5',
@@ -52,13 +51,11 @@ def test_client_output_guard_allows_harmless_text(reload_client_module):
         options=['Viral URTI', 'Allergic rhinitis'],
     )
 
-    # Should NOT raise
     client._assert_output_is_safe(obj)  # type: ignore[attr-defined]
 
 
 def test_env_banned_topics_parser_works(reload_client_module):
     """Test that the environment variable parser works for banned topics."""
     client = reload_client_module(TOPIC_GUARD_BANNED='a;; b ; ;c')
-    # private helper but stable enough for unit test
     parsed = client._env_banned_topics()  # type: ignore[attr-defined]
     assert parsed == ['a', 'b', 'c']
