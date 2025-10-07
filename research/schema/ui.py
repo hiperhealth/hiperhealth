@@ -1,4 +1,3 @@
-# sdx/src/sdx/schema/research.py
 """Pydantic schemas for research application."""
 
 from __future__ import annotations
