@@ -74,7 +74,7 @@ groups:
         run: |
           pytest \
             --cov=sdx \
-            --cov-fail-under=75 \
+            --cov-fail-under=88 \
             --cov-report term-missing \
             --no-cov-on-fail ${{ args.path }} ${{ args.params }}
 
