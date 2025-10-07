@@ -13,6 +13,7 @@ dependencies = [
     "fhir.resources >=8.1.0",
     "rago >=0.14.4",
     "pypdf >=5.4.0",
+  "pydicom >=2.4.0",
     "sqlalchemy >=2.0.41",
     "atpublic >=6",
     "sqlmodel >=0.0.24",
