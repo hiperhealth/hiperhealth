@@ -42,7 +42,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 # Now import the project-specific modules
 from sdx.agents.diagnostics import core as diag
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
-from sdx.models.sqla.research import Patient
+from sdx.models.sqla.ui import Patient
 from sdx.privacy.deidenitfier import (
     Deidentifier,
     deidentify_patient_record,

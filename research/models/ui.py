@@ -13,7 +13,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from .fhirx import Base  # Use the same Base as your other models
+from ...src.sdx.models.sqla.fhirx import (
+    Base,  # Use the same Base as your other models
+)
 
 
 class Patient(Base):

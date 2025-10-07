@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, List
 from uuid import UUID
 
-from sdx.models.sqla.research import (
+from sdx.models.sqla.ui import (
     Consultation,
     ConsultationDiagnosis,
     ConsultationExam,
@@ -12,8 +12,9 @@ from sdx.models.sqla.research import (
     Exam,
     Patient,
 )
-from sdx.schema.research import ConsultationCreate, PatientCreate
 from sqlalchemy.orm import Session
+
+from research.schema.ui import ConsultationCreate, PatientCreate
 
 
 class ResearchRepository:
