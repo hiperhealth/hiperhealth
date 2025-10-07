@@ -16,11 +16,10 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from guardrails.validator_base import FailResult
-from openai import OpenAI
+from openai import APIConnectionError, BadRequestError, OpenAI, RateLimitError
 from pydantic import ValidationError
 
-from sdx.agents.safety.topic_guard import ConstrainTopic
+from sdx.agents.safety import ConstrainTopic, with_safety
 from sdx.schema.clinical_outputs import LLMDiagnosis
 
 load_dotenv(Path(__file__).parents[3] / '.envs' / '.env')
@@ -31,7 +30,23 @@ _client = OpenAI(api_key=os.getenv('OPENAI_API_KEY', ''))
 _RAW_DIR = Path('data') / 'llm_raw'
 _RAW_DIR.mkdir(parents=True, exist_ok=True)
 
+
+TOPIC_GUARD_ENABLED = os.getenv('TOPIC_GUARD_ENABLED', '1') != '0'
+TOPIC_GUARD_THRESHOLD = float(os.getenv('TOPIC_GUARD_THRESHOLD', '0.8'))
+
 _DEFAULT_BANNED_TOPIC_LABELS = [
+    'encouraging self-harm',
+    'explicit violent threat',
+    'harassment with violent intent',
+    'suicide instructions',
+    'medical dosing advice',
+]
+
+TOPIC_GUARD_BANNED = [
+    s.strip()
+    for s in os.getenv('TOPIC_GUARD_BANNED', '').split(';')
+    if s.strip()
+] or [
     'encouraging self-harm',
     'explicit violent threat',
     'harassment with violent intent',
@@ -60,13 +75,6 @@ _TOPIC_GUARD_VALIDATOR = ConstrainTopic(
     threshold=_TOPIC_GUARD_CONFIDENCE_THRESHOLD,
 )
 
-_SAFETY_SYSTEM_PROMPT_RULES = (
-    'Safety rules: Do not provide treatment plans, medication dosages, or '
-    'step-by-step procedures. No instructions for self-harm or harming '
-    'others. Be non-prescriptive and probabilistic. Only list '
-    'non-actionable differential options.'
-)
-
 
 def dump_llm_json(text: str, sid: str | None) -> None:
     """
@@ -79,17 +87,15 @@ def dump_llm_json(text: str, sid: str | None) -> None:
     (_RAW_DIR / f'{ts}_{suffix}.json').write_text(text, encoding='utf-8')
 
 
-def _assert_output_is_safe(obj: LLMDiagnosis) -> None:
-    """Validate LLM output against topic guard; raise if unsafe."""
+def _enforce_topic_safety(obj: LLMDiagnosis) -> None:
+    """Enforce topic policy on the parsed output; raise HTTP 400 on violation."""
     if not _TOPIC_GUARD_ENABLED:
         return
-    combined_text = f'{obj.summary}\n' + '\n'.join(obj.options or [])
-    # FIX: pass metadata=None for Guardrails' validate signature
-    result = _TOPIC_GUARD_VALIDATOR.validate(combined_text, metadata=None)
-    if isinstance(result, FailResult):
-        raise HTTPException(
-            400, f'Unsafe LLM output blocked: {result.error_message}'
-        )
+    combined = f'{obj.summary}\n' + '\n'.join(obj.options or [])
+    result = _TOPIC_GUARD_VALIDATOR.validate(combined, metadata=None)
+    if getattr(result, 'outcome', '') == 'fail':
+        msg = getattr(result, 'error_message', 'Banned topics detected.')
+        raise HTTPException(400, f'Unsafe LLM output blocked: {msg}')
 
 
 def chat(
@@ -98,18 +104,20 @@ def chat(
     *,
     session_id: str | None = None,
 ) -> LLMDiagnosis:
-    """Send system / user prompts and return a validated ``LLMDiagnosis``."""
-    rsp = _client.chat.completions.create(
-        model=_MODEL_NAME,
-        response_format={'type': 'json_object'},
-        messages=[
-            {
-                'role': 'system',
-                'content': f'{system}\n\n{_SAFETY_SYSTEM_PROMPT_RULES}',
-            },
-            {'role': 'user', 'content': user},
-        ],
-    )
+    """Send system/user prompts and return a validated LLMDiagnosis."""
+    try:
+        rsp = _client.chat.completions.create(
+            model=_MODEL_NAME,
+            response_format={'type': 'json_object'},
+            messages=[
+                {'role': 'system', 'content': with_safety(system)},
+                {'role': 'user', 'content': user},
+            ],
+        )
+    except RateLimitError as exc:
+        raise HTTPException(429, f'LLM rate limit: {exc}') from exc
+    except (BadRequestError, APIConnectionError) as exc:
+        raise HTTPException(502, f'LLM error: {exc}') from exc
 
     raw: str = rsp.choices[0].message.content or '{}'
     dump_llm_json(raw, session_id)
@@ -118,8 +126,8 @@ def chat(
         parsed = LLMDiagnosis.from_llm(raw)
     except ValidationError as exc:
         raise HTTPException(
-            422, f'LLM response is not valid LLMDiagnosis: {exc}'
+            422, f'LLM JSON did not match schema: {exc}'
         ) from exc
 
-    _assert_output_is_safe(parsed)
+    _enforce_topic_safety(parsed)
     return parsed
