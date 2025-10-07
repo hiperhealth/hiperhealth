@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h2 class="my-4">{{ title }}</h2>
-    <a href="/start" class="btn btn-outline-primary mb-3"><i class="bi bi-person-plus"></i> Add Patient</a>
+    <a href="/select_language" class="btn btn-outline-primary mb-3"><i class="bi bi-person-plus"></i> Add Patient</a>
     {# Check if the 'patients_with_status' list has items #}
     {% if patients_with_status|length > 0 %}
         <div class="list-group w-75">
