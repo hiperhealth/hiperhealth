@@ -1,7 +1,9 @@
 # sdx
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)![Mkdocs](https://img.shields.io/badge/Documentation%20engine-Mkdocs-orange)
@@ -41,6 +43,8 @@ Thanks goes to these wonderful people:
       <td align="center" valign="top" width="14.28%"><a href="https://xmnlab.github.io"><img src="https://avatars.githubusercontent.com/u/5209757?v=4?s=100" width="100px;" alt="Ivan Ogasawara"/><br /><sub><b>Ivan Ogasawara</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=xmnlab" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/sandro-loch-988a7611b/"><img src="https://avatars.githubusercontent.com/u/3450741?v=4?s=100" width="100px;" alt="Sandro Loch"/><br /><sub><b>Sandro Loch</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=esloch" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/whitewolf2000ani"><img src="https://avatars.githubusercontent.com/u/116947102?v=4?s=100" width="100px;" alt="Aniket Kumar"/><br /><sub><b>Aniket Kumar</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=whitewolf2000ani" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/abhijeetSaroha"><img src="https://avatars.githubusercontent.com/u/108522472?v=4?s=100" width="100px;" alt="Abhijeet Saroha"/><br /><sub><b>Abhijeet Saroha</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=abhijeetSaroha" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/felipepaes"><img src="https://avatars.githubusercontent.com/u/12243928?v=4?s=100" width="100px;" alt="Felipe Paes"/><br /><sub><b>Felipe Paes</b></sub></a><br /><a href="https://github.com/sdx-org/sdx/commits?author=felipepaes" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

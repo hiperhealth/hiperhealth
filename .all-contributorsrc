@@ -33,6 +33,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "abhijeetSaroha",
+      "name": "Abhijeet Saroha",
+      "avatar_url": "https://avatars.githubusercontent.com/u/108522472?v=4",
+      "profile": "https://github.com/abhijeetSaroha",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "felipepaes",
+      "name": "Felipe Paes",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12243928?v=4",
+      "profile": "https://github.com/felipepaes",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

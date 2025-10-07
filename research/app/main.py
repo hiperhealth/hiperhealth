@@ -233,6 +233,12 @@ def dashboard(
     return _render('dashboard.html', **context)
 
 
+@app.get('/select_language', response_class=HTMLResponse)
+def select_language(request: Request):
+    """Display the language selection page."""
+    return _render('language.html', request=request)
+
+
 @app.post('/start', response_class=RedirectResponse, status_code=303)
 def start_new_consultation(
     lang: str = Form(...),
@@ -610,7 +616,7 @@ async def exams_post(
 
     record = patient_to_dict(repo.get_patient_by_uuid(patient_id))
     record['selected_exams'] = selected + custom
-    record['meta']['timestamp'] = datetime.utcnow()
+    record['meta']['timestamp'] = datetime.utcnow().isoformat()
 
     for exam in selected:
         record['evaluations']['ai_exam'][exam] = {
