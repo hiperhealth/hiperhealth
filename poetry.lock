@@ -5188,9 +5188,10 @@ yaml = ["pyyaml (>=6.0.1)"]
 name = "pydicom"
 version = "3.0.1"
 description = "A pure Python package for reading and writing DICOM data"
-optional = false
+optional = true
 python-versions = ">=3.10"
 groups = ["main"]
+markers = "extra == \"dicom\""
 files = [
     {file = "pydicom-3.0.1-py3-none-any.whl", hash = "sha256:db32f78b2641bd7972096b8289111ddab01fb221610de8d7afa835eb938adb41"},
     {file = "pydicom-3.0.1.tar.gz", hash = "sha256:7b8be344b5b62493c9452ba6f5a299f78f8a6ab79786c729b0613698209603ec"},
@@ -8088,7 +8089,10 @@ files = [
 [package.extras]
 cffi = ["cffi (>=1.17) ; python_version >= \"3.13\" and platform_python_implementation != \"PyPy\""]
 
+[extras]
+dicom = ["pydicom"]
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "4be9659d32e5e6c0756f774356f00d962c51c9f5f5a7eeace339e23f9023ec30"
+content-hash = "672958b76b3ab006b1b4f094121d1b58fe66036dc23a7df64562f0012815bad4"

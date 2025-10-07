@@ -12,7 +12,9 @@ import pytest
 
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
-from sdx.agents.extraction.dicom import DicomExtractor
+
+# DicomExtractor import moved into the fixture to avoid collection-time
+# failures when optional deps (like pydicom) are not installed on CI.
 from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
 from sqlalchemy import create_engine
@@ -86,13 +88,23 @@ def medical_extractor():
 @pytest.fixture
 def dicom_extractor():
     """Provide a DicomExtractor instance for tests."""
+    # Import inside the fixture so test collection doesn't fail if pydicom
+    # isn't installed. Skip the tests gracefully in that case.
+    pytest.importorskip('pydicom')
+    from sdx.agents.extraction.dicom import DicomExtractor
+
     return DicomExtractor()
 
 
 @pytest.fixture
 def sample_dicom_file(test_data_dir: Path) -> Path:
     """Path to the sample DICOM file used across tests."""
-    return test_data_dir / 'dicom' / 'ID_0000_AGE_0060_CONTRAST_1_CT.dcm'
+    path = test_data_dir / 'dicom' / 'ID_0000_AGE_0060_CONTRAST_1_CT.dcm'
+    if not path.exists():
+        pytest.skip(
+            'Sample DICOM file not found; skipping DICOM-related tests.'
+        )
+    return path
 
 
 # Use an in-memory SQLite database for fast, isolated tests

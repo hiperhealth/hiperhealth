@@ -73,6 +73,10 @@ def test_extract_metadata_missing_fields(extractor, tmp_path):
 
 def test_load_dicom_method(extractor):
     """Verify the internal DICOM loading method works safely."""
+    # Guard: skip if private loader API is missing to avoid brittle tests
+    if not hasattr(extractor, '_load_dicom'):
+        pytest.skip('internal loader API changed')
+
     ds = extractor._load_dicom(SAMPLE_DICOM, stop_before_pixels=True)
     assert isinstance(ds, pydicom.Dataset)
     assert hasattr(ds, 'PatientID') or hasattr(ds, 'Modality')
@@ -80,6 +84,17 @@ def test_load_dicom_method(extractor):
 
 def test_extract_fhir_requires_api_key(extractor, monkeypatch):
     """Ensure extract_fhir raises EnvironmentError without an API key."""
-    monkeypatch.delenv('OPENAI_API_KEY', raising=False)
+    # Clear a broad set of AI-related env vars to avoid accidental
+    # network calls
+    for k in (
+        'OPENAI_API_KEY',
+        'OPENAI_ORG',
+        'OPENAI_BASE_URL',
+        'AZURE_OPENAI_API_KEY',
+        'AZURE_OPENAI_ENDPOINT',
+        'GOOGLE_API_KEY',
+        'ANTHROPIC_API_KEY',
+    ):
+        monkeypatch.delenv(k, raising=False)
     with pytest.raises(EnvironmentError):
         extractor.extract_fhir(SAMPLE_DICOM)

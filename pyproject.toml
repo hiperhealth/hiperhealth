@@ -13,7 +13,6 @@ dependencies = [
     "fhir.resources >=8.1.0",
     "rago >=0.14.4",
     "pypdf >=5.4.0",
-  "pydicom >=2.4.0",
     "sqlalchemy >=2.0.41",
     "atpublic >=6",
     "sqlmodel >=0.0.24",
@@ -96,10 +95,7 @@ disable_error_code = [
 testpaths = [
     "tests",
 ]
-filterwarnings = [
-  "ignore:Importing 'parser.split_arg_string' is deprecated:DeprecationWarning",
-  "ignore:Support for class-based `config` is deprecated:DeprecationWarning:pydantic._internal._config",
-]
+# Keep pytest warnings unfiltered to avoid masking deprecations in our code.
 
 [tool.ruff]
 line-length = 79
@@ -139,3 +135,8 @@ min_confidence = 80
 paths = ["./"]
 sort_by_size = true
 verbose = false
+
+[project.optional-dependencies]
+dicom = [
+  "pydicom >=2.4.0",
+]
