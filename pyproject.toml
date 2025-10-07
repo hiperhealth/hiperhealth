@@ -95,6 +95,10 @@ disable_error_code = [
 testpaths = [
     "tests",
 ]
+filterwarnings = [
+  "ignore:Importing 'parser.split_arg_string' is deprecated:DeprecationWarning",
+  "ignore:Support for class-based `config` is deprecated:DeprecationWarning:pydantic._internal._config",
+]
 
 [tool.ruff]
 line-length = 79

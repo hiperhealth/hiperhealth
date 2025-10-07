@@ -12,6 +12,7 @@ import pytest
 
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
+from sdx.agents.extraction.dicom import DicomExtractor
 from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
 from sqlalchemy import create_engine
@@ -80,6 +81,18 @@ def wearable_extractor():
 def medical_extractor():
     """Provide a MedicalReportFileExtractor instance for tests."""
     return MedicalReportFileExtractor()
+
+
+@pytest.fixture
+def dicom_extractor():
+    """Provide a DicomExtractor instance for tests."""
+    return DicomExtractor()
+
+
+@pytest.fixture
+def sample_dicom_file(test_data_dir: Path) -> Path:
+    """Path to the sample DICOM file used across tests."""
+    return test_data_dir / 'dicom' / 'ID_0000_AGE_0060_CONTRAST_1_CT.dcm'
 
 
 # Use an in-memory SQLite database for fast, isolated tests
