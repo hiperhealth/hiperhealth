@@ -72,7 +72,8 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          poetry install
+          # Install the optional 'dicom' extra so pydicom is available in CI
+          poetry install --with dicom
 
       - name: Run unit tests
         run: makim tests.unit
@@ -115,7 +116,8 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          poetry install
+          # For linting we don't need the dicom extra, but keep parity with tests
+          poetry install --with dicom
 
       - name: Run style checks
         if: success() || failure()
