@@ -1,6 +1,8 @@
-# sdx/src/sdx/models/sqla/research.py
 """SQLAlchemy models for research application."""
 
+from sdx.models.sqla.fhirx import (
+    Base,
+)
 from sqlalchemy import (
     JSON,
     Column,
@@ -12,8 +14,6 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.orm import relationship
-
-from .fhirx import Base  # Use the same Base as your other models
 
 
 class Patient(Base):

@@ -70,8 +70,13 @@ groups:
             help: Specify parameters to be used for tests
             type: string
             default: "-vv"
+        backend: bash
         run: |
-          pytest ${{ args.path }} ${{ args.params }}
+          pytest \
+            --cov=sdx \
+            --cov-fail-under=88 \
+            --cov-report term-missing \
+            --no-cov-on-fail ${{ args.path }} ${{ args.params }}
 
       ci:
         help: run the sames tests executed on CI

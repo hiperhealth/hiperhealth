@@ -42,7 +42,6 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 # Now import the project-specific modules
 from sdx.agents.diagnostics import core as diag
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
-from sdx.models.sqla.research import Patient
 from sdx.privacy.deidenitfier import (
     Deidentifier,
     deidentify_patient_record,
@@ -51,6 +50,7 @@ from sqlalchemy.orm import Session
 
 from research.app.database import SessionLocal
 from research.models.repositories import ResearchRepository
+from research.models.ui import Patient
 
 # Add the project's 'src' and 'research' directories to the Python path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
