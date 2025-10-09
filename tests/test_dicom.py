@@ -7,12 +7,17 @@ missing. The sample DICOM file used for tests is located under
 
 from pathlib import Path
 
-import pydicom
 import pytest
 
-from pydicom.dataset import FileDataset, FileMetaDataset
-from pydicom.uid import ExplicitVRLittleEndian, generate_uid
-from sdx.agents.extraction.dicom import DicomExtractor
+# Import pydicom modules - will be skipped if not available
+try:
+    import pydicom
+
+    from pydicom.dataset import FileDataset, FileMetaDataset
+    from pydicom.uid import ExplicitVRLittleEndian, generate_uid
+    from sdx.agents.extraction.dicom import DicomExtractor
+except ImportError:
+    pytest.skip('pydicom not available', allow_module_level=True)
 
 # path to the sample DICOM test file
 DATA_DIR = Path(__file__).parent / 'data' / 'dicom'

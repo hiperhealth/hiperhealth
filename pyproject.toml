@@ -6,7 +6,7 @@ readme = "README.md"
 authors = [
   {name = "Ivan Ogasawara", email = "ivan.ogasawara@gmail.com"}
 ]
-license = "BSD 3 Clause"
+license = "BSD-3-Clause"
 requires-python = ">=3.10,<4"
 dependencies = [
     "anamnesisai >=0.4.0",
@@ -142,3 +142,8 @@ verbose = false
 dicom = [
   "pydicom >=2.4.0",
 ]
+
+[tool.poetry.group.dicom.dependencies]
+# Provide a named poetry 'group' so CI can use `poetry install --with dicom`.
+# Keep the same version constraint as the optional-dependency above.
+pydicom = ">=2.4.0"
