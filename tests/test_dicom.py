@@ -12,12 +12,12 @@ import pytest
 # Import pydicom modules - will be skipped if not available
 try:
     import pydicom
-
-    from pydicom.dataset import FileDataset, FileMetaDataset
-    from pydicom.uid import ExplicitVRLittleEndian, generate_uid
-    from sdx.agents.extraction.dicom import DicomExtractor
 except ImportError:
     pytest.skip('pydicom not available', allow_module_level=True)
+
+from pydicom.dataset import FileDataset, FileMetaDataset
+from pydicom.uid import ExplicitVRLittleEndian, generate_uid
+from sdx.agents.extraction.dicom import DicomExtractor
 
 # path to the sample DICOM test file
 DATA_DIR = Path(__file__).parent / 'data' / 'dicom'

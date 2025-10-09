@@ -72,8 +72,8 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          # Install the optional 'dicom' extra and dev group so dev tools (pre-commit, linters) are available in CI
-          poetry install --with dicom,dev
+          # Install the optional 'dicom' extra for tests
+          poetry install --with dicom
 
       - name: Run unit tests
         run: makim tests.unit
@@ -119,24 +119,23 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate sdx
           poetry config virtualenvs.create false
-          # Install dev group so pre-commit and linting tools are available; keep parity with tests
+          # Install dev group so pre-commit and linting tools are available
           poetry install --with dicom,dev
 
       - name: Run style checks
         if: success() || failure()
         run: |
-          # Use conda environment's Python directly to avoid shell activation issues
-          CONDA_PYTHON="$CONDA/bin/python"
-          CONDA_PIP="$CONDA/bin/pip"
+          # Initialize conda for the shell and activate environment
+          eval "$(conda shell.bash hook)"
+          conda activate sdx
+          PY="$CONDA_PREFIX/bin/python"
+          PIP="$PY -m pip"
 
-          # Install pre-commit explicitly using conda's pip
-          $CONDA_PIP install pre-commit
+          # Verify pre-commit installation
+          $PY -m pre_commit --version
 
-          # Verify installation
-          $CONDA_PYTHON -m pre_commit --version
-
-          # Run pre-commit install and linter using conda's Python
-          $CONDA_PYTHON -m pre_commit install
+          # Run pre-commit install and linter
+          $PY -m pre_commit install
           makim tests.linter
 
       - name: Setup tmate session

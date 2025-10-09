@@ -62,7 +62,8 @@ mkdocstrings = ">=0.21.2"
 mkdocstrings-python = ">= 1.1.2"
 mkdocs-gen-files = ">=0.5.0"
 makim = "1.27.0"
-# Remove explicit virtualenv constraint to let pre-commit handle it
+# Use a known-good virtualenv version that fixes the 'endswith' regression
+virtualenv = ">=20.26.3,<25.0"
 fastapi = ">=0.115"
 python-multipart = ">=0.0.20"
 
@@ -145,4 +146,5 @@ dicom = [
 [tool.poetry.group.dicom.dependencies]
 # Provide a named poetry 'group' so CI can use `poetry install --with dicom`.
 # Keep the same version constraint as the optional-dependency above.
+# NOTE: This duplication is intentional - both must be kept in sync manually.
 pydicom = ">=2.4.0"

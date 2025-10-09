@@ -89,6 +89,8 @@ class DicomExtractor:
         self,
         file: FileInput,
         api_key: str | None = None,
+        subject_reference: str | None = None,
+        include_series_description: bool = False,
     ) -> Dict[str, Any]:
         """Extract DICOM metadata and generate a minimal FHIR ImagingStudy.
 
@@ -120,7 +122,10 @@ class DicomExtractor:
             'series': series,
         }
 
-        if findings_text:
+        if subject_reference:
+            imaging_study['subject'] = {'reference': subject_reference}
+
+        if include_series_description and findings_text:
             series.append({'description': findings_text})
 
         # attach a short study-level summary (non-PHI)
