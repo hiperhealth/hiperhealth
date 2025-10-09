@@ -8234,4 +8234,4 @@ dicom = ["pydicom"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "28852328415b9a809bb90a2484f975a8d51996d63a59340937480390b2d17fd9"
+content-hash = "6c5f06e91acad54985328004e78f8ec51b44ef1e3ed1c1292f10af61fc64c3c7"
