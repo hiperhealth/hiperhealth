@@ -116,6 +116,7 @@ sort_by_size = true
 
 [project.optional-dependencies]
 dicom = ["pydicom >=2.5"]
+dev = ["pytest", "ruff", "pre-commit"]
 
 [tool.poetry.group.dicom.dependencies]
 # This section defines the 'dicom' dependency group used in CI via:
