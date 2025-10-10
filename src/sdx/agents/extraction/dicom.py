@@ -103,9 +103,18 @@ class DicomExtractor:
         subject_reference: str | None = None,
         include_series_description: bool = False,
     ) -> Dict[str, Any]:
-        """Build a minimally valid FHIR ImagingStudy from DICOM metadata."""
-        _ = api_key
-        metadata = self.extract_metadata(file)
+        """Build a minimally valid FHIR ImagingStudy from DICOM metadata.
+
+        Raises
+        ------
+        EnvironmentError: If no API key is provided.
+        """
+        if not api_key:
+            raise EnvironmentError(
+                'API key is required to extract FHIR ImagingStudy.'
+            )
+
+        metadata = self.extract_metadata(FileInput)
 
         study_uid = self._validate_uid(
             str(metadata.get('StudyInstanceUID') or '')
