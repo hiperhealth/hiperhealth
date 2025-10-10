@@ -12,6 +12,8 @@ import pytest
 
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
+
+# Import these directly since they are always required
 from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
 from sqlalchemy import create_engine
@@ -24,7 +26,6 @@ from research.models.repositories import ResearchRepository
 @pytest.fixture
 def env() -> dict[str, str | None]:
     """Return a fixture for the environment variables from .env file."""
-    # This assumes a .envs/.env file at the project root
     dotenv_path = Path(__file__).parents[1] / '.envs' / '.env'
     if not dotenv_path.exists():
         warnings.warn(
@@ -82,7 +83,30 @@ def medical_extractor():
     return MedicalReportFileExtractor()
 
 
-# Use an in-memory SQLite database for fast, isolated tests
+@pytest.fixture
+def dicom_extractor():
+    """Provide a DicomExtractor instance for tests."""
+    # Import lazily and skip gracefully if not available
+    pytest.importorskip('pydicom')
+    try:
+        from sdx.agents.extraction.dicom import DicomExtractor
+    except ImportError as e:
+        pytest.skip(f'DICOM extractor unavailable: {e}')
+    return DicomExtractor()
+
+
+@pytest.fixture
+def sample_dicom_file(test_data_dir: Path) -> Path:
+    """Path to the sample DICOM file used across tests."""
+    path = test_data_dir / 'dicom' / 'ID_0000_AGE_0060_CONTRAST_1_CT.dcm'
+    if not path.exists():
+        pytest.skip(
+            'Sample DICOM file not found; skipping DICOM-related tests.'
+        )
+    return path
+
+
+# In-memory SQLite DB for isolated tests
 TEST_DB_URL = 'sqlite:///:memory:'
 engine = create_engine(TEST_DB_URL, connect_args={'check_same_thread': False})
 TestingSessionLocal = sessionmaker(
