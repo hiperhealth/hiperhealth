@@ -33,12 +33,10 @@ def extractor():
 def test_extract_metadata_basic(extractor):
     """Ensure metadata extraction works on a valid DICOM file."""
     if not SAMPLE_DICOM.exists():
-        # Skip when sample DICOM test data is unavailable
         pytest.skip(f'Sample DICOM file not found at {SAMPLE_DICOM}')
 
     metadata = extractor.extract_metadata(SAMPLE_DICOM)
 
-    # Basic structural checks
     assert isinstance(metadata, dict)
     assert 'PatientID' in metadata
     assert 'Modality' in metadata
@@ -48,9 +46,6 @@ def test_extract_metadata_basic(extractor):
 
 def test_extract_metadata_missing_fields(extractor, tmp_path):
     """Ensure missing DICOM fields are handled gracefully."""
-    # Provide minimal file meta and encoding so pydicom can write a conformant
-    # DICOM file. Use FileDataset (not plain Dataset) and a 128-byte
-    # preamble so the 'DICM' prefix and file meta info are written.
     file_meta = FileMetaDataset()
     file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
     file_meta.MediaStorageSOPClassUID = generate_uid()
@@ -58,7 +53,6 @@ def test_extract_metadata_missing_fields(extractor, tmp_path):
     file_meta.ImplementationClassUID = generate_uid()
 
     test_file = tmp_path / 'empty.dcm'
-    # FileDataset writes the file meta and preamble when saved
     ds = FileDataset(
         str(test_file), {}, file_meta=file_meta, preamble=b'\0' * 128
     )
@@ -70,20 +64,18 @@ def test_extract_metadata_missing_fields(extractor, tmp_path):
     )
 
     metadata = extractor.extract_metadata(test_file)
-
-    # fallback values for missing tags
     assert metadata['PatientID'] == 'Unknown'
     assert metadata['StudyDate'] == 'Unknown'
 
 
 def test_load_dicom_method(extractor):
     """Verify the internal DICOM loading method works safely."""
-    # Guard: skip if private loader API is missing to avoid brittle tests
+    if not SAMPLE_DICOM.exists():
+        pytest.skip(f'Sample DICOM file not found at {SAMPLE_DICOM}')
     if not hasattr(extractor, '_load_dicom'):
         pytest.skip('internal loader API changed')
 
     try:
-        # Call private loader while tolerating signature drift
         ds = extractor._load_dicom(SAMPLE_DICOM, stop_before_pixels=True)
     except TypeError:
         pytest.skip('internal loader signature changed')
@@ -94,9 +86,11 @@ def test_load_dicom_method(extractor):
 
 def test_extract_fhir_requires_api_key(extractor, monkeypatch):
     """Ensure extract_fhir raises EnvironmentError without an API key."""
-    # Clear a broad set of AI-related env vars to avoid accidental
-    # network calls
-    for k in (
+    if not SAMPLE_DICOM.exists():
+        pytest.skip(f'Sample DICOM file not found at {SAMPLE_DICOM}')
+
+    # Clear potential AI keys to prevent external calls
+    for key in (
         'OPENAI_API_KEY',
         'OPENAI_ORG',
         'OPENAI_BASE_URL',
@@ -105,6 +99,7 @@ def test_extract_fhir_requires_api_key(extractor, monkeypatch):
         'GOOGLE_API_KEY',
         'ANTHROPIC_API_KEY',
     ):
-        monkeypatch.delenv(k, raising=False)
+        monkeypatch.delenv(key, raising=False)
+
     with pytest.raises(EnvironmentError):
         extractor.extract_fhir(SAMPLE_DICOM)

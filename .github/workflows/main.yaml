@@ -54,6 +54,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Ensure compatible Poetry version (>=1.2 for `--with` syntax)
+      - name: Install Poetry
+        run: pip install "poetry>=1.2"
+
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
@@ -70,8 +74,8 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          # Install the optional 'dicom' dependency group so pydicom is available in CI
-          poetry install --with dicom
+          # Install both 'dev' and 'dicom' dependency groups for full CI coverage
+          poetry install --with dev,dicom
 
       - name: Run unit tests
         run: makim tests.unit
@@ -95,11 +99,14 @@ jobs:
         shell: bash -l {0}
 
     concurrency:
-      group: ci-linter-docs-${{ matrix.os }}-${{ matrix.python_version }}-${{ github.ref }}
+      group: ci-linter-docs-${{ github.ref }}
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: pip install "poetry>=1.2"
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -114,8 +121,8 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          # For linting we don't need the DICOM group, but keeping parity with tests
-          poetry install --with dicom
+          # Only install 'dev' group for linting (omit dicom for faster install)
+          poetry install --with dev
 
       - name: Run style checks
         if: success() || failure()

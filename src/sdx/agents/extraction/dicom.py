@@ -1,6 +1,7 @@
 """DICOM extraction and FHIR ImagingStudy conversion utilities."""
 
 import io
+import re
 
 from pathlib import Path
 from typing import Any, Dict
@@ -17,21 +18,15 @@ class DicomExtractor:
 
     @staticmethod
     def _get_str(ds: Any, name: str, default: str = 'Unknown') -> str:
-        """Return a JSON-safe string for a DICOM attribute.
-
-        pydicom value types (e.g. PersonName) may not be JSON-serializable, so
-        convert to str when present and return a default otherwise.
-        """
+        """Return a JSON-safe string for a DICOM attribute."""
         val = getattr(ds, name, None)
-        if val is None or val == '':
-            return default
-        return str(val)
+        return str(val) if val not in (None, '') else default
 
     @staticmethod
     def _redact_metadata(metadata: Dict[str, Any]) -> Dict[str, str]:
-        """Return a copy of metadata with PHI keys removed and values.
+        """Return a copy of metadata with a limited set of PHI keys removed.
 
-        stringified.
+        Not exhaustive.
         """
         phi_keys = {
             'PatientName',
@@ -48,8 +43,19 @@ class DicomExtractor:
             'OperatorsName',
             'PerformingPhysicianName',
             'RequestingPhysician',
+            'ProtocolName',
+            'StationName',
+            'OtherPatientIDs',
         }
         return {k: str(v) for k, v in metadata.items() if k not in phi_keys}
+
+    @staticmethod
+    def _validate_uid(uid: str) -> str:
+        """Validate DICOM UID format and length."""
+        uid = uid.strip()
+        if not uid or len(uid) > 64 or not re.fullmatch(r'\d+(\.\d+)+', uid):
+            raise ValueError(f'Invalid DICOM UID: {uid!r}')
+        return uid
 
     @staticmethod
     def extract_metadata(file: FileInput) -> Dict[str, Any]:
@@ -80,7 +86,7 @@ class DicomExtractor:
         )
         metadata['SeriesNumber'] = DicomExtractor._get_str(ds, 'SeriesNumber')
 
-        # UIDs (required for valid FHIR ImagingStudy/Series)
+        # UIDs
         metadata['StudyInstanceUID'] = DicomExtractor._get_str(
             ds, 'StudyInstanceUID', default=''
         )
@@ -98,22 +104,15 @@ class DicomExtractor:
         include_series_description: bool = False,
     ) -> Dict[str, Any]:
         """Build a minimally valid FHIR ImagingStudy from DICOM metadata."""
-        _ = api_key  # suppress unused variable warning
+        _ = api_key
         metadata = self.extract_metadata(file)
 
-        study_uid = str(metadata.get('StudyInstanceUID') or '').strip()
-        series_uid = str(metadata.get('SeriesInstanceUID') or '').strip()
-
-        if not study_uid:
-            raise ValueError(
-                'DICOM missing StudyInstanceUID; '
-                'cannot build valid ImagingStudy'
-            )
-        if not series_uid:
-            raise ValueError(
-                'DICOM missing SeriesInstanceUID; '
-                'cannot build valid ImagingStudy'
-            )
+        study_uid = self._validate_uid(
+            str(metadata.get('StudyInstanceUID') or '')
+        )
+        series_uid = self._validate_uid(
+            str(metadata.get('SeriesInstanceUID') or '')
+        )
 
         imaging_study: Dict[str, Any] = {
             'resourceType': 'ImagingStudy',
@@ -123,8 +122,16 @@ class DicomExtractor:
         }
 
         findings_text = str(metadata.get('SeriesDescription') or '').strip()
+        patient_name = str(metadata.get('PatientName') or '').strip()
+        patient_id = str(metadata.get('PatientID') or '').strip()
+
+        # Only include description if not PHI-like or sentinel
         if include_series_description and findings_text:
-            imaging_study['series'][0]['description'] = findings_text
+            if findings_text.lower() != 'unknown' and findings_text not in (
+                patient_name,
+                patient_id,
+            ):
+                imaging_study['series'][0]['description'] = findings_text
 
         if subject_reference:
             imaging_study['subject'] = {'reference': subject_reference}
@@ -132,10 +139,7 @@ class DicomExtractor:
         return imaging_study
 
     @staticmethod
-    def _load_dicom(
-        file: FileInput,
-        stop_before_pixels: bool = False,
-    ) -> Any:
+    def _load_dicom(file: FileInput, stop_before_pixels: bool = False) -> Any:
         """Load DICOM file safely from path, bytes, or file-like object."""
         try:
             import pydicom
@@ -144,8 +148,8 @@ class DicomExtractor:
         except ModuleNotFoundError as e:
             raise ModuleNotFoundError(
                 'pydicom is required for DICOM extraction. '
-                'Install with "pip install sdx[dicom]" or add pydicom to your '
-                'environment.'
+                'Install with "pip install sdx[dicom]" or add pydicom '
+                'to your environment.'
             ) from e
 
         try:

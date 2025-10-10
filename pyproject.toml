@@ -7,7 +7,7 @@ authors = [
   {name = "Ivan Ogasawara", email = "ivan.ogasawara@gmail.com"}
 ]
 license = "BSD-3-Clause"
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.10,<4"  # widened to allow 3.13+ if deps support
 dependencies = [
     "anamnesisai >=0.4.0",
     "fhir.resources >=8.1.0",
@@ -62,11 +62,9 @@ mkdocstrings = ">=0.21.2"
 mkdocstrings-python = ">= 1.1.2"
 mkdocs-gen-files = ">=0.5.0"
 makim = "1.27.0"
-# Use a known-good virtualenv version that fixes the 'endswith' regression
 virtualenv = ">=20.26.3,<25.0"
 fastapi = ">=0.115"
 python-multipart = ">=0.0.20"
-
 
 [tool.bandit]
 exclude_dirs = ["tests"]
@@ -82,47 +80,29 @@ warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unused_configs = true
 exclude = ["scripts/"]
-plugins = [
-  "pydantic.mypy",
-]
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = "sdx.schema.fhirx"
-disable_error_code = [
-  "name-defined",
-  "valid-type",
-]
+disable_error_code = ["name-defined", "valid-type"]
 
 [tool.pytest.ini_options]
-testpaths = [
-    "tests",
-]
-# Keep pytest warnings unfiltered to avoid masking deprecations in our code.
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 79
 force-exclude = true
 src = ["./"]
-exclude = [
-  'docs',
-]
+exclude = ['docs']
 
 [tool.ruff.lint]
-select = [
-  "E",   # pycodestyle
-  "F",   # pyflakes
-  "D",   # pydocstyle
-  "YTT", # flake8-2020
-  "RUF", # Ruff-specific rules
-  "I001",  # isort
-]
+select = ["E", "F", "D", "YTT", "RUF", "I001"]
 fixable = ["I001", "F401"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 [tool.ruff.lint.isort]
-# Use a single line between direct and from import
 lines-between-types = 1
 
 [tool.ruff.format]
@@ -130,21 +110,18 @@ quote-style = "single"
 
 [tool.vulture]
 exclude = ["tests"]
-ignore_decorators = []
-ignore_names = []
-make_whitelist = true
 min_confidence = 80
 paths = ["./"]
 sort_by_size = true
-verbose = false
 
 [project.optional-dependencies]
-dicom = [
-  "pydicom >=2.4.0",
-]
+dicom = ["pydicom >=2.4.0"]
 
 [tool.poetry.group.dicom.dependencies]
-# Provide a named poetry 'group' so CI can use `poetry install --with dicom`.
-# Keep the same version constraint as the optional-dependency above.
-# NOTE: This duplication is intentional - both must be kept in sync manually.
+# This section defines the 'dicom' dependency group used in CI via:
+#   poetry install --with dicom
+# The same package is also defined under [project.optional-dependencies]
+# to allow user installs via:
+#   poetry install -E dicom
+# Keep both entries synchronized manually.
 pydicom = ">=2.4.0"
