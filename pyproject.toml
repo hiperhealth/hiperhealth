@@ -7,7 +7,7 @@ authors = [
   {name = "Ivan Ogasawara", email = "ivan.ogasawara@gmail.com"}
 ]
 license = "BSD-3-Clause"
-requires-python = ">=3.10,<4"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "anamnesisai >=0.4.0",
     "fhir.resources >=8.1.0",

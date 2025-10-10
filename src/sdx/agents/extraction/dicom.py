@@ -29,9 +29,9 @@ class DicomExtractor:
 
     @staticmethod
     def _redact_metadata(metadata: Dict[str, Any]) -> Dict[str, str]:
-        """Return a copy of metadata with common PHI keys removed and.
+        """Return a copy of metadata with PHI keys removed and values.
 
-        values stringified.
+        stringified.
         """
         phi_keys = {
             'PatientName',
@@ -53,10 +53,7 @@ class DicomExtractor:
 
     @staticmethod
     def extract_metadata(file: FileInput) -> Dict[str, Any]:
-        """Extract relevant metadata fields from a DICOM file.
-
-        Values are normalized to strings where appropriate.
-        """
+        """Extract relevant metadata fields from a DICOM file."""
         ds = DicomExtractor._load_dicom(file, stop_before_pixels=True)
         metadata: Dict[str, Any] = {}
 
@@ -83,6 +80,14 @@ class DicomExtractor:
         )
         metadata['SeriesNumber'] = DicomExtractor._get_str(ds, 'SeriesNumber')
 
+        # UIDs (required for valid FHIR ImagingStudy/Series)
+        metadata['StudyInstanceUID'] = DicomExtractor._get_str(
+            ds, 'StudyInstanceUID', default=''
+        )
+        metadata['SeriesInstanceUID'] = DicomExtractor._get_str(
+            ds, 'SeriesInstanceUID', default=''
+        )
+
         return metadata
 
     def extract_fhir(
@@ -92,45 +97,37 @@ class DicomExtractor:
         subject_reference: str | None = None,
         include_series_description: bool = False,
     ) -> Dict[str, Any]:
-        """Extract DICOM metadata and generate a minimal FHIR ImagingStudy.
-
-        If an API key is provided this method could call an external AI service
-        to enrich findings. If no key is available, proceed in offline mode and
-        return a basic ImagingStudy resource constructed from metadata.
-        """
+        """Build a minimally valid FHIR ImagingStudy from DICOM metadata."""
+        _ = api_key  # suppress unused variable warning
         metadata = self.extract_metadata(file)
-        findings_text = str(
-            metadata.get('SeriesDescription', '') or ''
-        ).strip()
 
-        # Only require a key when we actually perform a remote AI call. For now
-        # proceed in offline mode if no key is provided.
-        # reference api_key to avoid unused-variable tooling warnings
-        if api_key:
-            # api_key would be used by a remote enrichment call
-            pass
-        # Redact PHI and stringify remaining values
-        safe_metadata = DicomExtractor._redact_metadata(metadata)
+        study_uid = str(metadata.get('StudyInstanceUID') or '').strip()
+        series_uid = str(metadata.get('SeriesInstanceUID') or '').strip()
 
-        # If a remote AI call were implemented, it would be performed here and
-        # would require `key`. Since that's not implemented, return a minimal
-        # ImagingStudy resource constructed locally.
-        series: list[Dict[str, str]] = []
+        if not study_uid:
+            raise ValueError(
+                'DICOM missing StudyInstanceUID; '
+                'cannot build valid ImagingStudy'
+            )
+        if not series_uid:
+            raise ValueError(
+                'DICOM missing SeriesInstanceUID; '
+                'cannot build valid ImagingStudy'
+            )
+
         imaging_study: Dict[str, Any] = {
             'resourceType': 'ImagingStudy',
             'status': 'available',
-            'series': series,
+            'uid': study_uid,
+            'series': [{'uid': series_uid}],
         }
+
+        findings_text = str(metadata.get('SeriesDescription') or '').strip()
+        if include_series_description and findings_text:
+            imaging_study['series'][0]['description'] = findings_text
 
         if subject_reference:
             imaging_study['subject'] = {'reference': subject_reference}
-
-        if include_series_description and findings_text:
-            series.append({'description': findings_text})
-
-        # attach a short study-level summary (non-PHI)
-        if safe_metadata:
-            imaging_study['description'] = str(safe_metadata)
 
         return imaging_study
 
@@ -139,12 +136,7 @@ class DicomExtractor:
         file: FileInput,
         stop_before_pixels: bool = False,
     ) -> Any:
-        """Load DICOM file safely from path, bytes, or file-like object.
-
-        pydicom is imported lazily so the module can be used without pydicom
-        being installed. If pydicom is missing, a ModuleNotFoundError will be
-        raised when DICOM functionality is accessed.
-        """
+        """Load DICOM file safely from path, bytes, or file-like object."""
         try:
             import pydicom
 

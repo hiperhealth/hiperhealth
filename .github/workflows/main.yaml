@@ -9,7 +9,6 @@ on:
 jobs:
   check-branch:
     runs-on: ubuntu-latest
-
     timeout-minutes: 2
     concurrency:
       group: ci-check-branch-${{ github.ref }}
@@ -72,7 +71,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          # Install the optional 'dicom' extra for tests
+          # Install the optional 'dicom' dependency group so pydicom is available in CI
           poetry install --with dicom
 
       - name: Run unit tests
@@ -115,27 +114,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # Initialize conda for the shell
-          eval "$(conda shell.bash hook)"
-          conda activate sdx
           poetry config virtualenvs.create false
-          # Install dev group so pre-commit and linting tools are available
-          poetry install --with dicom,dev
+          # For linting we don't need the DICOM group, but keeping parity with tests
+          poetry install --with dicom
 
       - name: Run style checks
         if: success() || failure()
         run: |
-          # Initialize conda for the shell and activate environment
-          eval "$(conda shell.bash hook)"
-          conda activate sdx
-          PY="$CONDA_PREFIX/bin/python"
-          PIP="$PY -m pip"
-
-          # Verify pre-commit installation
-          $PY -m pre_commit --version
-
-          # Run pre-commit install and linter
-          $PY -m pre_commit install
+          pre-commit install
           makim tests.linter
 
       - name: Setup tmate session
