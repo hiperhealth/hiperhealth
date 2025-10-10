@@ -58,9 +58,9 @@ class DicomExtractor:
         return uid
 
     @staticmethod
-    def extract_metadata(file: FileInput) -> Dict[str, Any]:
+    def extract_metadata(file_input: FileInput) -> Dict[str, Any]:
         """Extract relevant metadata fields from a DICOM file."""
-        ds = DicomExtractor._load_dicom(file, stop_before_pixels=True)
+        ds = DicomExtractor._load_dicom(file_input, stop_before_pixels=True)
         metadata: Dict[str, Any] = {}
 
         # Patient info
@@ -68,37 +68,62 @@ class DicomExtractor:
         metadata['PatientID'] = DicomExtractor._get_str(ds, 'PatientID')
         metadata['PatientSex'] = DicomExtractor._get_str(ds, 'PatientSex')
         metadata['PatientBirthDate'] = DicomExtractor._get_str(
-            ds, 'PatientBirthDate'
+            ds,
+            'PatientBirthDate',
         )
 
         # Study info
         metadata['StudyDate'] = DicomExtractor._get_str(ds, 'StudyDate')
         metadata['StudyTime'] = DicomExtractor._get_str(ds, 'StudyTime')
         metadata['StudyDescription'] = DicomExtractor._get_str(
-            ds, 'StudyDescription'
+            ds,
+            'StudyDescription',
         )
         metadata['Modality'] = DicomExtractor._get_str(ds, 'Modality')
         metadata['Manufacturer'] = DicomExtractor._get_str(ds, 'Manufacturer')
 
         # Series info
         metadata['SeriesDescription'] = DicomExtractor._get_str(
-            ds, 'SeriesDescription'
+            ds,
+            'SeriesDescription',
         )
         metadata['SeriesNumber'] = DicomExtractor._get_str(ds, 'SeriesNumber')
 
         # UIDs
         metadata['StudyInstanceUID'] = DicomExtractor._get_str(
-            ds, 'StudyInstanceUID', default=''
+            ds,
+            'StudyInstanceUID',
+            default='',
         )
         metadata['SeriesInstanceUID'] = DicomExtractor._get_str(
-            ds, 'SeriesInstanceUID', default=''
+            ds,
+            'SeriesInstanceUID',
+            default='',
         )
 
         return metadata
 
+    @staticmethod
+    def _is_non_phi_description(
+        text: str,
+        patient_name: str,
+        patient_id: str,
+    ) -> bool:
+        """Return True if description is unlikely to contain PHI."""
+        t = text.strip().casefold()
+        if not t or t == 'unknown':
+            return False
+        for probe in (
+            patient_name.strip().casefold(),
+            patient_id.strip().casefold(),
+        ):
+            if probe and probe in t:
+                return False
+        return True
+
     def extract_fhir(
         self,
-        file: FileInput,
+        file_input: FileInput,
         api_key: str | None = None,
         subject_reference: str | None = None,
         include_series_description: bool = False,
@@ -107,14 +132,15 @@ class DicomExtractor:
 
         Raises
         ------
-        EnvironmentError: If no API key is provided.
+        EnvironmentError
+            If no API key is provided.
         """
         if not api_key:
             raise EnvironmentError(
                 'API key is required to extract FHIR ImagingStudy.'
             )
 
-        metadata = self.extract_metadata(FileInput)
+        metadata = self.extract_metadata(file_input)
 
         study_uid = self._validate_uid(
             str(metadata.get('StudyInstanceUID') or '')
@@ -134,13 +160,12 @@ class DicomExtractor:
         patient_name = str(metadata.get('PatientName') or '').strip()
         patient_id = str(metadata.get('PatientID') or '').strip()
 
-        # Only include description if not PHI-like or sentinel
-        if include_series_description and findings_text:
-            if findings_text.lower() != 'unknown' and findings_text not in (
-                patient_name,
-                patient_id,
-            ):
-                imaging_study['series'][0]['description'] = findings_text
+        if include_series_description and self._is_non_phi_description(
+            findings_text,
+            patient_name,
+            patient_id,
+        ):
+            imaging_study['series'][0]['description'] = findings_text
 
         if subject_reference:
             imaging_study['subject'] = {'reference': subject_reference}
@@ -148,7 +173,10 @@ class DicomExtractor:
         return imaging_study
 
     @staticmethod
-    def _load_dicom(file: FileInput, stop_before_pixels: bool = False) -> Any:
+    def _load_dicom(
+        file_input: FileInput,
+        stop_before_pixels: bool = False,
+    ) -> Any:
         """Load DICOM file safely from path, bytes, or file-like object."""
         try:
             import pydicom
@@ -162,14 +190,19 @@ class DicomExtractor:
             ) from e
 
         try:
-            if isinstance(file, (str, Path)):
+            if isinstance(file_input, (str, Path)):
                 return pydicom.dcmread(
-                    str(file), stop_before_pixels=stop_before_pixels
+                    str(file_input),
+                    stop_before_pixels=stop_before_pixels,
                 )
-            if isinstance(file, bytes):
+            if isinstance(file_input, bytes):
                 return pydicom.dcmread(
-                    io.BytesIO(file), stop_before_pixels=stop_before_pixels
+                    io.BytesIO(file_input),
+                    stop_before_pixels=stop_before_pixels,
                 )
-            return pydicom.dcmread(file, stop_before_pixels=stop_before_pixels)
+            return pydicom.dcmread(
+                file_input,
+                stop_before_pixels=stop_before_pixels,
+            )
         except (InvalidDicomError, FileNotFoundError, OSError) as e:
             raise ValueError(f'Invalid DICOM file: {e}') from e

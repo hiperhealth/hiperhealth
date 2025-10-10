@@ -62,7 +62,7 @@ mkdocstrings = ">=0.21.2"
 mkdocstrings-python = ">= 1.1.2"
 mkdocs-gen-files = ">=0.5.0"
 makim = "1.27.0"
-virtualenv = ">=20.26.3,<25.0"
+virtualenv = "^20.24"
 fastapi = ">=0.115"
 python-multipart = ">=0.0.20"
 
@@ -115,7 +115,7 @@ paths = ["./"]
 sort_by_size = true
 
 [project.optional-dependencies]
-dicom = ["pydicom >=2.4.0"]
+dicom = ["pydicom >=2.5"]
 
 [tool.poetry.group.dicom.dependencies]
 # This section defines the 'dicom' dependency group used in CI via:
