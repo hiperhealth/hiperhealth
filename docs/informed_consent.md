@@ -1,5 +1,5 @@
 title: "Informed Consent Template for Research Data Use"
-version: 1.1
+version: 1
 last_updated: "2025-10-21"
 author: "SDX Contributors"
 ---
@@ -24,7 +24,7 @@ Your participation is completely voluntary.
 ---
 
 ## 2. Purpose of the Research
-The purpose of this research is to improve understanding of health conditions and care delivery by analyzing health-related data.  
+The purpose of this research is to improve understanding of health conditions and care delivery by analyzing de-identified patient data.  
 Your data may help develop better tools, treatments, and technologies for patients in the future.
 
 ---
@@ -32,12 +32,14 @@ Your data may help develop better tools, treatments, and technologies for patien
 ## 3. Procedures
 If you agree:
 
-- Researchers will use data already collected as part of your care.  
-- No additional tests or visits are required.  
-- Your data will be either:
-  - **De-identified** under HIPAA §164.514 (no Authorization required), or  
-  - **Coded, Limited Data Set, or identifiable PHI**, which requires a valid Authorization, IRB waiver, and/or Data Use Agreement (DUA).  
-- Data may be shared with approved research partners or institutions under confidentiality agreements.  
+- Researchers will use data already collected as part of your care.
+- No additional tests or visits are required.
+- **HIPAA de-identification categories:**
+  - **De-identified under HIPAA §164.514(b):** Not PHI; no Authorization required.
+  - **Limited Data Set (LDS) under HIPAA §164.514(e):** External disclosures require a Data Use Agreement (DUA); Authorization or waiver is not required for LDS disclosures; institutional/IRB approvals may still apply.
+  - **Identifiable PHI:** Requires your HIPAA Authorization or an IRB-approved waiver of Authorization.
+  - **Note:** “Coded”/pseudonymized data that can be re-identified by the holder remain PHI under HIPAA.
+- Data may be shared with approved research partners or institutions under strict confidentiality agreements and Data Use Agreements where applicable.
 - Only authorized personnel will access your information.
 
 ---
@@ -46,80 +48,73 @@ If you agree:
 There are no physical risks to you.  
 Although every effort will be made to protect your privacy, there is a small risk that someone could identify you from shared data.  
 
-**Security measures include:**
+**Security measures:**
 
-- Encryption in transit and at rest  
-- Role-based access with logging and auditing  
-- Regular security assessments  
+- Data will be encrypted in transit and at rest.
+- Access is role-based (least privilege), logged, and audited.
+- Regular security assessments are performed.
 
 ---
 
 ## 5. Benefits
 There may be no direct benefit to you.  
-However, your data may help researchers advance medical knowledge and improve patient care.
+However, your data may help researchers advance medical knowledge, improve diagnostic tools, or develop better treatments.
 
 ---
 
 ## 6. Confidentiality and Data Protection
-- Personal identifiers (e.g., name, address) will be removed or replaced with a study code.  
-- Data will be retained according to applicable institutional, IRB, or legal retention requirements.  
-- After the retention period, data will be securely deleted or anonymized, and may be archived in de-identified form for research integrity.  
-- International data transfers will comply with safeguards such as Standard Contractual Clauses (SCCs) and a Transfer Impact Assessment.  
-  Participants may request a copy of the SCCs (subject to redactions) by contacting the Data Protection Officer.  
+- Personal identifiers (e.g., name, address) will be removed or replaced with a study code.
+- Data will be retained for [insert duration according to law/IRB] or until the completion of the study, then securely destroyed or archived in de-identified form.
+- International transfers will follow appropriate safeguards (e.g., Standard Contractual Clauses, Transfer Impact Assessment), and participants can request copies.
 - All use of your information will comply with applicable privacy laws (e.g., HIPAA, GDPR).
 
 ---
 
 ## 7. Voluntary Participation
 Taking part in this research is your choice.  
-Refusing will not affect your medical care or your relationship with healthcare providers.
+Refusing will not affect your medical care or relationship with your healthcare providers.
 
 ---
 
 ## 8. Withdrawal of Consent
 You may withdraw your consent at any time by contacting the research team.  
-Upon withdrawal:
+After withdrawal:
 
-- All feasible efforts will be made to instruct partners and collaborators to cease processing and delete your data.  
-- Data already used in analyses, anonymized datasets, or publications cannot be retrieved, but further sharing will stop where feasible.
+- New uses of your data will cease.
+- Downstream partners will be instructed to stop processing and delete/destroy data where feasible.
+- Data already used in analyses, publications, or shared de-identified datasets cannot be retracted.
 
 ---
 
 ## 9. Future Use of Data
+You may choose whether your **de-identified data** can be stored for future research, including commercial applications:
 
-Please indicate your choices by checking one option for each statement:
-
-**Use in future research (non-commercial):**  
-☐ I give permission for my de-identified data to be used in future approved studies.  
-☐ I do NOT give permission for my de-identified data to be used in future studies.  
-
-**Use in commercial research (e.g., AI/ML model training):**  
-☐ My data may be used for commercial research.  
-☐ My data may NOT be used for commercial research.  
-Participant initials: _______  
-
-**Recontact for future studies:**  
-☐ I wish to be recontacted for future research.  
-☐ I do NOT wish to be recontacted.  
-
-**Return of research results:**  
-☐ I wish to receive individual research results.  
-☐ I do NOT wish to receive individual research results.  
+- [ ] Yes  [ ] No – My de-identified data may be used for commercial research, including AI/ML model training.  
+- **Note:** Identifiable PHI will not be used for any future research without a new Authorization or an IRB-approved waiver.  
+- [ ] Yes  [ ] No – I wish/do not wish to be recontacted for future studies.  
+- [ ] Yes  [ ] No – Individual research results will/will not be returned.  
+- [ ] Acknowledge – I understand I will not receive financial benefits from downstream products.
 
 ---
 
-## 10. Contact Information
+## 10. Return of Results Disclaimer
+Any returned results are **research information**, not a medical diagnosis, and should not be used to make clinical decisions.  
+Clinically actionable findings, if any, will be managed per institutional policy.
+
+---
+
+## 11. Contact Information
 If you have questions or wish to withdraw consent, please contact:
 
-**Principal Investigator:** Dr. Jane Smith — jane.smith@sdx.org — +1 (555) 123-4567  
+**Principal Investigator:** Dr. Jane Smith, jane.smith@sdx.org, +1 (555) 123-4567  
 **Ethics/IRB Contact:** irb@sdx.org  
 **Data Controller:** SDX Research Institute, 123 Research Lane, City, Country  
 **Data Protection Officer:** dpo@sdx.org  
-**For GDPR complaints:** Contact your local Data Protection Authority
+**For GDPR complaints:** Data Protection Authority, City, Country
 
 ---
 
-## 11. Authorization and Signatures
+## 12. Authorization and Signatures
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
@@ -129,34 +124,26 @@ If you have questions or wish to withdraw consent, please contact:
 | Researcher |  |  |  |
 | Witness (optional) |  |  |  |
 
----
+**HIPAA Authorization Elements (US-specific):**
 
-### HIPAA Authorization Fields
-
-**Description of PHI to be used/disclosed:** ______________________  
-**Who may disclose the information:** ____________________________  
-**To whom disclosure will be made:** _____________________________  
-**Purpose of disclosure:** _______________________________________  
-**Expiration date or event:** ____________________________________  
-**How to revoke authorization:** _________________________________  
-**Notice of potential re-disclosure:** ____________________________  
-☐ I acknowledge that treatment/payment is not conditioned on signing this authorization.  
-☐ I acknowledge I have received a copy of this authorization.  
+- Description of PHI to be used/disclosed and by whom/recipients  
+- Purpose of disclosure  
+- Expiration date/event  
+- Statement on right to revoke and instructions  
+- Notice of potential re-disclosure  
+- Statement that treatment/payment is not conditioned on signing  
+- Copy of this form will be provided to participant
 
 ---
 
-## 12. Jurisdiction-Specific Notices (GDPR and others)
-
-**Legal Basis for Processing (GDPR):**  
-- Art. 6(1)(a): Consent of the data subject  
-- Art. 9(2)(a): Explicit consent for processing special-category (health) data  
-
-You may withdraw your consent at any time without affecting the lawfulness of prior processing.  
-Once data are anonymized, they are no longer subject to GDPR.  
-
-**Data Subject Rights:**  
-- Access, rectification, erasure, restriction, portability, and objection  
-- Right to lodge a complaint with your Data Protection Authority  
+## 13. Jurisdiction-Specific Notices (e.g., GDPR)
+- Purposes and legal basis of processing (Art. 6(1), Art. 9(2) for special-category data)  
+- Categories of personal data  
+- Recipients and transfers  
+- Retention period and anonymization strategy  
+- International transfer safeguards  
+- Data subject rights: access, rectification, erasure, restriction, portability, objection  
+- Right to lodge a complaint with supervisory authority  
 
 ---
 
