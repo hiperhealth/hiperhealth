@@ -42,15 +42,10 @@ If you agree:
 - No additional tests or visits are required.
 - **HIPAA de-identification categories:**
   - **De-identified under HIPAA §164.514(b):** Not PHI; no Authorization required.
-  - **Limited Data Set (LDS) under HIPAA §164.514(e):** External disclosures
-    require a Data Use Agreement (DUA); Authorization or waiver is not required
-    for LDS disclosures; institutional/IRB approvals may still apply.
-  - **Identifiable PHI:** Requires your HIPAA Authorization or an IRB/Privacy Board–approved
-    waiver of Authorization.
-  - **Note:** “Coded”/pseudonymized data that can be re-identified by the holder
-    remain PHI under HIPAA.
-- Data may be shared with approved research partners or institutions under
-  strict confidentiality agreements and Data Use Agreements where applicable.
+  - **Limited Data Set (LDS) under HIPAA §164.514(e):** External disclosures for research, public health, or health care operations require a Data Use Agreement (DUA); Authorization or waiver is not required for those purposes; institutional/IRB approvals may still apply.
+  - **Identifiable PHI:** Requires your HIPAA Authorization or an IRB/Privacy Board–approved waiver of Authorization.
+  - **Note:** “Coded”/pseudonymized data that can be re-identified by the holder remain PHI under HIPAA.
+- Data may be shared with approved research partners or institutions under strict confidentiality agreements and Data Use Agreements where applicable.
 - Only authorized personnel will access your information.
 
 ---
@@ -89,8 +84,7 @@ treatments.
   copies.
 - All use of your information will comply with applicable privacy laws (e.g.,
   HIPAA, GDPR).
-- **Note:** Copies of SCCs may be redacted to protect confidential or commercially
-  sensitive information.
+- **Note:** Copies of SCCs may be redacted to protect confidential or commercially sensitive information.
 
 ---
 
@@ -116,21 +110,21 @@ withdrawal:
 
 ## 9. Future Use of Data
 
-Please select one option for each item to indicate your choice.  
+Please select one option for each item to indicate your choice:  
 
-1. Use of de-identified data for commercial research, including AI/ML model training:  
+1. **Commercial research consent:** Use of de-identified data for commercial research, including AI/ML model training  
    - [ ] I consent  
    - [ ] I do not consent  
 
-2. Recontact for future studies:  
+2. **Recontact consent:** Recontact for future studies  
    - [ ] I wish to be recontacted  
    - [ ] I do not wish to be recontacted  
 
-3. Receipt of individual research results:  
+3. **Receipt of results:** Receipt of individual research results  
    - [ ] I wish to receive results  
    - [ ] I do not wish to receive results  
 
-4. Understanding of no financial benefits from downstream products:  
+4. **No financial benefit acknowledgment:** Understanding of no financial benefits from downstream products  
    - [ ] I acknowledge
 
 **Note:** Identifiable PHI will not be used for any future research without a new
@@ -173,8 +167,9 @@ Consent form and agree to participate in this research study.
 
 ### HIPAA Authorization Elements (US-specific)
 
+- **Authorized discloser:** [Name/class of person(s) authorized to use/disclose the PHI]  
 I authorize the use and disclosure of my Protected Health Information (PHI) as described below.  
-Please initial and sign each line to confirm your HIPAA Authorization.
+Please initial each bullet and sign below to confirm your HIPAA Authorization.
 
 - **Description of PHI:** [Describe PHI to be used/disclosed]  
 - **Recipients:** [List recipients of PHI]  
@@ -182,7 +177,7 @@ Please initial and sign each line to confirm your HIPAA Authorization.
 - **Expiration date/event:** [Insert date or event]  
 - **Right to revoke:** I understand I may revoke this Authorization at any time in writing by contacting [contact/address]. My revocation will not affect uses/disclosures already made in reliance on this Authorization.  
 - **Notice of potential re-disclosure:** I understand that information disclosed under this Authorization may no longer be protected by HIPAA.  
-- **Treatment/payment:** My treatment or payment is not conditioned on signing this Authorization.  
+- **Treatment/payment/eligibility:** [is | is not] conditioned on signing this Authorization. If conditioned, consequences: [describe].  
 - **Copy of Authorization:** I will receive a copy of this Authorization for my records.
 
 | Role                   | Initials | Signature | Date |
@@ -200,7 +195,9 @@ Please initial and sign each line to confirm your HIPAA Authorization.
 - Retention period and anonymization strategy  
 - International transfer safeguards  
 - Data subject rights: access, rectification, erasure, restriction, portability, objection  
-- Right to lodge a complaint with supervisory authority
+- Right to lodge a complaint with supervisory authority  
+- Any applicable research derogations/limitations to rights under GDPR Art. 89 and Member State laws, and how rights requests will be handled subject to those limits.  
+- Note: “De-identified” under HIPAA may still be “personal data” under GDPR unless irreversibly anonymized. Pseudonymized data remains personal data under GDPR.
 
 ---
 
