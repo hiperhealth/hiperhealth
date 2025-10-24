@@ -1,3 +1,21 @@
+### Notes
+
+- This repository uses an AI bot for reviews. Keep your PR in **Draft** while
+  you work. When you’re ready for a review, change the status to **Ready for
+  review** to trigger a new review round. If you make additional changes and
+  don’t want to trigger the bot, switch the PR back to **Draft**.
+- AI-bot comments may not always be accurate. Please review them critically and
+  share your feedback; it helps us improve the tool.
+- Avoid changing code that is unrelated to your proposal. Keep your PR as short
+  as possible to increase the chances of a timely review. Large PRs may not be
+  reviewed and may be closed.
+- Don’t add unnecessary comments. Your code should be readable and
+  self-documenting
+  ([guidance](https://google.github.io/styleguide/cppguide.html#Comments)).
+- Don’t change core features without prior discussion with the community. Use
+  our Discord to discuss ideas, blockers, or issues:
+  https://discord.gg/Nu4MdGj9jB.
+
 ## Pull Request description
 
 <!-- Describe the purpose of your PR and the changes you have made. -->
