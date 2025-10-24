@@ -14,7 +14,7 @@
   ([guidance](https://google.github.io/styleguide/cppguide.html#Comments)).
 - Don’t change core features without prior discussion with the community. Use
   our Discord to discuss ideas, blockers, or issues:
-  https://discord.gg/Nu4MdGj9jB.
+  {https://discord.gg/Nu4MdGj9jB}.
 
 ## Pull Request description
 
