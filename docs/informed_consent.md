@@ -74,17 +74,19 @@ treatments.
 
 ## 6. Confidentiality and Data Protection
 
-- Personal identifiers (e.g., name, address) will be removed or replaced with a
-  study code.
-- Data will be retained for [insert duration according to law/IRB] or until the
-  completion of the study, then securely destroyed or archived in de-identified
-  form.
-- International transfers will follow appropriate safeguards (e.g., Standard
-  Contractual Clauses, Transfer Impact Assessment), and participants can request
-  copies.
-- All use of your information will comply with applicable privacy laws (e.g.,
-  HIPAA, GDPR).
-- **Note:** Copies of SCCs may be redacted to protect confidential or commercially sensitive information.
+We take your privacy seriously and will implement strict safeguards to protect your information.
+
+- **De-identification:** Personal identifiers (e.g., name, address) will be removed or replaced with a study code.  
+- **Data retention:** Data will be retained for an undetermined period, or for a maximum of 10 years, then securely destroyed or archived in de-identified form.  
+- **Access control:** Only authorized personnel will access your information. Access is role-based (least privilege), logged, and audited.  
+- **Data security:** Data will be encrypted in transit and at rest. Regular security assessments are performed.  
+- **Data sharing:** Data may be shared with approved research partners or institutions under strict confidentiality agreements and Data Use Agreements where applicable.  
+- **International transfers:** Transfers of data outside your country will follow appropriate safeguards (e.g., Standard Contractual Clauses, Transfer Impact Assessment). Participants can request copies.  
+- **Compliance:** All use of your information will comply with applicable privacy laws (e.g., HIPAA, GDPR).  
+- **Sensitive information:** Agreements with research partners may be partially redacted to protect confidential or commercially sensitive information. 
+
+> ⚠️ **Note:** Despite these measures, there is a small risk that someone could identify you from shared data.
+
 
 ---
 
@@ -140,55 +142,47 @@ if any, will be managed per institutional policy.
 
 ---
 
+
+
 ## 11. Contact Information
 
-If you have questions or wish to withdraw consent, please contact:
+If you have questions, wish to withdraw consent, or need more information about this research, please contact:
 
-**Principal Investigator:** Dr. Jane Smith, jane.smith@sdx.org, +1 (555) 123-4567  
-**Ethics/IRB Contact:** irb@sdx.org  
-**Data Controller:** SDX Research Institute, 123 Research Lane, City, Country  
-**Data Protection Officer:** dpo@sdx.org  
-**For GDPR complaints:** Data Protection Authority, City, Country
+**Research Contact / General Inquiries:** **connect@telehealthcareai.org**  
+
+> ⚠️ **Note:** We do not currently have an IRB. All research activities follow internal organizational review and oversight. Participation is voluntary, and your questions or concerns will be addressed via the above contact.
 
 ---
 
-## 12. Authorization and Signatures
+## 12. Consent Submission and HIPAA Acknowledgment
 
-By signing below, you acknowledge that you have read and understood this Informed
-Consent form and agree to participate in this research study.
+By submitting this form, you confirm that you have read and understood this Informed Consent document and agree to participate in this research study.  
 
-| Role                                           | Name | Signature | Date |
-| ---------------------------------------------- | ---- | --------- | ---- |
-| Participant / Patient                          |      |           |      |
-| Parent/Guardian (if applicable)                |      |           |      |
-| Participant Assent (for minors, if applicable) |      |           |      |
-| Researcher                                     |      |           |      |
-| Witness (optional)                             |      |           |      |
+All HIPAA Authorization elements listed below are acknowledged by checking the corresponding boxes in the online form. No physical signature is required.
 
 ### HIPAA Authorization Elements (US-specific)
 
-- **Authorized discloser:** [Name/class of person(s) authorized to use/disclose the PHI]  
-I authorize the use and disclosure of my Protected Health Information (PHI) as described below.  
-Please initial each bullet and sign below to confirm your HIPAA Authorization.
+- **Authorized discloser:** I acknowledge the person(s) authorized to use or disclose my PHI as described.  
+- **Description of PHI:** I confirm the types of data (PHI) to be used or disclosed.  
+- **Recipients:** I understand who will receive my data.  
+- **Purpose of disclosure:** I understand why my data will be used or shared.  
+- **Expiration date/event:** I understand when this authorization ends.  
+- **Right to revoke:** I may revoke this authorization at any time by contacting **connect@telehealthcareai.org**. Revocation will not affect disclosures already made.  
+- **Notice of potential re-disclosure:** I understand that information disclosed may no longer be protected by HIPAA.  
+- **Treatment/payment/eligibility:** I acknowledge whether treatment, payment, or eligibility is conditioned on submitting this form.  
+- **Copy of Authorization:** After submission, I will receive a copy of my consent via email for my records.
 
-- **Description of PHI:** [Describe PHI to be used/disclosed]  
-- **Recipients:** [List recipients of PHI]  
-- **Purpose of disclosure:** [State purpose]  
-- **Expiration date/event:** [Insert date or event]  
-- **Right to revoke:** I understand I may revoke this Authorization at any time in writing by contacting [contact/address]. My revocation will not affect uses/disclosures already made in reliance on this Authorization.  
-- **Notice of potential re-disclosure:** I understand that information disclosed under this Authorization may no longer be protected by HIPAA.  
-- **Treatment/payment/eligibility:** [is | is not] conditioned on signing this Authorization. If conditioned, consequences: [describe].  
-- **Copy of Authorization:** I will receive a copy of this Authorization for my records.
+**Submission instructions:**  
+Please complete and submit your consent through the online form  [Insert Google Form link here].  
 
-| Role                   | Initials | Signature | Date |
-| ---------------------- | -------- | --------- | ---- |
-| Participant / Patient  |          |           |      |
-| Researcher             |          |           |      |
+Once submitted, your responses will be stored securely and linked to this research study.
+
 
 ---
 
 ## 13. Jurisdiction-Specific Notices (e.g., GDPR)
 
+- If you reside in a region covered by GDPR, the following applies to your data rights.
 - Purposes and legal basis of processing (Art. 6(1), Art. 9(2) for special-category data)  
 - Categories of personal data  
 - Recipients and transfers  
