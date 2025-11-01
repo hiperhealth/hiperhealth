@@ -19,6 +19,7 @@ from sqlalchemy.orm import sessionmaker
 
 from research.app.main import app
 from research.models.repositories import ResearchRepository
+from research.models.ui import Base
 
 
 @pytest.fixture
@@ -93,11 +94,13 @@ TestingSessionLocal = sessionmaker(
 @pytest.fixture(scope='function')
 def db_session():
     """Create a new database session for each test."""
+    Base.metadata.create_all(bind=engine)
     session = TestingSessionLocal()
     try:
         yield session
     finally:
         session.close()
+        Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture(scope='function')
