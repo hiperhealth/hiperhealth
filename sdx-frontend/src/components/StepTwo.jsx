@@ -22,7 +22,7 @@ export default function StepTwo() {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    console.log("✅ Full Form Data:", data);
+    console.log(" Form Data:", data);
     alert("Form submitted successfully!");
     navigate("/wearable");
   };
