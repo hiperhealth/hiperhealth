@@ -18,6 +18,7 @@ This Project aims to ...
 
 - License: BSD 3 Clause
 - Documentation: https://sdx.com
+- [Informed Consent Template](./informed_consent.md)
 
 ## Features
 
