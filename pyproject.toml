@@ -97,6 +97,10 @@ disable_error_code = [
 testpaths = [
     "tests",
 ]
+filterwarnings = [
+    "error::RuntimeWarning",
+    "error::typeguard.TypeHintWarning",
+]
 
 [tool.ruff]
 line-length = 79
