@@ -1,0 +1,81 @@
+default_stages:
+  - pre-commit
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-json
+        exclude: ^tests/data/wearable/.*\.json$
+      - id: check-toml
+      - id: check-xml
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: detect-private-key
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.0
+    hooks:
+      - id: djlint
+        name: djlint-jinja-fmt
+        args: [--reformat, --profile=jinja]
+        files: '\.(html|jinja2?|j2)$'
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.1.0"
+    hooks:
+      - id: prettier
+        files: '\.(md)$'
+
+  - repo: local
+    hooks:
+      - id: ruff-linter
+        name: ruff-linter
+        entry: ruff check --fix
+        language: system
+        pass_filenames: true
+        require_serial: yes
+        files: "./"
+        types:
+          - python
+
+      - id: ruff-format
+        name: ruff-format
+        entry: ruff format
+        language: system
+        pass_filenames: true
+        require_serial: yes
+        files: "./"
+        types:
+          - python
+
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        files: "src/sdx"
+        pass_filenames: true
+        types:
+          - python
+
+      - id: bandit
+        name: bandit
+        entry: bandit
+        language: system
+        args: ["--configfile", "pyproject.toml", "-iii", "-lll"]
+        pass_filenames: true
+        types:
+          - python
+
+      - id: vulture
+        name: vulture
+        entry: vulture
+        language: system
+        files: "src/sdx"
+        description: Find unused Python code.
+        pass_filenames: true
+        types:
+          - python
