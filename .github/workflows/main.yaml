@@ -56,6 +56,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: setup macOS
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          brew update
+          # libmagic is the formula (provided by the "file" project)
+          brew install libmagic || brew install file
+          # Expose the magic database path for python-magic if it needs it
+          echo "MAGIC=$(brew --prefix libmagic 2>/dev/null || brew --prefix)/share/misc/magic.mgc" >> $GITHUB_ENV
+
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-version: latest
