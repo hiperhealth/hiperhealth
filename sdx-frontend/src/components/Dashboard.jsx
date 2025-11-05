@@ -61,7 +61,7 @@ export default function Dashboard() {
     const newOffset = (event.selected * itemsPerPage) % patients.length;
     setItemOffset(newOffset);
   };
-  const hasPatients = 4 || patients.length > 0;
+  const hasPatients =patients.length > 0 || 4 ;
 
   return (
     <div className="bg-light min-vh-100 py-3">

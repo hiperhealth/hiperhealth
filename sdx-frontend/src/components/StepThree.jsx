@@ -31,7 +31,7 @@ export default function StepThree() {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
+  const onSubmit = () => {
     if (showUpload) {
       console.log("✅ Wearable data uploaded:", file);
       alert("Wearable data uploaded successfully!");
