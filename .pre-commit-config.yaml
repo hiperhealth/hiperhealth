@@ -5,6 +5,7 @@ repos:
     rev: v4.6.0
     hooks:
       - id: end-of-file-fixer
+        exclude: '.*\.svg$'
       - id: trailing-whitespace
       - id: check-json
         exclude: ^tests/data/wearable/.*\.json$
