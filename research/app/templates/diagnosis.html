@@ -1,150 +1,227 @@
 {% extends "base.html" %}
+
 {% block content %}
-    <div class="wizard-step mx-auto">
-        <h2 class="mb-4">AI Differential Diagnosis</h2>
-        <p class="alert alert-info">{{ summary }}</p>
-        <button type="button"
-                class="btn btn-outline-primary mb-3"
-                data-bs-toggle="modal"
-                data-bs-target="#addDiagnosisModal">
-            <i class="fs-5 bi bi-clipboard-plus"></i>
-            Add Diagnosis
-        </button>
-        <form id="diagnosis-form" method="post">
-            <div class="text-danger mb-2">
-                <span id="show-errors"></span>
+  <div class="wizard-step mx-auto">
+    <h2 class="mb-4">
+      AI Differential Diagnosis
+    </h2>
+    <p class="alert alert-info">
+      {{ summary }}
+    </p>
+    <button type="button"
+            class="btn btn-outline-primary mb-3"
+            data-bs-toggle="modal"
+            data-bs-target="#addDiagnosisModal">
+      <i class="fs-5 bi bi-clipboard-plus"></i>
+      Add Diagnosis
+    </button>
+    <form id="diagnosis-form"
+          method="post">
+      <div class="text-danger mb-2">
+        <span id="show-errors"></span>
+      </div>
+      <input type="hidden"
+             name="sid"
+             value="{{ sid }}" />
+      {% for option in options %}
+        <div id="{{ option | replace(' ', '_') }}_diag"
+             class="card mb-2 rounded">
+          <div class="card-header">
+            <div class="form-check">
+              <input class="form-check-input"
+                     data-bs-toggle="collapse"
+                     data-bs-target="#collapse{{ loop.index }}"
+                     type="checkbox"
+                     name="selected"
+                     value="{{ option }}"
+                     id="opt{{ loop.index }}" />
+              <label class="form-check-label"
+                     for="opt{{ loop.index }}">
+                {{ option }}
+              </label>
             </div>
-            <input type="hidden" name="sid" value="{{ sid }}" />
-            {% for option in options %}
-                <div id="{{ option | replace(' ', '_') }}_diag" class="card mb-2 rounded">
-                    <div class="card-header">
-                        <div class="form-check">
-                            <input class="form-check-input"
-                                   data-bs-toggle="collapse"
-                                   data-bs-target="#collapse{{ loop.index }}"
-                                   type="checkbox"
-                                   name="selected"
-                                   value="{{ option }}"
-                                   id="opt{{ loop.index }}" />
-                            <label class="form-check-label" for="opt{{ loop.index }}">{{ option }}</label>
-                        </div>
-                    </div>
-                    <div class="card-body collapse" id="collapse{{ loop.index }}">
-                        <div class="row mb-4">
-                            <div class="col">
-                                <small class="text-secondary">Please, rate the suggested diagnosis below:</small>
-                                <hr />
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-3">
-                                <div class="d-flex flex-column">
-                                    <label for="accuracy" class="text-primary form-label pl-3">Accuracy</label>
-                                    <select name="{{ option }}--accuracy"
-                                            id="{{ option | replace(' ', '_') }}-accuracy"
-                                            class="form-select form-select-sm"
-                                            aria-label="Accuracy Rating Select">
-                                        <option disabled value="" selected>Not Rated</option>
-                                        {% for i in range(0, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="d-flex flex-column">
-                                    <label for="relevance" class="text-primary form-label pl-3">Relevance</label>
-                                    <select name="{{ option }}--relevance"
-                                            id="{{ option | replace(' ', '_') }}-relevance"
-                                            class="form-select form-select-sm"
-                                            aria-label="Relevance Rating Select">
-                                        <option disabled value="" selected>Not Rated</option>
-                                        {% for i in range(0, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="d-flex flex-column">
-                                    <label for="usefulness" class="text-primary form-label pl-3">Usefulness</label>
-                                    <select name="{{ option }}--usefulness"
-                                            id="{{ option | replace(' ', '_') }}-usefulness"
-                                            class="form-select form-select-sm"
-                                            aria-label="Usefulness Rating Select">
-                                        <option disabled value="" selected>Not Rated</option>
-                                        {% for i in range(0, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-3">
-                                <div class="d-flex flex-column">
-                                    <label for="coherence" class="text-primary form-label pl-3">Coherence</label>
-                                    <select name="{{ option }}--coherence"
-                                            id="{{ option | replace(' ', '_') }}-coherence"
-                                            class="form-select form-select-sm"
-                                            aria-label="Coherence Rating Select">
-                                        <option disabled value="" selected>Not Rated</option>
-                                        {% for i in range(0, 11) %}<option value="{{ i }}">{{ i }}</option>{% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col">
-                                <div class="mb-3">
-                                    <label for="comments" class="text-primary  form-label">Comments</label>
-                                    <textarea name="{{ option }}--comments"
-                                              placeholder="Add any observations about the suggested diagnosis"
-                                              class="form-control"
-                                              id="comments"
-                                              rows="3"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-            <button id="diagnosis-next" class="btn btn-primary my-3">Next</button>
-        </form>
-    </div>
-    <!-- Modal Add Custom Diagnosis -->
-    <div class="modal fade"
-         id="addDiagnosisModal"
-         tabindex="-1"
-         aria-labelledby="addDiagnosisModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addDiagnosisModalLabel">Add Diagnosis</h1>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p class="text-secondary">
-                        The model generates diagnostic suggestions based on the given input data. However, these outputs may not encompass all clinically plausible hypotheses. To improve diagnostic coverage, users may manually insert additional candidate conditions supported by their clinical evaluation.
-                    </p>
-                    <div>
-                        <label class="form-label" for="custom-diagnosis">Diagnosis</label>
-                        <input class="form-control"
-                               type="text"
-                               name="custom-diagnosis"
-                               id="custom-diagnosis" />
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button disabled id="add-custom-diagnosis-button" class="btn btn-success">Add Diagnosis</button>
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            data-bs-dismiss="modal">Cancel</button>
-                </div>
+          </div>
+          <div class="card-body collapse"
+               id="collapse{{ loop.index }}">
+            <div class="row mb-4">
+              <div class="col">
+                <small class="text-secondary">Please, rate the suggested diagnosis below:</small>
+                <hr />
+              </div>
             </div>
+            <div class="row mb-3">
+              <div class="col-3">
+                <div class="d-flex flex-column">
+                  <label for="accuracy"
+                         class="text-primary form-label pl-3">
+                    Accuracy
+                  </label>
+                  <select name="{{ option }}--accuracy"
+                          id="{{ option | replace(' ', '_') }}-accuracy"
+                          class="form-select form-select-sm"
+                          aria-label="Accuracy Rating Select">
+                    <option disabled
+                            value=""
+                            selected>
+                      Not Rated
+                    </option>
+                    {% for i in range(0, 11) %}
+                      <option value="{{ i }}">
+                        {{ i }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="d-flex flex-column">
+                  <label for="relevance"
+                         class="text-primary form-label pl-3">
+                    Relevance
+                  </label>
+                  <select name="{{ option }}--relevance"
+                          id="{{ option | replace(' ', '_') }}-relevance"
+                          class="form-select form-select-sm"
+                          aria-label="Relevance Rating Select">
+                    <option disabled
+                            value=""
+                            selected>
+                      Not Rated
+                    </option>
+                    {% for i in range(0, 11) %}
+                      <option value="{{ i }}">
+                        {{ i }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="d-flex flex-column">
+                  <label for="usefulness"
+                         class="text-primary form-label pl-3">
+                    Usefulness
+                  </label>
+                  <select name="{{ option }}--usefulness"
+                          id="{{ option | replace(' ', '_') }}-usefulness"
+                          class="form-select form-select-sm"
+                          aria-label="Usefulness Rating Select">
+                    <option disabled
+                            value=""
+                            selected>
+                      Not Rated
+                    </option>
+                    {% for i in range(0, 11) %}
+                      <option value="{{ i }}">
+                        {{ i }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-3">
+                <div class="d-flex flex-column">
+                  <label for="coherence"
+                         class="text-primary form-label pl-3">
+                    Coherence
+                  </label>
+                  <select name="{{ option }}--coherence"
+                          id="{{ option | replace(' ', '_') }}-coherence"
+                          class="form-select form-select-sm"
+                          aria-label="Coherence Rating Select">
+                    <option disabled
+                            value=""
+                            selected>
+                      Not Rated
+                    </option>
+                    {% for i in range(0, 11) %}
+                      <option value="{{ i }}">
+                        {{ i }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col">
+                <div class="mb-3">
+                  <label for="comments"
+                         class="text-primary  form-label">
+                    Comments
+                  </label>
+                  <textarea name="{{ option }}--comments"
+                            placeholder="Add any observations about the suggested diagnosis"
+                            class="form-control"
+                            id="comments"
+                            rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      {% endfor %}
+      <button id="diagnosis-next"
+              class="btn btn-primary my-3">
+        Next
+      </button>
+    </form>
+  </div>
+  <!-- Modal Add Custom Diagnosis -->
+  <div class="modal fade"
+       id="addDiagnosisModal"
+       tabindex="-1"
+       aria-labelledby="addDiagnosisModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5"
+              id="addDiagnosisModalLabel">
+            Add Diagnosis
+          </h1>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="text-secondary">
+            The model generates diagnostic suggestions based on the given input data. However, these outputs may not encompass all clinically plausible hypotheses. To improve diagnostic coverage, users may manually insert additional candidate conditions supported by their clinical evaluation.
+          </p>
+          <div>
+            <label class="form-label"
+                   for="custom-diagnosis">
+              Diagnosis
+            </label>
+            <input class="form-control"
+                   type="text"
+                   name="custom-diagnosis"
+                   id="custom-diagnosis" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button disabled
+                  id="add-custom-diagnosis-button"
+                  class="btn btn-success">
+            Add Diagnosis
+          </button>
+          <button type="button"
+                  class="btn btn-outline-secondary"
+                  data-bs-dismiss="modal">
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
-    <!-- end modal add custom diagnosis -->
+  </div>
+  <!-- end modal add custom diagnosis -->
 {% endblock %}
+
 {% block scripts %}
-    <script>
+  <script>
 // when document is ready
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -301,5 +378,5 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.hide();
     })
 });
-    </script>
+  </script>
 {% endblock %}
