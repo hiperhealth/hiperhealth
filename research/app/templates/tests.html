@@ -1,108 +1,150 @@
 {% extends "base.html" %}
+
 {% block content %}
-    <div class="wizard-step mx-auto">
-        <h2 class="my-4">Upload Test Reports</h2>
-        <!-- Step 1: Question -->
-        <div id="test-files-question"
-             class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}d-none{% else %}d-block{% endif %}">
-            <p>
-                Medical test reports and diagnostic images can provide valuable insights for accurate diagnosis and treatment planning.
-            </p>
-            <div class="mb-3 d-flex fs-1 justify-content-between">
-                <i class="bi bi-file-earmark-pdf"></i>
-                <i class="bi bi-file-earmark-image"></i>
-                <i class="bi bi-file-earmark-medical"></i>
-                <i class="bi bi-clipboard2-pulse"></i>
-                <i class="bi bi-hospital"></i>
-                <i class="bi bi-heart-pulse"></i>
-            </div>
-            <div class="text-center">
-                <h4 class="mb-4">Do you want to upload test reports for this patient?</h4>
-                <div class="d-flex gap-3 justify-content-center">
-                    <button id="upload-yes" class="btn btn-primary btn-lg" type="button">
-                        <i class="bi bi-check-circle me-2"></i>Yes, Upload Reports
-                    </button>
-                    <button id="upload-no" class="btn btn-outline-secondary btn-lg" type="button">
-                        <i class="bi bi-x-circle me-2"></i>No, Skip This Step
-                    </button>
-                </div>
-            </div>
+  <div class="wizard-step mx-auto">
+    <h2 class="my-4">
+      Upload Test Reports
+    </h2>
+    <!-- Step 1: Question -->
+    <div id="test-files-question"
+         class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+                  d-none
+                {% else %}
+                  d-block
+                {% endif %}">
+      <p>
+        Medical test reports and diagnostic images can provide valuable insights for accurate diagnosis and treatment planning.
+      </p>
+      <div class="mb-3 d-flex fs-1 justify-content-between">
+        <i class="bi bi-file-earmark-pdf"></i>
+        <i class="bi bi-file-earmark-image"></i>
+        <i class="bi bi-file-earmark-medical"></i>
+        <i class="bi bi-clipboard2-pulse"></i>
+        <i class="bi bi-hospital"></i>
+        <i class="bi bi-heart-pulse"></i>
+      </div>
+      <div class="text-center">
+        <h4 class="mb-4">
+          Do you want to upload test reports for this patient?
+        </h4>
+        <div class="d-flex gap-3 justify-content-center">
+          <button id="upload-yes"
+                  class="btn btn-primary btn-lg"
+                  type="button">
+            <i class="bi bi-check-circle me-2"></i>Yes, Upload Reports
+          </button>
+          <button id="upload-no"
+                  class="btn btn-outline-secondary btn-lg"
+                  type="button">
+            <i class="bi bi-x-circle me-2"></i>No, Skip This Step
+          </button>
         </div>
-        <!-- Step 2: Upload Form (hidden initially) -->
-        <div id="upload-section"
-             class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}d-block{% else %}d-none{% endif %}">
-            <form id="test-files-form" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="patient_id" value="{{ patient_id }}" />
-                <input type="hidden" name="has_reports" id="has_reports_hidden" value="yes" />
-                <input type="hidden" name="action" id="action_field" value="upload" />
-                <span class="text-danger">
-                    {% if error %}{{ error }}{% endif %}
-                </span>
-                <div class="mb-3">
-                    <label class="text-secondary my-1" for="reports" class="form-label">
-                        Please select PDF files or medical images (JPG, JPEG, PNG) containing test reports
-                    </label>
-                    <input id="reports"
-                           class="form-control"
-                           name="reports"
-                           type="file"
-                           multiple
-                           accept=".pdf,image/png,image/jpeg,image/jpg" />
-                </div>
-                {% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
-                    <p class="my-3 text-secondary">
-                        {{ patient_data.fhir_reports|length }} report
-                        {% if patient_data.fhir_reports|length != 1 %}s{% endif %}
-                        uploaded
-                    </p>
-                    <ul class="list-unstyled mb-3">
-                        {% for report in patient_data.fhir_reports %}
-                            {% if report.filename %}
-                                <li>
-                                    <i class="bi bi-file-earmark-arrow-up me-1"></i>
-                                    {{ report.filename }}
-                                </li>
-                            {% else %}
-                                <li>
-                                    <i class="bi bi-file-earmark-arrow-up me-1"></i>
-                                    [Unnamed file]
-                                </li>
-                            {% endif %}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                <div class="d-flex align-items-center gap-2">
-                    <!-- Upload more reports -->
-                    <button type="button" class="btn btn-primary" id="upload-more-btn">
-                        <i class="bi bi-upload me-2"></i>Upload Report
-                    </button>
-                    <!-- Continue to next step -->
-                    <button type="button" class="btn btn-success" id="continue-btn">
-                        <i class="bi bi-arrow-right-circle me-2"></i>Continue to Next Step
-                    </button>
-                    <!-- Loading spinner -->
-                    <div id="loading-indicator"
-                         class="spinner-border text-primary"
-                         role="status"
-                         style="display: none">
-                        <span class="visually-hidden">Processing...</span>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <!-- Skip Form (hidden) -->
-        <form id="skip-form"
-              method="post"
-              action="/tests"
-              enctype="application/x-www-form-urlencoded"
-              style="display: none">
-            <input type="hidden" name="patient_id" value="{{ patient_id }}" />
-            <input type="hidden" name="has_reports" value="no" />
-        </form>
+      </div>
     </div>
+    <!-- Step 2: Upload Form (hidden initially) -->
+    <div id="upload-section"
+         class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+                  d-block
+                {% else %}
+                  d-none
+                {% endif %}">
+      <form id="test-files-form"
+            method="post"
+            enctype="multipart/form-data">
+        <input type="hidden"
+               name="patient_id"
+               value="{{ patient_id }}" />
+        <input type="hidden"
+               name="has_reports"
+               id="has_reports_hidden"
+               value="yes" />
+        <input type="hidden"
+               name="action"
+               id="action_field"
+               value="upload" />
+        <span class="text-danger">
+          {% if error %}
+            {{ error }}
+          {% endif %}
+        </span>
+        <div class="mb-3">
+          <label class="text-secondary my-1"
+                 for="reports"
+                 class="form-label">
+            Please select PDF files or medical images (JPG, JPEG, PNG) containing test reports
+          </label>
+          <input id="reports"
+                 class="form-control"
+                 name="reports"
+                 type="file"
+                 multiple
+                 accept=".pdf,image/png,image/jpeg,image/jpg" />
+        </div>
+        {% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+          <p class="my-3 text-secondary">
+            {{ patient_data.fhir_reports|length }} report
+            {% if patient_data.fhir_reports|length != 1 %}
+              s
+            {% endif %}
+            uploaded
+          </p>
+          <ul class="list-unstyled mb-3">
+            {% for report in patient_data.fhir_reports %}
+              {% if report.filename %}
+                <li>
+                  <i class="bi bi-file-earmark-arrow-up me-1"></i>
+                  {{ report.filename }}
+                </li>
+              {% else %}
+                <li>
+                  <i class="bi bi-file-earmark-arrow-up me-1"></i>
+                  [Unnamed file]
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+        <div class="d-flex align-items-center gap-2">
+          <!-- Upload more reports -->
+          <button type="button"
+                  class="btn btn-primary"
+                  id="upload-more-btn">
+            <i class="bi bi-upload me-2"></i>Upload Report
+          </button>
+          <!-- Continue to next step -->
+          <button type="button"
+                  class="btn btn-success"
+                  id="continue-btn">
+            <i class="bi bi-arrow-right-circle me-2"></i>Continue to Next Step
+          </button>
+          <!-- Loading spinner -->
+          <div id="loading-indicator"
+               class="spinner-border text-primary"
+               role="status"
+               style="display: none">
+            <span class="visually-hidden">Processing...</span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <!-- Skip Form (hidden) -->
+    <form id="skip-form"
+          method="post"
+          action="/tests"
+          enctype="application/x-www-form-urlencoded"
+          style="display: none">
+      <input type="hidden"
+             name="patient_id"
+             value="{{ patient_id }}" />
+      <input type="hidden"
+             name="has_reports"
+             value="no" />
+    </form>
+  </div>
 {% endblock %}
+
 {% block scripts %}
-    <script>
+  <script>
 document.addEventListener("DOMContentLoaded", () => {
     const questionSection = document.getElementById('test-files-question');
     const uploadSection = document.getElementById('upload-section');
@@ -161,5 +203,5 @@ document.addEventListener("DOMContentLoaded", () => {
         form.submit();
     });
 });
-    </script>
+  </script>
 {% endblock %}

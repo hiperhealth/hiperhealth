@@ -140,3 +140,35 @@ min_confidence = 80
 paths = ["./"]
 sort_by_size = true
 verbose = false
+
+[tool.djlint]
+blank_line_after_tag="load,extends,include"
+blank_line_before_tag="load,extends,include,block"
+close_void_tags=true
+# custom_blocks="toc,example"
+# custom_html="mjml,simple-greeting,mj-\w+"
+format_attribute_template_tags=true
+format_css=true
+indent=2
+line_break_after_multiline_tag=true
+max_attribute_length=3
+max_blank_lines=1
+max_line_length=80
+profile="django"
+# it is necessary to exclude src/literev/templates/tags because of the
+# following issue:
+#   - https://github.com/Riverside-Healthcare/djLint/issues/703
+exclude="src/backend/workflow/tests,.git,docs,.eggs,src/backend/literev/templates/tags"
+# TODO: remove from the ignore list:
+#       H013,H021,H023,D018
+ignore="H026,H029,H005,H030,H031,H006,H013,H021,H023,D018"
+preserve_blank_lines=false
+
+[tool.djlint.html]
+indent_size=2
+
+[tool.djlint.css]
+indent_size=2
+
+[tool.djlint.js]
+indent_size=2
