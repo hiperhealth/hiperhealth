@@ -18,13 +18,15 @@ derived from the patient data itself.
 """
 
 import io
+import json
+import re
 import sys
 import uuid
 
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import (
     Depends,
@@ -38,9 +40,15 @@ from fastapi import (
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from reports import (
+    load_fhir_reports,
+    process_uploaded_reports,
+    save_fhir_reports,
+)
 
 # Now import the project-specific modules
 from sdx.agents.diagnostics import core as diag
+from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
 from sdx.agents.extraction.wearable import WearableDataFileExtractor
 from sdx.privacy.deidenitfier import (
     Deidentifier,
@@ -166,6 +174,23 @@ def patient_to_dict(patient: Patient) -> Dict[str, Any]:
     }
 
     if consultation:
+        if consultation.previous_tests:
+            try:
+                raw = consultation.previous_tests
+                sanitized = re.sub(
+                    r':\s*\*+(?=\s*[,}\]])', ': "[REDACTED]"', raw
+                )
+                fhir_reports = json.loads(sanitized)
+                if isinstance(fhir_reports, list):
+                    patient_dict['patient']['fhir_reports'] = fhir_reports
+                else:
+                    patient_dict['patient']['fhir_reports'] = []
+            except Exception as e:
+                print('JSON decoding error:', e)
+                patient_dict['patient']['fhir_reports'] = []
+        else:
+            patient_dict['patient']['fhir_reports'] = []
+
         consultation_fields = [
             'weight_kg',
             'height_cm',
@@ -200,7 +225,11 @@ def _get_next_step(patient: Patient) -> str:
         return 'symptoms'
     if consultation.mental_health is None:
         return 'mental'
-    # 'tests' step is a placeholder in this version
+    if (
+        not consultation.previous_tests
+        or len(consultation.previous_tests) == 0
+    ):
+        return 'tests'
     if consultation.wearable_data is None:
         return 'wearable'
     if not consultation.selected_diagnoses:
@@ -426,8 +455,10 @@ def tests(
     patient_id: str,
     repo: ResearchRepository = Depends(get_repository),
 ) -> HTMLResponse:
-    """Display the previous tests form."""
+    """Display the Upload Medical Reports form."""
     patient = repo.get_patient_by_uuid(patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail='Patient not found')
     record = patient_to_dict(patient)
     return _render(
         'tests.html',
@@ -442,10 +473,68 @@ def tests(
 async def tests_post(
     patient_id: str = Form(...),
     has_reports: str = Form(...),
+    reports: Optional[List[UploadFile]] = File(None),
+    action: str = Form('upload'),
     repo: ResearchRepository = Depends(get_repository),
-) -> RedirectResponse:
-    """Handle previous tests data (placeholder)."""
-    return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
+):
+    """Upload Previous Medical Reports or Skip."""
+    patient = repo.get_patient_by_uuid(patient_id)
+    if not patient:
+        raise HTTPException(status_code=404, detail='Patient not found')
+
+    consultation = patient.consultations[-1]
+
+    fhir_reports = load_fhir_reports(consultation)
+    seen_filenames = {
+        r.get('filename', '').lower()
+        for r in fhir_reports
+        if isinstance(r, dict) and 'filename' in r
+    }
+
+    extractor = MedicalReportFileExtractor()
+    context = {
+        'patient_id': patient_id,
+        'patient_data': {},
+        'lang': consultation.lang if consultation else 'en',
+    }
+
+    if has_reports == 'no':
+        try:
+            save_fhir_reports(consultation, [], repo)
+        except Exception as e:
+            context['error'] = f'Failed to save data: {e}'
+            return _render('tests.html', **context)
+        return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
+
+    if action == 'upload' and reports:
+        new_reports, error = await process_uploaded_reports(
+            reports, seen_filenames, extractor
+        )
+        if error:
+            context['error'] = error
+            return _render('tests.html', **context)
+
+        fhir_reports.extend(new_reports)
+
+        try:
+            save_fhir_reports(consultation, fhir_reports, repo)
+        except Exception as e:
+            context['error'] = f'Report data validation failed: {e}'
+            return _render('tests.html', **context)
+
+        record = patient_to_dict(patient)
+        context = {
+            'patient_id': patient_id,
+            'patient_data': record['patient'],
+            'lang': record['meta']['lang'],
+        }
+        return _render('tests.html', **context)
+
+    if action == 'continue':
+        repo.db.commit()
+        return RedirectResponse(f'/consultation/{patient_id}', status_code=303)
+
+    return _render('tests.html', **context)
 
 
 @app.get('/wearable', response_class=HTMLResponse)
