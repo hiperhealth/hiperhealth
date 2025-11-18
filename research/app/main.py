@@ -40,11 +40,6 @@ from fastapi import (
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from reports import (
-    load_fhir_reports,
-    process_uploaded_reports,
-    save_fhir_reports,
-)
 
 # Now import the project-specific modules
 from sdx.agents.diagnostics import core as diag
@@ -57,6 +52,11 @@ from sdx.privacy.deidenitfier import (
 from sqlalchemy.orm import Session
 
 from research.app.database import SessionLocal
+from research.app.reports import (
+    load_fhir_reports,
+    process_uploaded_reports,
+    save_fhir_reports,
+)
 from research.models.repositories import ResearchRepository
 from research.models.ui import Patient
 
