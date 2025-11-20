@@ -9,6 +9,6 @@ dependencies:
   - poetry
   - nodejs  # used by semantic-release
   - tesseract
-  - libmagic
+  # - libmagic  <-- removed, not supported on Windows
   - pip:
       - paginate==0.5.6  # distlib issue
