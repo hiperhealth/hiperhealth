@@ -103,19 +103,6 @@ app.mount('/static', _STATIC, name='static')
 
 
 # --- Helper Functions ---
-def has_fhir_reports(consultation) -> bool:
-    """Return True if consultation has any FHIR reports."""
-    try:
-        if (
-            consultation.previous_tests is not None
-            and consultation.previous_tests != ''
-        ):
-            return True  # User made a decision (uploaded or skipped)
-        return False  # No decision made yet
-    except Exception:
-        return False
-
-
 def _render(template: str, **context: Any) -> HTMLResponse:
     tpl = TEMPLATES.get_template(template)
     return HTMLResponse(tpl.render(**context))
@@ -188,20 +175,7 @@ def patient_to_dict(patient: Patient) -> Dict[str, Any]:
     }
 
     if consultation:
-        if consultation.previous_tests:
-            try:
-                fhir_reports = load_fhir_reports(consultation)
-                patient_dict['patient']['fhir_reports'] = fhir_reports
-            except Exception:
-                logger.error(
-                    'Failed to load fhir_reports in patient_to_dict',
-                    exc_info=True,
-                )
-                patient_dict['patient']['fhir_reports'] = []
-        else:
-            patient_dict['patient']['fhir_reports'] = []
-
-        # Add other consultation fields
+        # consultation fields
         consultation_fields = [
             'weight_kg',
             'height_cm',
@@ -236,7 +210,7 @@ def _get_next_step(patient: Patient) -> str:
         return 'symptoms'
     if consultation.mental_health is None:
         return 'mental'
-    if not has_fhir_reports(consultation):
+    if consultation.previous_tests is None:
         return 'tests'
     if consultation.wearable_data is None:
         return 'wearable'

@@ -1,8 +1,6 @@
 """Helper functions for managing and processing medical reports."""
 
-import json
 import logging
-import re
 
 from typing import List, Optional, Tuple
 
@@ -17,38 +15,22 @@ logger = logging.getLogger(__name__)
 
 def load_fhir_reports(consultation) -> List[dict]:
     """Load and deserialize FHIR reports from consultation."""
-    if not consultation.previous_tests:
+    reports = consultation.previous_tests
+
+    if not reports:
         return []
 
-    try:
-        raw = consultation.previous_tests
-
-        # Sanitize unquoted asterisks
-        sanitized = re.sub(r':\s*\*+(?=\s*[,}\]])', ': "REDACTED"', raw)
-
-        reports = json.loads(sanitized)
-        if isinstance(reports, str):
-            reports = json.loads(reports)
-
-        # Type check: ensure it's a list
-        if not isinstance(reports, list):
-            logger.warning('Loaded fhir_reports is not a list')
-            return []
-
-        return reports
-    except json.JSONDecodeError:
-        logger.error('JSON decode error loading fhir_reports', exc_info=True)
+    if not isinstance(reports, list):
+        logger.warning('Loaded reports is not a list')
         return []
-    except Exception:
-        logger.error('Failed to load fhir_reports', exc_info=True)
-        return []
+
+    return reports
 
 
 def save_fhir_reports(consultation, reports: List[dict], repo) -> None:
-    """Serialize and save FHIR reports to consultation."""
+    """Save FHIR reports to consultation."""
     try:
-        json_data = json.dumps(reports)
-        consultation.previous_tests = json_data
+        consultation.previous_tests = reports
         repo.db.commit()
         logger.info(f'Saved {len(reports)} reports')
     except Exception:

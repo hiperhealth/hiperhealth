@@ -46,9 +46,9 @@ class Consultation(Base):
     mental_exercises = Column(Text)
     symptoms = Column(Text)
     mental_health = Column(Text)
-    previous_tests = Column(Text)
 
     # Store complex, semi-structured data as JSON
+    previous_tests = Column(JSON)
     wearable_data = Column(JSON)
     ai_diag_raw = Column(JSON)
     ai_exam_raw = Column(JSON)

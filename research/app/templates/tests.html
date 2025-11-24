@@ -7,7 +7,7 @@
     </h2>
     <!-- Step 1: Question -->
     <div id="test-files-question"
-         class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+         class="{% if patient_data.previous_tests and patient_data.previous_tests|length > 0 %}
                   d-none
                 {% else %}
                   d-block
@@ -43,7 +43,7 @@
     </div>
     <!-- Step 2: Upload Form (hidden initially) -->
     <div id="upload-section"
-         class="{% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+         class="{% if patient_data.previous_tests and patient_data.previous_tests|length > 0 %}
                   d-block
                 {% else %}
                   d-none
@@ -80,16 +80,16 @@
                  multiple
                  accept=".pdf,image/png,image/jpeg,image/jpg" />
         </div>
-        {% if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 %}
+        {% if patient_data.previous_tests and patient_data.previous_tests|length > 0 %}
           <p class="my-3 text-secondary">
-            {{ patient_data.fhir_reports|length }} report
-            {% if patient_data.fhir_reports|length != 1 %}
+            {{ patient_data.previous_tests|length }} report
+            {% if patient_data.previous_tests|length != 1 %}
               s
             {% endif %}
             uploaded
           </p>
           <ul class="list-unstyled mb-3">
-            {% for report in patient_data.fhir_reports %}
+            {% for report in patient_data.previous_tests %}
               {% if report.filename %}
                 <li>
                   <i class="bi bi-file-earmark-arrow-up me-1"></i>
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reportsInput = document.getElementById('reports');
 
     // Auto-show upload form if reports exist
-    const hasUploadedReports = {{ 'true' if patient_data.fhir_reports and patient_data.fhir_reports|length > 0 else 'false' }};
+    const hasUploadedReports = {{ 'true' if patient_data.previous_tests and patient_data.previous_tests|length > 0 else 'false' }};
     if (hasUploadedReports) {
         questionSection.style.display = 'none';
         uploadSection.style.display = 'block';
