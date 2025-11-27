@@ -55,7 +55,7 @@ development tasks.
 
     ```bash
     conda env create -f conda/dev.yaml
-    conda activate sdx
+    conda activate hiperhealth
     ```
 
 3.  **Install Project Dependencies:**
