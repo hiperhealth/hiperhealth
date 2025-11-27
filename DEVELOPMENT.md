@@ -32,14 +32,14 @@ uphold this code.
 
 ## 1. Getting Started: Local Setup
 
-This project uses **Conda** to manage environments, **Poetry** to manage dependencies, and **Makim** to streamline
-development tasks.
+This project uses **Conda** to manage environments, **Poetry** to manage
+dependencies, and **Makim** to streamline development tasks.
 
 ### Prerequisites
 
 - Python 3.11+
-- [Conda](https://github.com/conda-forge/miniforge?tab=readme-ov-file#download) installed on your
-  system.
+- [Conda](https://github.com/conda-forge/miniforge?tab=readme-ov-file#download)
+  installed on your system.
 
 ### Installation
 
