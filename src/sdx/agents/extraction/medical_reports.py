@@ -24,7 +24,7 @@ from typing import (
 import magic
 import pytesseract
 
-from anamnesisai import AnamnesisAI
+from anamnesisai.core import AnamnesisAI
 from PIL import Image
 from pypdf import PdfReader
 from pypdf.errors import EmptyFileError, PdfStreamError

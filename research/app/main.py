@@ -103,6 +103,16 @@ app.mount('/static', _STATIC, name='static')
 
 
 # --- Helper Functions ---
+
+
+def _safe_safety(assoc: Any) -> Optional[Any]:
+    val = getattr(assoc, 'safety', object())
+    if val is not object():
+        return val
+    agents = getattr(assoc, 'agents', None)
+    return getattr(agents, 'safety', None) if agents is not None else None
+
+
 def _render(template: str, **context: Any) -> HTMLResponse:
     tpl = TEMPLATES.get_template(template)
     return HTMLResponse(tpl.render(**context))
@@ -163,7 +173,7 @@ def patient_to_dict(patient: Patient) -> Dict[str, Any]:
                         'relevance': assoc.relevance,
                         'usefulness': assoc.usefulness,
                         'coherence': assoc.coherence,
-                        'safety': assoc.safety,
+                        'safety': _safe_safety(assoc),  # safe lookup issue #77
                         'comments': assoc.comments,
                     }
                 }
