@@ -13,7 +13,7 @@ from typing import IO, Any, ClassVar, Generic, Literal, TypeVar, Union, cast
 
 import magic
 
-from sdx.utils import is_float
+from hiperhealth.utils import is_float
 
 
 class WearableDataExtractorError(Exception):

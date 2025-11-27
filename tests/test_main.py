@@ -1,4 +1,4 @@
-"""Tests for sdx package."""
+"""Tests for hiperhealth package."""
 
 import pytest
 

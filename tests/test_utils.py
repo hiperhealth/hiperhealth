@@ -1,8 +1,8 @@
-"""Test SDX utility functions module."""
+"""Test HiPerHealth utility functions module."""
 
 import datetime
 
-from sdx.utils import is_float, make_json_serializable
+from hiperhealth.utils import is_float, make_json_serializable
 
 
 def test_is_float():

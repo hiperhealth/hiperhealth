@@ -1,5 +1,5 @@
-site_name: sdx
-site_url: https://sdx.com
+site_name: hiperhealth
+site_url: https://hiperhealth.com
 repo_url: https://github.com/MYORG/MYREPO
 docs_dir: ./docs/
 site_dir: ./build/
@@ -113,7 +113,7 @@ markdown_extensions:
   - tables
   - toc
 extra:
-  project_name: "sdx"
+  project_name: "hiperhealth"
   team:
     - name: "Active maintainers"
       members:
@@ -137,4 +137,4 @@ extra:
       icon: :material-cancel:{ .cancel }
       description: Unlikely to ever be supported or no upstream support.
 
-copyright: "Copyright &copy; 2022, sdx Team"
+copyright: "Copyright &copy; 2022, hiperhealth Team"

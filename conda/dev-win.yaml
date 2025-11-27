@@ -1,4 +1,4 @@
-name: sdx
+name: hiperhealth
 channels:
   - conda-forge
   - nodefaults

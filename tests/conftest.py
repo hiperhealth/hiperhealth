@@ -1,4 +1,4 @@
-"""Pytest configuration for the sdx package tests."""
+"""Pytest configuration for the hiperhealth package tests."""
 
 from __future__ import annotations
 
@@ -12,8 +12,10 @@ import pytest
 
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
-from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
-from sdx.agents.extraction.wearable import WearableDataFileExtractor
+from hiperhealth.agents.extraction.medical_reports import (
+    MedicalReportFileExtractor,
+)
+from hiperhealth.agents.extraction.wearable import WearableDataFileExtractor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

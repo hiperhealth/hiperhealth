@@ -1,6 +1,6 @@
 ![LOGO](/images/logo.png)
 
-# sdx
+# hiperhealth
 
 [![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)![Mkdocs](https://img.shields.io/badge/Documentation%20engine-Mkdocs-orange)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
@@ -17,7 +17,7 @@
 This Project aims to ...
 
 - License: BSD 3 Clause
-- Documentation: https://sdx.com
+- Documentation: https://hiperhealth.com
 - [Informed Consent Template](./informed_consent.md)
 
 ## Features

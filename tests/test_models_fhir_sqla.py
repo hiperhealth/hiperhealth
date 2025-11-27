@@ -24,10 +24,10 @@ import inspect
 from datetime import date, datetime
 from typing import Any, Dict
 
+import hiperhealth.models.sqla.fhirx as orm_models
 import pytest
-import sdx.models.sqla.fhirx as orm_models
 
-from sdx.models.sqla.fhirx import Base
+from hiperhealth.models.sqla.fhirx import Base
 from sqlalchemy import (
     JSON,
     Boolean,

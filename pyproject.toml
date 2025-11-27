@@ -1,5 +1,5 @@
 [project]
-name = "sdx"
+name = "hiperhealth"
 version = "0.2.0"  # semantic-release
 description = "This Project aims to ..."
 readme = "README.md"
@@ -30,10 +30,10 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 packages = [
-  {include = "sdx", from="src"},
+  {include = "hiperhealth", from="src"},
   {include = "research", from="."},
 ]
-include = ["src/sdx/py.typed"]
+include = ["src/hiperhealth/py.typed"]
 
 exclude = [
   ".git/*",
@@ -87,7 +87,7 @@ plugins = [
 ]
 
 [[tool.mypy.overrides]]
-module = "sdx.schema.fhirx"
+module = "hiperhealth.schema.fhirx"
 disable_error_code = [
   "name-defined",
   "valid-type",

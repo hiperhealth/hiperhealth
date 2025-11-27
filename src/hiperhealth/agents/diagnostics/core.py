@@ -6,8 +6,8 @@ import json
 
 from typing import Any, Dict, List
 
-from sdx.agents.client import chat
-from sdx.schema.clinical_outputs import LLMDiagnosis
+from hiperhealth.agents.client import chat
+from hiperhealth.schema.clinical_outputs import LLMDiagnosis
 
 _DIAG_PROMPTS = {
     'en': (

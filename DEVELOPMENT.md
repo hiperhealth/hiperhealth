@@ -1,9 +1,9 @@
 # Contributor Guide
 
-First off, thank you for considering contributing to `sdx`! We welcome all
-contributions, from bug reports to new features and documentation improvements.
-This guide provides everything you need to get your development environment set
-up and start contributing.
+First off, thank you for considering contributing to `hiperhealth`! We welcome
+all contributions, from bug reports to new features and documentation
+improvements. This guide provides everything you need to get your development
+environment set up and start contributing.
 
 Following these guidelines helps to communicate that you respect the time of the
 developers managing and developing this open source project. In return, they
@@ -47,8 +47,8 @@ development tasks.
     then clone your fork locally:
 
     ```bash
-    git clone git@github.com:<your-username>/sdx.git
-    cd sdx
+    git clone git@github.com:<your-username>/hiperhealth.git
+    cd hiperhealth
     ```
 
 2.  **Install Dependencies:** This command creates a virtual environment and
@@ -68,7 +68,7 @@ development tasks.
 
 4.  **(Optional) Set Up API Keys:** Certain tests and features that interact
     with external services (e.g., OpenAI) require API keys. Create a `.env` file
-    at `sdx/.envs/.env` and add your keys there.
+    at `hiperhealth/.envs/.env` and add your keys there.
     ```dotenv
     # In .envs/.env
     OPENAI_API_KEY="your-key-here"
@@ -99,8 +99,8 @@ All common development tasks are managed via `makim` commands defined in
 ### Database Migrations
 
 The database schema is managed with Alembic. The schema's source of truth is the
-set of Pydantic models in `src/sdx/schema/`, which are used to auto-generate the
-SQLAlchemy ORM models.
+set of Pydantic models in `src/hiperhealth/schema/`, which are used to
+auto-generate the SQLAlchemy ORM models.
 
 If you modify a Pydantic schema that requires a database change:
 
@@ -159,12 +159,13 @@ Our test suite uses `pytest`.
 
 ## 3. Architectural Overview
 
-The `sdx` library follows a "schema-first" approach for its database models.
+The `hiperhealth` library follows a "schema-first" approach for its database
+models.
 
-1.  **Pydantic Schemas (`src/sdx/schema/`)**: These are the primary source of
-    truth. They define the data structures and validation rules for our
-    application.
-2.  **SQLAlchemy Models (`src/sdx/models/sqla/`)**: These ORM models are
+1.  **Pydantic Schemas (`src/hiperhealth/schema/`)**: These are the primary
+    source of truth. They define the data structures and validation rules for
+    our application.
+2.  **SQLAlchemy Models (`src/hiperhealth/models/sqla/`)**: These ORM models are
     **auto-generated** from the Pydantic schemas using the
     `scripts/gen_models/gen_sqla.py` script (`makim models.sqla`). **Do not edit
     these files manually.**

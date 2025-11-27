@@ -2,7 +2,7 @@
 Test SQLModel models generated.
 
 Smoke-tests for *all* auto-generated SQLModel tables in
-`sdx.models.sqlmodel.fhirx`.
+`hiperhealth.models.sqlmodel.fhirx`.
 
 The suite verifies that:
 
@@ -54,7 +54,7 @@ def _sample_for_column(sa_column) -> Any:
 
 def _iter_sqlmodel_tables():
     """Yield each concrete SQLModel class from the generated module."""
-    mod = importlib.import_module('sdx.models.sqlmodel.fhirx')
+    mod = importlib.import_module('hiperhealth.models.sqlmodel.fhirx')
     for _, obj in inspect.getmembers(mod, inspect.isclass):
         if (
             issubclass(obj, SQLModel)

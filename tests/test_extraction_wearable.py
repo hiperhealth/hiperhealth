@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from sdx.agents.extraction.wearable import WearableDataExtractorError
+from hiperhealth.agents.extraction.wearable import WearableDataExtractorError
 
 TEST_DATA_PATH = Path(__file__).parent / 'data' / 'wearable'
 JSON_FILE = TEST_DATA_PATH / 'wearable_data.json'

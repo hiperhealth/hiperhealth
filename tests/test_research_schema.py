@@ -1,6 +1,6 @@
 """Unit tests for the research schema module."""
 
-from sdx.models.sqla.fhirx import Base
+from hiperhealth.models.sqla.fhirx import Base
 from sqlalchemy import create_engine, inspect
 
 

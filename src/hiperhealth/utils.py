@@ -1,4 +1,4 @@
-"""SDX utility functions."""
+"""HiPerHealth utility functions."""
 
 import datetime
 

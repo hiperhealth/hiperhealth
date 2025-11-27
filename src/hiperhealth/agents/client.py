@@ -19,7 +19,7 @@ from fastapi import HTTPException
 from openai import OpenAI
 from pydantic import ValidationError
 
-from sdx.schema.clinical_outputs import LLMDiagnosis
+from hiperhealth.schema.clinical_outputs import LLMDiagnosis
 
 load_dotenv(Path(__file__).parents[3] / '.envs' / '.env')
 

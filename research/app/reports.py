@@ -5,7 +5,7 @@ import logging
 from typing import List, Optional, Tuple
 
 from fastapi import UploadFile
-from sdx.agents.extraction.medical_reports import (
+from hiperhealth.agents.extraction.medical_reports import (
     MedicalReportExtractorError,
     MedicalReportFileExtractor,
 )

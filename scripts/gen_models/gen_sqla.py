@@ -1,7 +1,7 @@
 """
 Generate SQLAlchemy ORM models.
 
-Utility script for  SDX that inspects Pydantic models
+Utility script for  HiPerHealth that inspects Pydantic models
 (from both `fhir_models` and `custom_models`) and produces a basic
 SQLAlchemy 2.x ORM layer with one table per Pydantic class.
 
@@ -37,7 +37,7 @@ from pydantic import BaseModel
 OUTPUT_PATH = (
     Path(__file__).resolve().parent.parent.parent
     / 'src'
-    / 'sdx'
+    / 'hiperhealth'
     / 'models'
     / 'sqla'
     / 'fhirx.py'
@@ -174,7 +174,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 @public
 class Base(DeclarativeBase):
-    \"\"\"Declarative base for  SDX.\"\"\"
+    \"\"\"Declarative base for  HiPerHealth.\"\"\"
     pass
 
 """

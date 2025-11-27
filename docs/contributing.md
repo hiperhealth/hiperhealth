@@ -4,7 +4,7 @@ In order to be able to contribute, it is important that you understand the
 project layout.
 
 This project uses the _src layout_, which means that the package code is located
-at `./src/sdx`.
+at `./src/hiperhealth`.
 
 For my information, check the official documentation:
 <https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/>
@@ -46,8 +46,9 @@ and “help wanted” is open to whoever wants to implement it.
 
 ### Write Documentation
 
-sdx could always use more documentation, whether as part of the official sdx
-docs, in docstrings, or even on the web in blog posts, articles, and such.
+hiperhealth could always use more documentation, whether as part of the official
+hiperhealth docs, in docstrings, or even on the web in blog posts, articles, and
+such.
 
 ### Submit Feedback
 
@@ -62,14 +63,14 @@ If you are proposing a feature:
 
 ## Get Started
 
-Ready to contribute? Here’s how to set up `sdx` for local development.
+Ready to contribute? Here’s how to set up `hiperhealth` for local development.
 
-1. Fork the `sdx` repo on GitHub.
+1. Fork the `hiperhealth` repo on GitHub.
 2. Clone your fork locally and change to the directory of your project:
 
 ```bash
-$ git clone git@github.com:your_name_here/sdx.git
-$ cd sdx/
+$ git clone git@github.com:your_name_here/hiperhealth.git
+$ cd hiperhealth/
 ```
 
 ### Prepare and use virtual environment
@@ -81,7 +82,7 @@ that, ensure that conda is already available in your terminal session and run:
 
 ```bash
 $ conda env create env create --file conda/dev.yaml
-$ conda activate sdx
+$ conda activate hiperhealth
 ```
 
 Note: you can use `mamba env create` instead, if you have it already installed,
@@ -107,8 +108,8 @@ You are now ready to implement your changes or improvements.
 
 ### Install and Use Pre-commit Hooks
 
-- `sdx` uses a set of `pre-commit` hooks to improve code quality. The hooks can
-  be installed locally using:
+- `hiperhealth` uses a set of `pre-commit` hooks to improve code quality. The
+  hooks can be installed locally using:
 
 ```bash
 $ pre-commit install
@@ -155,7 +156,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 ## Running tests locally
 
-The tests can be executed using the `test` dependencies of `sdx` in the
+The tests can be executed using the `test` dependencies of `hiperhealth` in the
 following way:
 
 ```bash

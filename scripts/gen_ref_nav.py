@@ -20,7 +20,7 @@ root = Path(__file__).parent.parent
 src = root / 'src'
 for path in sorted(src.rglob('*.py')):
     module_path = path.relative_to(src).with_suffix('')
-    doc_path = path.relative_to(src / 'sdx').with_suffix('.md')
+    doc_path = path.relative_to(src / 'hiperhealth').with_suffix('.md')
     full_doc_path = Path('api', doc_path)
 
     parts = tuple(module_path.parts)

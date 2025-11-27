@@ -2,7 +2,7 @@
 title: "Informed Consent Template for Research Data Use"
 version: 1
 last_updated: "2025-10-21"
-author: "SDX Contributors"
+author: "HiPerHealth Contributors"
 ---
 
 # Informed Consent for Use of Health Data in Research
@@ -12,8 +12,8 @@ author: "SDX Contributors"
 > with real values before implementation.
 
 **Project/Study Title:** Example Health Data Study **Institution/Organization:**
-SDX Research Institute **Version Date:** 2025-10-21 **IRB Protocol Number:**
-IRB-2025-12345
+HiPerHealth Research Institute **Version Date:** 2025-10-21 **IRB Protocol
+Number:** IRB-2025-12345
 
 ---
 

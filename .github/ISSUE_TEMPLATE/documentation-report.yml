@@ -7,7 +7,7 @@ body:
   - type: markdown
     attributes:
       value: >
-        **Thank you for wanting to report a problem with sdx's documentation!**
+        **Thank you for wanting to report a problem with hiperhealth's documentation!**
 
 
         ⚠
@@ -15,7 +15,7 @@ body:
         GitHub][issue search].
 
 
-        [issue search]: https://github.com/sdx/sdx/issues?q=is%3Aopen+is%3Aissue+label%3Adocs
+        [issue search]: https://github.com/hiperhealth/hiperhealth/issues?q=is%3Aopen+is%3Aissue+label%3Adocs
 
   - type: textarea
     attributes:
@@ -25,7 +25,7 @@ body:
         If there are external references that are related please link them here
         as well.
       placeholder: >-
-        I was reading the sdx documentation for sdx version X and I'm having
+        I was reading the hiperhealth documentation for hiperhealth version X and I'm having
         problems understanding Y.
         It would be very helpful if that got rephrased as Z.
     validations:
@@ -43,9 +43,9 @@ body:
     attributes:
       label: Code of Conduct
       description: |
-        Read the [`sdx` Code of Conduct][CoC] first.
+        Read the [`hiperhealth` Code of Conduct][CoC] first.
 
-        [CoC]: https://github.com/sdx/sdx/blob/main/CODE_OF_CONDUCT.md
+        [CoC]: https://github.com/hiperhealth/hiperhealth/blob/main/CODE_OF_CONDUCT.md
       options:
         - label: I agree to follow the Code of Conduct
           required: true

@@ -22,7 +22,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 @public
 class Base(DeclarativeBase):
-    """Declarative base for  SDX."""
+    """Declarative base for  HiPerHealth."""
 
     pass
 

@@ -6,7 +6,7 @@ SQLModel class with ``table=True``.  Complex / unknown field types are
 stored in PostgreSQL JSONB columns.
 
 Output file:
-    src/sdx/models/sqlmodel/fhirx.py      (overwritten)
+    src/hiperhealth/models/sqlmodel/fhirx.py      (overwritten)
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from pydantic import BaseModel
 OUTPUT_PATH = (
     Path(__file__).resolve().parent.parent.parent
     / 'src'
-    / 'sdx'
+    / 'hiperhealth'
     / 'models'
     / 'sqlmodel'
     / 'fhirx.py'

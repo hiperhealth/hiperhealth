@@ -2,14 +2,14 @@
 
 ## Stable release
 
-To install sdx, run this command in your terminal:
+To install hiperhealth, run this command in your terminal:
 
 ```bash
-pip install sdx
+pip install hiperhealth
 ```
 
-This is the preferred method to install sdx, as it will always install the most
-recent stable release.
+This is the preferred method to install hiperhealth, as it will always install
+the most recent stable release.
 
 If you don't have [pip](https://pip.pypa.io) installed, this
 [Python installation guide](http://docs.python-guide.org/en/latest/starting/installation/)
@@ -17,7 +17,7 @@ can guide you through the process.
 
 ## From sources
 
-The sources for sdx can be downloaded from the [Github repo]().
+The sources for hiperhealth can be downloaded from the [Github repo]().
 
 You can either clone the public repository:
 

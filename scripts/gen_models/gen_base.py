@@ -8,12 +8,12 @@ import pkgutil
 from types import ModuleType
 from typing import Dict, Type
 
+from hiperhealth.schema.fhirx import BaseLanguage
 from pydantic import BaseModel
-from sdx.schema.fhirx import BaseLanguage
 
 # Package paths to scan for Pydantic models
 PACKAGE_PATHS = [
-    'sdx.schema',
+    'hiperhealth.schema',
 ]
 
 IGNORED_CLASSES = [BaseLanguage, BaseModel]
@@ -34,7 +34,7 @@ def iter_pydantic_models() -> Dict[str, Type[BaseModel]]:
         ):
             submod = __import__(submod_name, fromlist=['*'])
             for name, obj in inspect.getmembers(submod, inspect.isclass):
-                if not obj.__module__.startswith('sdx'):
+                if not obj.__module__.startswith('hiperhealth'):
                     continue
                 if issubclass(obj, BaseModel) and obj not in IGNORED_CLASSES:
                     discovered[f'{submod.__name__}.{name}'] = obj

@@ -2,7 +2,7 @@
 
 import pytest
 
-from sdx.privacy.deidenitfier import Deidentifier
+from hiperhealth.privacy.deidenitfier import Deidentifier
 
 # Skipping all Deidentifier tests temporarily
 pytestmark = pytest.mark.skip(

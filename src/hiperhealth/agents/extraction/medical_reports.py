@@ -29,7 +29,7 @@ from PIL import Image
 from pypdf import PdfReader
 from pypdf.errors import EmptyFileError, PdfStreamError
 
-from sdx.utils import make_json_serializable
+from hiperhealth.utils import make_json_serializable
 
 
 # Exceptions

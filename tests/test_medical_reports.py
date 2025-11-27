@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from sdx.agents.extraction.medical_reports import (
+from hiperhealth.agents.extraction.medical_reports import (
     MedicalReportExtractorError,
     MedicalReportFileExtractor,
     TextExtractionError,

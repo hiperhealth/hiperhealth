@@ -11,10 +11,10 @@ from typing import Any
 import questionary
 import typer
 
+from hiperhealth.agents.diagnostics import core as diag
 from rich import print
-from sdx.agents.diagnostics import core as diag
 
-RECORDS_DIR = Path.home() / 'config' / '.sdx' / 'records'
+RECORDS_DIR = Path.home() / 'config' / '.hiperhealth' / 'records'
 RECORDS_DIR.mkdir(parents=True, exist_ok=True)
 
 

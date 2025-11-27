@@ -2,14 +2,14 @@
 blank_issues_enabled: true
 contact_links:
   - name: 🙋  Usage Questions
-    url: https://github.com/sdx/sdx/discussions
+    url: https://github.com/hiperhealth/hiperhealth/discussions
     about: |
-      Use sdx's GitHub Discussions to ask "How do I do X with sdx?".
+      Use hiperhealth's GitHub Discussions to ask "How do I do X with hiperhealth?".
   - name: 📖  Tutorial
-    url: https://github.com/sdx/sdx
+    url: https://github.com/hiperhealth/hiperhealth
     about: |
-      The sdx tutorial is continually updated and provides an in depth walkthrough
-      of how to use the latest release of sdx.
-  - name: 📝  sdx Code of Conduct
-    url: https://github.com/sdx/sdx/coc/CODE_OF_CONDUCT.md
-    about: Expectations for how people will interact with each other on sdx's GitHub.
+      The hiperhealth tutorial is continually updated and provides an in depth walkthrough
+      of how to use the latest release of hiperhealth.
+  - name: 📝  hiperhealth Code of Conduct
+    url: https://github.com/hiperhealth/hiperhealth/coc/CODE_OF_CONDUCT.md
+    about: Expectations for how people will interact with each other on hiperhealth's GitHub.

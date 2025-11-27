@@ -38,16 +38,18 @@ from fastapi import (
 )
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 # Now import the project-specific modules
-from sdx.agents.diagnostics import core as diag
-from sdx.agents.extraction.medical_reports import MedicalReportFileExtractor
-from sdx.agents.extraction.wearable import WearableDataFileExtractor
-from sdx.privacy.deidenitfier import (
+from hiperhealth.agents.diagnostics import core as diag
+from hiperhealth.agents.extraction.medical_reports import (
+    MedicalReportFileExtractor,
+)
+from hiperhealth.agents.extraction.wearable import WearableDataFileExtractor
+from hiperhealth.privacy.deidenitfier import (
     Deidentifier,
     deidentify_patient_record,
 )
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy.orm import Session
 
 from research.app.database import SessionLocal

@@ -57,6 +57,6 @@
   "skipCi": true,
   "repoType": "github",
   "repoHost": "https://github.com",
-  "projectName": "sdx",
-  "projectOwner": "sdx-org"
+  "projectName": "hiperhealth",
+  "projectOwner": "hiperhealth-org"
 }

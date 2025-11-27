@@ -1,6 +1,6 @@
 """SQLAlchemy models for research application."""
 
-from sdx.models.sqla.fhirx import (
+from hiperhealth.models.sqla.fhirx import (
     Base,
 )
 from sqlalchemy import (

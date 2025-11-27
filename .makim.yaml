@@ -73,7 +73,7 @@ groups:
         backend: bash
         run: |
           pytest \
-            --cov=sdx \
+            --cov=hiperhealth \
             --cov-fail-under=85 \
             --cov-report term-missing \
             --no-cov-on-fail ${{ args.path }} ${{ args.params }}

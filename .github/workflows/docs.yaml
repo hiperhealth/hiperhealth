@@ -27,7 +27,7 @@ jobs:
           miniforge-version: latest
           environment-file: conda/dev.yaml
           channels: conda-forge,nodefaults
-          activate-environment: sdx
+          activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
           python-version: "3.10"

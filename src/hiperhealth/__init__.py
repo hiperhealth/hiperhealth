@@ -1,4 +1,4 @@
-"""sdx."""
+"""hiperhealth."""
 
 from importlib import metadata as importlib_metadata
 

@@ -1,6 +1,6 @@
 """Tests for patient creation, retrieval, and listing."""
 
-from sdx.models.sqla.fhirx import Base
+from hiperhealth.models.sqla.fhirx import Base
 
 from tests.conftest import engine
 
