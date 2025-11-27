@@ -32,13 +32,13 @@ uphold this code.
 
 ## 1. Getting Started: Local Setup
 
-This project uses **Poetry** to manage dependencies and **makim** to streamline
+This project uses **Conda** to manage environments, **Poetry** to manage dependencies, and **Makim** to streamline
 development tasks.
 
 ### Prerequisites
 
 - Python 3.11+
-- [Poetry](https://python-poetry.org/docs/#installation) installed on your
+- [Conda](https://github.com/conda-forge/miniforge?tab=readme-ov-file#download) installed on your
   system.
 
 ### Installation
@@ -51,27 +51,29 @@ development tasks.
     cd hiperhealth
     ```
 
-2.  **Install Dependencies:** This command creates a virtual environment and
-    installs all packages from the `poetry.lock` file.
+2.  **Create the Development Environment:**
+
+    ```bash
+    conda env create -f conda/dev.yaml
+    conda activate sdx
+    ```
+
+3.  **Install Project Dependencies:**
 
     ```bash
     poetry install
     ```
 
-3.  **Set Up the Database:** Our `makim` task runner simplifies database setup.
-    This command runs Alembic to create the `db.sqlite` file and applies all
-    migrations.
+4.  **(Optional) Enable Pre-commit Hooks:**
 
     ```bash
-    makim db.setup
+    pre-commit install
     ```
 
-4.  **(Optional) Set Up API Keys:** Certain tests and features that interact
-    with external services (e.g., OpenAI) require API keys. Create a `.env` file
-    at `hiperhealth/.envs/.env` and add your keys there.
-    ```dotenv
-    # In .envs/.env
-    OPENAI_API_KEY="your-key-here"
+5.  **Run Unit Tests:**
+
+    ```bash
+    makim tests.unit
     ```
 
 ---
