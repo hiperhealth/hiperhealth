@@ -1,6 +1,13 @@
 # Release Notes
 ---
 
+## [0.3.1](https://github.com/hiperhealth/hiperhealth/compare/0.3.0...0.3.1) (2025-11-30)
+
+
+### Bug Fixes
+
+* Fix typo in error message for file processing ([#93](https://github.com/hiperhealth/hiperhealth/issues/93)) ([933b8d6](https://github.com/hiperhealth/hiperhealth/commit/933b8d6034789531b09c73277d4b459a2082ccfa))
+
 # [0.3.0](https://github.com/hiperhealth/hiperhealth/compare/0.2.0...0.3.0) (2025-11-27)
 
 

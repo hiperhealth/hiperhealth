@@ -88,7 +88,7 @@ class WearableDataFileExtractor(BaseWearableDataExtractor[FileInput]):
         else:
             raise FileProcessingError(
                 'File could not be processed. '
-                'It can be a malformed or currupted file.'
+                'It can be a malformed or corrupted file.'
             )
 
     def is_supported(self, file: FileInput) -> bool:

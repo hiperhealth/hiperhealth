@@ -1,6 +1,6 @@
 [project]
 name = "hiperhealth"
-version = "0.3.0"  # semantic-release
+version = "0.3.1"  # semantic-release
 description = "This Project aims to ..."
 readme = "README.md"
 authors = [
