@@ -99,6 +99,7 @@ testpaths = [
 ]
 filterwarnings = [
     "error::RuntimeWarning",
+    "error::typeguard.TypeHintWarning",
 ]
 
 [tool.ruff]
