@@ -32,13 +32,42 @@ export default function StepThree() {
   const navigate = useNavigate();
 
   const onSubmit = () => {
+    const patientId = localStorage.getItem('currentPatientId');
     if (showUpload) {
-      console.log("✅ Wearable data uploaded:", file);
-      alert("Wearable data uploaded successfully!");
-      navigate("/");
+      if (!file) {
+        alert('Please select a file to upload');
+        return;
+      }
+      if (!patientId) {
+        alert('No active patient found. Please start with Add Patient.');
+        return;
+      }
+      import('../api').then(({ api }) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        fetch(api(`/api/v1/patients/${patientId}/wearable/upload`), {
+          method: 'POST',
+          body: fd,
+        })
+          .then(async (res) => {
+            if (!res.ok) throw new Error(await res.text());
+            const j = await res.json();
+            console.log('✅ Wearable data uploaded:', j);
+            alert('Wearable data uploaded successfully!');
+            // clear current patient id after completing flow
+            localStorage.removeItem('currentPatientId');
+            navigate('/');
+          })
+          .catch((err) => {
+            console.error(err);
+            alert('Failed to upload wearable: ' + err.message);
+          });
+      });
     } else {
-      navigate("/");
-      console.log("⏭ Skipped wearable data upload");
+      // skip upload -> finish flow
+      localStorage.removeItem('currentPatientId');
+      navigate('/');
+      console.log('⏭ Skipped wearable data upload');
     }
   };
 

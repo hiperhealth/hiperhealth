@@ -51,5 +51,15 @@
     "symptomsRequired": "Los síntomas son obligatorios",
     "mentalHealthRequired": "Las preocupaciones de salud mental son obligatorias",
     "previousExamsRequired": "Este campo es obligatorio"
+  },
+
+  "navbar": {
+    "brand": "TeleHealthCareAI",
+    "dashboard": "Panel de Control",
+    "patients": "Pacientes",
+    "addPatient": "Agregar Paciente",
+    "language": "Idioma",
+    "english": "English",
+    "spanish": "Español"
   }
 }

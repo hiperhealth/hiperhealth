@@ -51,5 +51,15 @@
     "symptomsRequired": "Symptoms are required",
     "mentalHealthRequired": "Mental health concerns are required",
     "previousExamsRequired": "This field is required"
+  },
+
+  "navbar": {
+    "brand": "TeleHealthCareAI",
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "addPatient": "Add Patient",
+    "language": "Language",
+    "english": "English",
+    "spanish": "Español"
   }
 }
