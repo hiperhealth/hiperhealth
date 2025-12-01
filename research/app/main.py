@@ -110,6 +110,39 @@ def _render(template: str, **context: Any) -> HTMLResponse:
     return HTMLResponse(tpl.render(**context))
 
 
+def extract_medical_reports_for_ui(consultation) -> List[Dict[str, Any]]:
+    """Help to format reports for the UI."""
+    formattted_reports = []
+    fhir_reports = load_fhir_reports(consultation)
+    for report in fhir_reports:
+        if isinstance(report, dict):
+            file_name = report.get('filename', 'unknown')
+            resource_keys = [
+                k for k in report.keys() if k[0].isupper() and k != 'filename'
+            ]
+            if resource_keys:
+                resource_type = ', '.join(sorted(resource_keys))
+            else:
+                resource_type = 'Bundle'
+
+            formattted_reports.append(
+                {
+                    'file_name': file_name,
+                    'resource_type': resource_type,
+                    'fhir_content': report,
+                }
+            )
+        else:
+            formattted_reports.append(
+                {
+                    'filename': 'Unknown',
+                    'resource_type': 'Unknown',
+                    'fhir_content': report,
+                }
+            )
+    return formattted_reports
+
+
 def patient_to_dict(patient: Patient) -> Dict[str, Any]:
     """Convert a Patient ORM object to a dictionary for template rendering."""
     if not patient:
@@ -741,10 +774,17 @@ def patient(
         raise HTTPException(status_code=404, detail='Patient not found')
 
     active_tab = request.query_params.get('active_tab', 'demographics')
+
+    medical_reports = []
+    if patient.consultations:
+        medical_reports = extract_medical_reports_for_ui(
+            patient.consultations[-1]
+        )
     context = {
         'title': 'Patient',
         'patient': patient_to_dict(patient),
         'active_tab': active_tab,
+        'medical_reports': medical_reports,
     }
     return _render('patient.html', **context)
 
