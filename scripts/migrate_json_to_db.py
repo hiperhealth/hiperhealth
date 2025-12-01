@@ -6,12 +6,12 @@ import logging
 
 from pathlib import Path
 
-from research.app.database import SessionLocal
-from research.models.repositories import ResearchRepository
-
-# Add the project root to the Python path to allow for imports
+# Add the project root to the Python path to allow for imports BEFORE local imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
+
+from research.app.database import SessionLocal
+from research.models.repositories import ResearchRepository
 
 
 logger = logging.getLogger(__name__)
