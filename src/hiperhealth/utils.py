@@ -6,14 +6,16 @@ from typing import Any
 
 
 def is_float(value: str) -> bool:
-    """Check if a string is a float."""
-    if not value.isnumeric():
-        try:
-            float(value)
-            return True
-        except ValueError:
+    """Check if a string represents a float (not a plain integer)."""
+    value = value.strip()
+    try:
+        # Reject plain integers (e.g., '1', '-2')
+        if value == '' or value.isnumeric() or (value.lstrip('-').isnumeric()):
             return False
-    return False
+        float(value)
+        return True
+    except ValueError:
+        return False
 
 
 def make_json_serializable(obj: Any) -> Any:
