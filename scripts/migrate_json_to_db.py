@@ -17,6 +17,7 @@ sys.path.insert(0, str(project_root / 'src'))
 logger = logging.getLogger(__name__)
 
 
+
 def migrate_data():
     """Migrate patient data from JSON to the database."""
     db = SessionLocal()
