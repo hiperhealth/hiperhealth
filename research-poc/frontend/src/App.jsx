@@ -7,6 +7,7 @@ import StepOne from "./components/StepOne";
 import StepTwo from "./components/StepTwo";
 import StepThree from "./components/StepThree";
 import AppNavbar from "./components/Navbar";
+import PatientView from "./components/PatientView";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/demographics" element={<StepOne />} />
         <Route path="/lifestyle" element={<StepTwo />} />
         <Route path="/wearable" element={<StepThree />} />
+  <Route path="/patients/:id" element={<PatientView />} />
       </Routes>
     </Router>
   );

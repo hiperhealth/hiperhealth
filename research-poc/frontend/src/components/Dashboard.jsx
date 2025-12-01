@@ -15,41 +15,49 @@ import ReactPaginate from "react-paginate";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  //   const [patients, setPatients] = useState([]);
-  const [patients] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      age: 45,
-      gender: "Male",
-      status: "Active",
-      lastVisit: "2025-10-28",
-    },
-    {
-      id: 2,
-      name: "Maria Gonzalez",
-      age: 34,
-      gender: "Female",
-      status: "Under Review",
-      lastVisit: "2025-10-15",
-    },
-    {
-      id: 3,
-      name: "Arjun Patel",
-      age: 29,
-      gender: "Male",
-      status: "Completed",
-      lastVisit: "2025-09-30",
-    },
-    {
-      id: 4,
-      name: "Sophia Lee",
-      age: 52,
-      gender: "Female",
-      status: "Active",
-      lastVisit: "2025-10-29",
-    },
-  ]);
+  const { useEffect } = React;
+  const [patients, setPatients] = useState([]);
+  const [stats, setStats] = useState({ total_patients: 0, active_records: 0, this_month: 0, recent_patients: [] });
+  // fetch patients and dashboard stats from backend
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const mod = await import('../api');
+        const [patientsRes, statsRes] = await Promise.all([
+          fetch(mod.api('/api/v1/patients')),
+          fetch(mod.api('/api/v1/dashboard/stats')),
+        ]);
+        if (!mounted) return;
+        const patientsJson = patientsRes.ok ? await patientsRes.json() : [];
+        const statsJson = statsRes.ok ? await statsRes.json() : { total_patients: 0, active_records: 0, this_month: 0 };
+        if (mounted) {
+          setPatients(patientsJson || []);
+          setStats(statsJson || { total_patients: 0, active_records: 0, this_month: 0, recent_patients: [] });
+        }
+      } catch (err) {
+        console.error('Failed to load dashboard data', err);
+      }
+    };
+
+    // initial load
+    load();
+
+    // refetch when window/tab regains focus or visibility
+    const onFocus = () => {
+      if (document.visibilityState === 'visible') {
+        load();
+      }
+    };
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+    };
+  }, []);
   const itemsPerPage = 3;
   const [itemOffset, setItemOffset] = useState(0);
 
@@ -61,7 +69,7 @@ export default function Dashboard() {
     const newOffset = (event.selected * itemsPerPage) % patients.length;
     setItemOffset(newOffset);
   };
-  const hasPatients =patients.length > 0 || 4 ;
+  const hasPatients = patients && patients.length > 0;
 
   return (
     <div className="bg-light min-vh-100 py-3">
@@ -76,14 +84,17 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {hasPatients && (
+          {(
             <Button
-              onClick={() => navigate("/demographics")}
+              onClick={() => {
+                // start a new patient flow; frontend will create patient on StepOne submit
+                navigate('/demographics');
+              }}
               variant="primary"
               size="md"
               className="d-flex align-items-center gap-2"
             >
-              <span style={{ fontSize: "1.2rem" }}>➕</span>
+              <span style={{ fontSize: '1.2rem' }}>➕</span>
               <span>Add Patient</span>
             </Button>
           )}
@@ -98,7 +109,7 @@ export default function Dashboard() {
                     <span style={{ fontSize: "1.5rem" }}>📋</span>
                   </div>
                   <div>
-                    <h3 className="mb-0 fw-bold">{patients.length}</h3>
+                    <h3 className="mb-0 fw-bold">{stats.total_patients ?? patients.length}</h3>
                     <p className="text-muted mb-0 small">Total Patients</p>
                   </div>
                 </div>
@@ -114,7 +125,7 @@ export default function Dashboard() {
                     <span style={{ fontSize: "1.5rem" }}>✅</span>
                   </div>
                   <div>
-                    <h3 className="mb-0 fw-bold">{patients.length}</h3>
+                    <h3 className="mb-0 fw-bold">{stats.active_records ?? patients.length}</h3>
                     <p className="text-muted mb-0 small">Active Records</p>
                   </div>
                 </div>
@@ -130,7 +141,7 @@ export default function Dashboard() {
                     <span style={{ fontSize: "1.5rem" }}>📊</span>
                   </div>
                   <div>
-                    <h3 className="mb-0 fw-bold">0</h3>
+                    <h3 className="mb-0 fw-bold">{stats.this_month ?? 0}</h3>
                     <p className="text-muted mb-0 small">This Month</p>
                   </div>
                 </div>
@@ -147,7 +158,7 @@ export default function Dashboard() {
                 Get started by adding your first patient record
               </p>
               <Button
-                onClick={() => navigate("/language")}
+                onClick={() => navigate("/demographics")}
                 variant="primary"
                 size="md"
                 className="px-4"
@@ -194,13 +205,46 @@ export default function Dashboard() {
                         </Badge>
                       </td>
                       <td>{patient.lastVisit}</td>
-                      <td>
+                      <td className="d-flex gap-2">
                         <Button
                           size="sm"
                           variant="outline-primary"
-                          onClick={() => alert(`Viewing ${patient.name}`)}
+                          onClick={() => navigate(`/patients/${patient.id}`)}
                         >
                           View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          onClick={async () => {
+                            if (!window.confirm(`Delete patient ${patient.name || patient.id}? This action cannot be undone.`)) return;
+                            try {
+                              const mod = await import('../api');
+                              const res = await fetch(mod.api(`/api/v1/patients/${patient.id}`), { method: 'DELETE' });
+                              if (res.ok || res.status === 204) {
+                                // remove from local list and refresh stats
+                                setPatients((prev) => prev.filter((p) => p.id !== patient.id));
+                                try {
+                                  const mod2 = await import('../api');
+                                  const r = await fetch(mod2.api('/api/v1/dashboard/stats'));
+                                  if (r.ok) {
+                                    const s = await r.json();
+                                    setStats(s || { total_patients: 0, active_records: 0, this_month: 0, recent_patients: [] });
+                                  }
+                                } catch (e) {
+                                  console.warn('Failed to refresh stats after delete', e);
+                                }
+                                return;
+                              }
+                              const txt = await res.text();
+                              throw new Error(txt || `Failed to delete (${res.status})`);
+                            } catch (err) {
+                              console.error('Delete failed', err);
+                              alert('Failed to delete patient: ' + (err.message || err));
+                            }
+                          }}
+                        >
+                          Delete
                         </Button>
                       </td>
                     </tr>
