@@ -44,6 +44,20 @@
         Symptoms
       </button>
       <button class="nav-link
+                     {% if active_tab=='medical_reports' %}
+                       active
+                     {% endif %}"
+              id="nav-medical-reports-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-medical-reports"
+              role="tab"
+              type="button"
+              aria-controls="nav-medical-reports"
+              aria-selected="false">
+        <i class="bi bi-file-earmark-medical me-1"></i>Medical Reports
+        <span class="badge bg-secondary ms-1">{{ medical_reports|length }}</span>
+      </button>
+      <button class="nav-link
                      {% if active_tab == 'diagnosis' %}
                        active
                      {% endif %}"
@@ -157,6 +171,71 @@
       </div>
     </div>
     <!-- Symptoms End -->
+    <!--Medical Reports Start-->
+    <div class="tab-pane fade
+                {% if active_tab == 'medical_reports' %}
+                  show active
+                {% endif %}"
+         id="nav-medical-reports"
+         role="tabpanel"
+         aria-labelledby="nav-medical-reports-tab">
+      <h3 class="mt-4">
+        Medical Reports
+      </h3>
+      <hr />
+
+      {% if medical_reports|length>0 %}
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr class="table-primary">
+                <th scope="col">
+                  File Name
+                </th>
+                <th scope="col">
+                  Resource type
+                </th>
+                <th scope="col">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for report in medical_reports %}
+                <tr>
+                  <td>
+                    <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                    <strong>{{ report.file_name }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge bg-secondary">
+                      {{ report.resource_type }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#fhirModal"
+                            data-report-filename="{{ report.file_name }}"
+                            data-report-fhir='{{ report.fhir_content | tojson }}'>
+                      <i class="bi bi-eye-fill"></i> View fhir
+                    </button>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="alert alert-info"
+             role="alert">
+          <i class="bi bi-info-circle me-2"></i>
+          No medical reports available for this patient.
+        </div>
+      {% endif %}
+    </div>
+    <!--Medical Reports End-->
     <!-- Diagnosis Start -->
     <div class="tab-pane fade
                 {% if active_tab == 'diagnosis' %}
@@ -432,6 +511,110 @@
         </div>
       </div>
     </div>
-    <!-- Exams Start -->
+    <!-- Exams End -->
   </div>
+  <!-- FHIR Content Viewer Modal -->
+  <div class="modal fade"
+       id="fhirModal"
+       tabindex="-1"
+       aria-labelledby="fhirModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"
+              id="fhirModalLabel">
+            <i class="bi bi-file-earmark-code me-2"></i>FHIR Content
+          </h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close">
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <p class="mb-0">
+              <strong>File Name:</strong>
+            </p>
+            <p id="modalReportFilename"
+               class="text-muted">
+            </p>
+          </div>
+          <hr />
+          <p class="mb-2">
+            <strong>FHIR JSON Content:</strong>
+          </p>
+          <pre id="modalReportFhir"
+               class="bg-light p-3 rounded"
+               style="max-height: 500px;
+                      overflow-y: auto;
+                      font-size: 0.875rem;
+                      font-family: 'Courier New', monospace"></pre>
+        </div>
+        <div class="modal-footer">
+          <button type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal">
+            Close
+          </button>
+          <button type="button"
+                  class="btn btn-primary"
+                  id="copyFhirBtn">
+            <i class="bi bi-clipboard me-1"></i>Copy JSON
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Handle FHIR Modal
+    const fhirModal = document.getElementById('fhirModal');
+    if (fhirModal) {
+      fhirModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        const filename = button.getAttribute('data-report-filename');
+        const fhirJson = button.getAttribute('data-report-fhir');
+
+        // Set filename
+        document.getElementById('modalReportFilename').textContent = filename;
+
+        // Parse and display FHIR JSON
+        try {
+          // If it's already an object, stringify it. If it's a string, parse then stringify.
+          const fhirObj = typeof fhirJson === 'string' ? JSON.parse(fhirJson) : fhirJson;
+          document.getElementById('modalReportFhir').textContent =
+            JSON.stringify(fhirObj, null, 2);
+        } catch (e) {
+          document.getElementById('modalReportFhir').textContent =
+            'Error parsing FHIR content: ' + e.message;
+        }
+      });
+    }
+
+    // Handle Copy Button
+    const copyBtn = document.getElementById('copyFhirBtn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const content = document.getElementById('modalReportFhir').textContent;
+        navigator.clipboard.writeText(content).then(() => {
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+          copyBtn.classList.remove('btn-primary');
+          copyBtn.classList.add('btn-success');
+
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.classList.add('btn-primary');
+            copyBtn.classList.remove('btn-success');
+          }, 2000);
+        });
+      });
+    }
+  });
+  </script>
 {% endblock %}
