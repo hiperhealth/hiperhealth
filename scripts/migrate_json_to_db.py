@@ -3,7 +3,6 @@
 import json
 import sys
 import logging
-
 from pathlib import Path
 
 # Add the project root to the Python path to allow for imports BEFORE local imports
@@ -13,10 +12,7 @@ sys.path.insert(0, str(project_root / 'src'))
 from research.app.database import SessionLocal
 from research.models.repositories import ResearchRepository
 
-
 logger = logging.getLogger(__name__)
-
-
 
 def migrate_data():
     """Migrate patient data from JSON to the database."""
@@ -46,7 +42,7 @@ def migrate_data():
 
         # Check if patient already exists to prevent duplicates
         if repo.get_patient_by_uuid(patient_uuid):
-            logger.warning(f'Patient {patient_uuid} already exists. Skipping.')
+            logger.info(f'Patient {patient_uuid} already exists. Skipping.')
             continue
 
         logger.info(f'Migrating patient {patient_uuid}...')
@@ -58,7 +54,8 @@ def migrate_data():
         except Exception as e:
             logger.error(f'  ERROR migrating patient {patient_uuid}: {e}')
 
-    logger.info('\nMigration complete.')
+    logger.info('Migration complete.')
+    logger.info('Migration complete.')
     db.close()
 
 
