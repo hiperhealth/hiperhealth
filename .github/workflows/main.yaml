@@ -124,19 +124,16 @@ jobs:
           conda-solver: libmamba
           python-version: "3.10"
 
-      - name: Install dependencies (Poetry venv)
+      - name: Install dependencies
         run: |
-          poetry config virtualenvs.create true
-          poetry install --with dev
-          poetry run pip install pre-commit ruff mypy bandit vulture djlint prettier
+          poetry config virtualenvs.create false
+          poetry install
 
       - name: Run style checks
         if: success() || failure()
         run: |
-          poetry run pre-commit install
-          poetry run pre-commit run --all-files --verbose
-          # keep makim linter step for parity (executes same hooks)
-          poetry run makim tests.linter
+          pre-commit install
+          makim tests.linter
 
       - name: Setup tmate session
         if: "${{ failure() && (contains(github.event.pull_request.labels.*.name, 'ci:enable-debugging')) }}"
