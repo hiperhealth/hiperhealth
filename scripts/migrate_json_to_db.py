@@ -1,18 +1,21 @@
 """Script for migrating data from JSON files into the database."""
 
 import json
-import sys
 import logging
+import sys
+
 from pathlib import Path
 
-# Add the project root to the Python path to allow for imports BEFORE local imports
+# Add the project root to the Python path to allow for imports
+# BEFORE local imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
 
-from research.app.database import SessionLocal
-from research.models.repositories import ResearchRepository
+from research.app.database import SessionLocal  # noqa: E402
+from research.models.repositories import ResearchRepository  # noqa: E402
 
 logger = logging.getLogger(__name__)
+
 
 def migrate_data():
     """Migrate patient data from JSON to the database."""
