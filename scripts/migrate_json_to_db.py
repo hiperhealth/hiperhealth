@@ -17,6 +17,14 @@ from research.models.repositories import ResearchRepository  # noqa: E402
 logger = logging.getLogger(__name__)
 
 
+def configure_logging(level: int = logging.INFO) -> None:
+    """Configure logging for the migration script."""
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s %(levelname)s %(name)s: %(message)s',
+    )
+
+
 def migrate_data():
     """Migrate patient data from JSON to the database."""
     db = SessionLocal()
@@ -31,11 +39,11 @@ def migrate_data():
         / 'patients.json'
     )
 
-    logger.info(f'Loading data from {json_path}...')
+    logger.info('Loading data from %s...', json_path)
     with open(json_path, 'r') as f:
         patient_records = json.load(f)
 
-    logger.info(f'Found {len(patient_records)} patient records to migrate.')
+    logger.info('Found %d patient records to migrate.', len(patient_records))
 
     for record in patient_records:
         patient_uuid = record.get('meta', {}).get('uuid')
@@ -45,21 +53,23 @@ def migrate_data():
 
         # Check if patient already exists to prevent duplicates
         if repo.get_patient_by_uuid(patient_uuid):
-            logger.info(f'Patient {patient_uuid} already exists. Skipping.')
+            logger.info('Patient %s already exists. Skipping.', patient_uuid)
             continue
 
-        logger.info(f'Migrating patient {patient_uuid}...')
+        logger.info('Migrating patient %s...', patient_uuid)
         try:
             # The repository methods are designed to handle
             # this dictionary format
             repo.create_patient_and_consultation(record)
             repo.update_consultation(patient_uuid, record)
-        except Exception as e:
-            logger.error(f'  ERROR migrating patient {patient_uuid}: {e}')
+        except Exception:
+            db.rollback()
+            logger.exception('ERROR migrating patient %s', patient_uuid)
 
     logger.info('Migration complete.')
     db.close()
 
 
 if __name__ == '__main__':
+    configure_logging()
     migrate_data()
