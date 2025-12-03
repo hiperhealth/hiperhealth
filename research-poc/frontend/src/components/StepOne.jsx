@@ -22,8 +22,35 @@ export default function StepOne() {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    console.log("Step1:", data);
-    navigate("/lifestyle");
+    // Create patient with demographics (backend) and store current patient id
+    import('../api').then(({ api }) => {
+      fetch(api('/api/v1/patients'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          age: data.age,
+          gender: data.gender,
+          weight: data.weight,
+          height: data.height,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || 'Failed to create patient');
+          }
+          return res.json();
+        })
+        .then((json) => {
+          // save id and continue
+          localStorage.setItem('currentPatientId', json.id);
+          navigate('/lifestyle');
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Failed to create patient: ' + err.message);
+        });
+    });
   };
 
   return (
