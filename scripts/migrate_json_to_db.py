@@ -58,7 +58,6 @@ def migrate_data():
             logger.error(f'  ERROR migrating patient {patient_uuid}: {e}')
 
     logger.info('Migration complete.')
-    logger.info('Migration complete.')
     db.close()
 
 
