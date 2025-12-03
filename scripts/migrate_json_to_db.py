@@ -2,7 +2,6 @@
 
 import json
 import sys
-import logging
 
 from pathlib import Path
 
@@ -12,9 +11,6 @@ from research.models.repositories import ResearchRepository
 # Add the project root to the Python path to allow for imports
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / 'src'))
-
-
-logger = logging.getLogger(__name__)
 
 
 def migrate_data():
@@ -31,33 +27,33 @@ def migrate_data():
         / 'patients.json'
     )
 
-    logger.info(f'Loading data from {json_path}...')
+    print(f'Loading data from {json_path}...')
     with open(json_path, 'r') as f:
         patient_records = json.load(f)
 
-    logger.info(f'Found {len(patient_records)} patient records to migrate.')
+    print(f'Found {len(patient_records)} patient records to migrate.')
 
     for record in patient_records:
         patient_uuid = record.get('meta', {}).get('uuid')
         if not patient_uuid:
-            logger.warning('Skipping record with no UUID.')
+            print('Skipping record with no UUID.')
             continue
 
         # Check if patient already exists to prevent duplicates
         if repo.get_patient_by_uuid(patient_uuid):
-            logger.warning(f'Patient {patient_uuid} already exists. Skipping.')
+            print(f'Patient {patient_uuid} already exists. Skipping.')
             continue
 
-        logger.info(f'Migrating patient {patient_uuid}...')
+        print(f'Migrating patient {patient_uuid}...')
         try:
             # The repository methods are designed to handle
             # this dictionary format
             repo.create_patient_and_consultation(record)
             repo.update_consultation(patient_uuid, record)
         except Exception as e:
-            logger.error(f'  ERROR migrating patient {patient_uuid}: {e}')
+            print(f'  ERROR migrating patient {patient_uuid}: {e}')
 
-    logger.info('\nMigration complete.')
+    print('\nMigration complete.')
     db.close()
 
 

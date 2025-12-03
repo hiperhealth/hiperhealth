@@ -1,6 +1,5 @@
 """A module for PII detection and de-identification."""
 
-import logging
 from typing import Dict, List, Optional
 
 from presidio_analyzer import (
@@ -11,9 +10,6 @@ from presidio_analyzer import (
 )
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
-
-
-logger = logging.getLogger(__name__)
 
 
 class Deidentifier:
@@ -74,9 +70,7 @@ class Deidentifier:
             ],
         )
         self.analyzer.registry.add_recognizer(custom_recognizer)
-        logger.info(
-            f"Custom recognizer '{entity_name}' added successfully."
-        )
+        print(f"Custom recognizer '{entity_name}' added successfully.")
 
     def analyze(
         self,
