@@ -1,7 +1,10 @@
-import pytest
+"""Test is_float function independently."""
+
 from hiperhealth.utils import is_float
 
+
 def test_is_float():
+    """Test if string is a float."""
     assert is_float('1.0')
     assert is_float('   1.0    ')
     assert is_float('-3.00')
