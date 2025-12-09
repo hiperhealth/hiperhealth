@@ -16,12 +16,14 @@ def is_float(value: str) -> bool:
     Returns
     -------
     bool
-        True if the string parses as a float and is not a plain integer; False otherwise.
+        True if the string parses as a float and is not a plain integer; False
+        otherwise.
 
     Notes
     -----
-    Accepts standard float formats, including scientific notation (e.g., ``"1e-3"``).
-    Plain integers (optionally signed) and empty strings return ``False``.
+    Accepts standard float formats, including scientific notation
+    (e.g., ``"1e-3"``). Plain integers (optionally signed) and empty strings
+    return ``False``.
     """
     stripped = value.strip()
 
