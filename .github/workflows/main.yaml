@@ -61,7 +61,9 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev.yaml
-          channels: conda-forge,nodefaults
+          channels:
+            - conda-forge
+            - nodefaults
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
@@ -72,7 +74,9 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev-win.yaml
-          channels: conda-forge,nodefaults
+          channels:
+            - conda-forge
+            - nodefaults
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
@@ -118,7 +122,9 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev.yaml
-          channels: conda-forge,nodefaults
+          channels:
+            - conda-forge
+            - nodefaults
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
