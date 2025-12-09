@@ -32,7 +32,7 @@ def is_float(value: str) -> bool:
         return False
 
     # Reject plain integer strings (e.g., "1", "-2", "+3")
-    if stripped.lstrip("+-").isdigit():
+    if stripped.lstrip('+-').isdigit():
         return False
 
     # Otherwise, validate it parses as a float
