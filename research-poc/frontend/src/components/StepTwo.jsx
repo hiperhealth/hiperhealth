@@ -22,9 +22,33 @@ export default function StepTwo() {
   const navigate = useNavigate();
 
   const onSubmit = (data) => {
-    console.log(" Form Data:", data);
-    alert("Form submitted successfully!");
-    navigate("/wearable");
+    // send lifestyle to backend for current patient
+    const patientId = localStorage.getItem('currentPatientId');
+    if (!patientId) {
+      alert('No active patient found. Please start with Add Patient.');
+      return;
+    }
+    import('../api').then(({ api }) => {
+      fetch(api(`/api/v1/patients/${patientId}/lifestyle`), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          diet: data.diet,
+          sleep_hours: data.sleep,
+          exercise: data.exercise,
+          mental_activities: data.mental,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) throw new Error(await res.text());
+          alert('Form submitted successfully!');
+          navigate('/wearable');
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Failed to save lifestyle: ' + err.message);
+        });
+    });
   };
 
   return (
