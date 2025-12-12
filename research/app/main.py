@@ -45,7 +45,7 @@ from hiperhealth.agents.extraction.medical_reports import (
     MedicalReportFileExtractor,
 )
 from hiperhealth.agents.extraction.wearable import WearableDataFileExtractor
-from hiperhealth.privacy.deidenitfier import (
+from hiperhealth.privacy.deidentifier import (
     Deidentifier,
     deidentify_patient_record,
 )
