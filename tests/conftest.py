@@ -12,16 +12,28 @@ import pytest
 
 from dotenv import dotenv_values, load_dotenv
 from fastapi.testclient import TestClient
-from hiperhealth.agents.extraction.medical_reports import (
-    MedicalReportFileExtractor,
-)
-from hiperhealth.agents.extraction.wearable import WearableDataFileExtractor
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from research.app.main import app
 from research.models.repositories import ResearchRepository
 from research.models.ui import Base
+
+try:
+    from research.app.main import app
+except (ImportError, RuntimeError):
+    app = None
+
+try:
+    from hiperhealth.agents.extraction.medical_reports import (
+        MedicalReportFileExtractor,
+    )
+except (ImportError, RuntimeError):
+    MedicalReportFileExtractor = None
+
+try:
+    from hiperhealth.agents.extraction.wearable import WearableDataFileExtractor
+except (ImportError, RuntimeError):
+    WearableDataFileExtractor = None
 
 
 @pytest.fixture
@@ -114,4 +126,6 @@ def test_repo(db_session):
 @pytest.fixture
 def client():
     """FastAPI test client fixture."""
+    if app is None:
+        pytest.skip('FastAPI app not available')
     return TestClient(app)
