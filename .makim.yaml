@@ -128,7 +128,9 @@ groups:
     tasks:
       setup:
         help: Creates and migrates the database to the latest version
-        run: alembic upgrade head
+        run: |
+          python -c "from pathlib import Path; Path('research/app/data').mkdir(parents=True, exist_ok=True)"
+          alembic upgrade head
       revision:
         help: Autogenerates a new database revision script
         args:
