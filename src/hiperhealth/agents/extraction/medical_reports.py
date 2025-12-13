@@ -31,6 +31,8 @@ from pypdf.errors import EmptyFileError, PdfStreamError
 
 from hiperhealth.utils import make_json_serializable
 
+# from hiperhealth.agents.extraction.dicom_extractor import DICOMTextExtractor
+
 
 # Exceptions
 class MedicalReportExtractorError(Exception):
@@ -57,8 +59,13 @@ T = TypeVar('T')
 
 # Types
 FileInput = Union[str, Path, IO[bytes], io.BytesIO]
-FileExtension = Literal['pdf', 'png', 'jpg', 'jpeg']
-MimeType = Literal['application/pdf', 'image/png', 'image/jpeg']
+FileExtension = Literal['pdf', 'png', 'jpg', 'jpeg', 'dcm']
+MimeType = Literal[
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'application/dicom',
+]
 
 
 class BaseMedicalReportExtractor(ABC, Generic[T]):
@@ -82,6 +89,7 @@ class MedicalReportFileExtractor(BaseMedicalReportExtractor[FileInput]):
         'png': 'image/png',
         'jpg': 'image/jpeg',
         'jpeg': 'image/jpeg',
+        'dcm': 'application/dicom',
     }
 
     def __init__(self) -> None:
@@ -162,6 +170,21 @@ class MedicalReportFileExtractor(BaseMedicalReportExtractor[FileInput]):
         mime = self._get_mime_type(source)
         if mime == 'application/pdf':
             text = self._extract_text_from_pdf(source)
+        elif mime == 'application/dicom':
+            # Import here to avoid circular import
+            from .dicom_extractor import DICOMTextExtractor
+
+            # Convert Path to str
+            if isinstance(source, Path):
+                source = str(source)
+            # Wrap IO[bytes] streams that are not BytesIO into BytesIO
+            elif hasattr(source, 'read') and not isinstance(
+                source, io.BytesIO
+            ):
+                source = io.BytesIO(source.read())
+                source.seek(0)
+
+            text = DICOMTextExtractor.extract_text(source)
         else:
             text = self._extract_text_from_image(source)
 
