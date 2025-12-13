@@ -150,6 +150,6 @@ cython_debug/
 .vscode/
 research/app/data/
 #backend database
-research-poc\backend\backend.db
+research-poc/backend/backend.db
 uvicorn.log
 uvicorn.pid
