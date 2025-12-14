@@ -51,8 +51,9 @@ dependencies, and **Makim** to streamline development tasks.
 
 Uv/Setuptools is a Python package management tool that simplifies the process of
 building and publishing Python packages. It allows us to easily manage
-dependencies, virtual environments, and package versions. Uv/Setuptools also includes
-features such as dependency resolution, lock files, and publishing to PyPI.
+dependencies, virtual environments, and package versions. Uv/Setuptools also
+includes features such as dependency resolution, lock files, and publishing to
+PyPI.
 
 ### Prerequisites
 
@@ -86,8 +87,8 @@ features such as dependency resolution, lock files, and publishing to PyPI.
     mamba activate hiperhealth
     ```
 
-3.  **Install Project Dependencies:** This command 
-    installs all required packages.
+3.  **Install Project Dependencies:** This command installs all required
+    packages.
 
     ```bash
     ./scripts/install-dev.sh
