@@ -10,6 +10,7 @@ import AppNavbar from "./components/Navbar";
 import PatientView from "./components/PatientView";
 import AITest from "./components/AITest";
 import AIDiagnosis from "./components/AIDiagnosis";
+import Summary from "./components/Summary";
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/wearable" element={<StepThree />} />
         <Route path="/aidiagnosis" element={<AIDiagnosis />} />
         <Route path="/aitest" element={<AITest/>}/>
+        <Route path="/summary" element={<Summary/>}/>
         <Route path="/patients/:id" element={<PatientView />} />
       </Routes>
     </Router>
