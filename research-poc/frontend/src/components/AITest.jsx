@@ -143,7 +143,7 @@ function AITest({ onBack, onComplete }) {
       if (onComplete) {
         onComplete(data);
       }
-     navigate('/');      
+     navigate('/summary');      
     } catch (error) {
       console.error('Error submitting test suggestions:', error);
       alert('Failed to submit test suggestions. Please try again.');
