@@ -6,7 +6,6 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)![Mkdocs](https://img.shields.io/badge/Documentation%20engine-Mkdocs-orange)
 [![Built with Material for MkDocs](https://img.shields.io/badge/Material_for_MkDocs-526CFE?style=for-the-badge&logo=MaterialForMkDocs&logoColor=white)](https://squidfunk.github.io/mkdocs-material/)
 ![Conda](https://img.shields.io/badge/Virtual%20environment-conda-brightgreen?logo=anaconda)[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)

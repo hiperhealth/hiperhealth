@@ -46,12 +46,12 @@ For more information, check the official documentation:
 
 ## 1. Getting Started: Local Setup
 
-This project uses **Conda** to manage environments, **Poetry** to manage
+This project uses **Conda** to manage environments, **Uv/Setuptools** to manage
 dependencies, and **Makim** to streamline development tasks.
 
-Poetry is a Python package management tool that simplifies the process of
+Uv/Setuptools is a Python package management tool that simplifies the process of
 building and publishing Python packages. It allows us to easily manage
-dependencies, virtual environments, and package versions. Poetry also includes
+dependencies, virtual environments, and package versions. Uv/Setuptools also includes
 features such as dependency resolution, lock files, and publishing to PyPI.
 
 ### Prerequisites
@@ -59,8 +59,6 @@ features such as dependency resolution, lock files, and publishing to PyPI.
 - Python 3.11+
 - [Conda](https://github.com/conda-forge/miniforge?tab=readme-ov-file#download)
   installed on your system.
-- [Poetry](https://python-poetry.org/docs/#installation) installed on your
-  system.
 
 ### Installation
 
@@ -88,11 +86,11 @@ features such as dependency resolution, lock files, and publishing to PyPI.
     mamba activate hiperhealth
     ```
 
-3.  **Install Project Dependencies:** This command creates a virtual environment
-    and installs all packages from the `poetry.lock` file.
+3.  **Install Project Dependencies:** This command 
+    installs all required packages.
 
     ```bash
-    poetry install
+    ./scripts/install-dev.sh
     ```
 
 4.  **Set Up the Database:** Our `makim` task runner simplifies database setup.

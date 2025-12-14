@@ -26,7 +26,7 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev.yaml
-          channels: conda-forge,nodefaults
+          channels: nodefaults,conda-forge
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
@@ -34,8 +34,7 @@ jobs:
 
       - name: Install deps
         run: |
-          poetry config virtualenvs.create false
-          poetry install
+          ./scripts/install-dev.sh
 
       - name: Generate documentation with changes from semantic-release
         run: makim --verbose docs.build

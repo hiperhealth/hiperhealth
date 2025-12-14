@@ -90,7 +90,7 @@ groups:
       build:
         help: "Build the package"
         run: |
-          poetry build
+          ./scripts/build.sh
 
   release:
     vars:

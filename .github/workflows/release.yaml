@@ -29,14 +29,14 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev.yaml
-          channels: conda-forge,nodefaults
+          channels: nodefaults,conda-forge
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
 
       - name: Install deps
         run: |
-          poetry install
+          ./scripts/install-dev.sh
 
       - name: Run semantic release (for tests)
         if: ${{ github.event_name != 'workflow_dispatch' }}
@@ -51,7 +51,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config pypi-token.pypi ${PYPI_TOKEN}
           makim release.ci
 
       - name: Generate documentation with changes from semantic-release

@@ -1,17 +1,16 @@
 [project]
 name = "hiperhealth"
 version = "0.3.1"  # semantic-release
-description = "This Project aims to ..."
+description = "Provide a pipeline for medical encounter empowered by AI"
 readme = "README.md"
 authors = [
   {name = "Ivan Ogasawara", email = "ivan.ogasawara@gmail.com"}
 ]
-license = "BSD 3 Clause"
+license = { text = "BSD 3 Clause" }
 requires-python = ">=3.10,<4"
 dependencies = [
     "anamnesisai >=0.4.0",
     "fhir.resources >=8.1.0",
-    "rago >=0.14.4",
     "pypdf >=5.4.0",
     "sqlalchemy >=2.0.41",
     "atpublic >=6",
@@ -23,52 +22,58 @@ dependencies = [
     "presidio-analyzer (>=2.2.359,<3.0.0)",
     "presidio-anonymizer (>=2.2.359,<3.0.0)",
     "uvicorn (>=0.38.0,<0.39.0)",
+    "torch >=2",
     "alembic (>=1.17.2,<2.0.0)",
+    # NumPy: macOS stays on 1.x; others use 2.x (with your Python guards)
+    "numpy >=1.26,<2 ; python_version <  '3.13' and sys_platform == 'darwin'",
+    "numpy >=2       ; python_version >= '3.13' and sys_platform == 'darwin'",
+    "numpy >=2,<2.1  ; python_version <  '3.10' and sys_platform != 'darwin'",
+  "numpy >=2,<2.2  ; python_version == '3.10' and sys_platform != 'darwin'",
 ]
+
+[project.urls]
+Homepage = "https://github.com/hiperhealth/hiperhealth"
+Issues = "https://github.com/hiperhealth/hiperhealth/issues"
 
 [build-system]
-requires = ["poetry-core>=2", "poetry>=2"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=70.1.0,<80.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.poetry]
-packages = [
-  {include = "hiperhealth", from="src"},
-  {include = "research", from="."},
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+hiperhealth = ["py.typed"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest >=7.3.2",
+  "pytest-cov >=4.1.0",
+  "coverage >=7.2.7",
+  "pre-commit >=3.3.2",
+  "ruff >=0.2.0",
+  "mypy >=1.5.0",
+  "bandit >=1.7.5",
+  "vulture >=2.7",
+  "ipython >=8",
+  "ipykernel >=6.0.0",
+  "Jinja2 >=3.1.2",
+  "mkdocs >=1.4.3",
+  "mkdocs-exclude >=1.0.2",
+  "mkdocs-jupyter >=0.24.1",
+  "mkdocs-literate-nav >=0.6.0",
+  "mkdocs-macros-plugin >=0.7.0,<1",
+  "mkdocs-material >=9.1.15",
+  "mkdocstrings >=0.21.2",
+  "mkdocstrings-python >= 1.1.2",
+  "mkdocs-gen-files >=0.5.0",
+  "makim ==1.27.0",
+  "fastapi >=0.115",
+  "python-multipart >=0.0.20",
 ]
-include = ["src/hiperhealth/py.typed"]
-
-exclude = [
-  ".git/*",
-  ".env*",
-]
-
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.3.2"
-pytest-cov = ">=4.1.0"
-coverage = ">=7.2.7"
-pre-commit = ">=3.3.2"
-ruff = ">=0.2.0"
-mypy = ">=1.5.0"
-bandit = ">=1.7.5"
-vulture = ">=2.7"
-ipython = ">=8"
-ipykernel = ">=6.0.0"
-Jinja2 = ">=3.1.2"
-mkdocs = ">=1.4.3"
-mkdocs-exclude = ">=1.0.2"
-mkdocs-jupyter = ">=0.24.1"
-mkdocs-literate-nav = ">=0.6.0"
-mkdocs-macros-plugin = ">=0.7.0,<1"
-mkdocs-material = ">=9.1.15"
-mkdocstrings = ">=0.21.2"
-mkdocstrings-python = ">= 1.1.2"
-mkdocs-gen-files = ">=0.5.0"
-makim = "1.27.0"
-# 'PosixPath' object has no attribute 'endswith'
-virtualenv = "<=20.25.1"
-fastapi = ">=0.115"
-python-multipart = ">=0.0.20"
-
 
 [tool.bandit]
 exclude_dirs = ["tests"]

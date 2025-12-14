@@ -49,8 +49,8 @@
     [
       "@semantic-release/exec",
       {
-        "prepareCmd": "poetry build",
-        "publishCmd": "poetry publish"
+        "prepareCmd": "./scripts/build.sh",
+        "publishCmd": "./scripts/publish.sh"
       }
     ],
     [

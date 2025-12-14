@@ -61,9 +61,7 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev.yaml
-          channels:
-            - conda-forge
-            - nodefaults
+          channels: nodefaults,conda-forge
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
@@ -74,21 +72,15 @@ jobs:
         with:
           miniforge-version: latest
           environment-file: conda/dev-win.yaml
-          channels:
-            - conda-forge
-            - nodefaults
+          channels: nodefaults,conda-forge
           activate-environment: hiperhealth
           auto-update-conda: true
           conda-solver: libmamba
           python-version: "${{ matrix.python_version }}"
 
-      - name: Check Poetry lock
-        run: poetry check
-
       - name: Install dependencies
         run: |
-          poetry config virtualenvs.create false
-          poetry install
+          ./scripts/install-dev.sh
 
       - name: Run unit tests
         run: makim tests.unit
@@ -132,8 +124,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry config virtualenvs.create false
-          poetry install
+          ./scripts/install-dev.sh
 
       - name: Run style checks
         if: success() || failure()
