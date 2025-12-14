@@ -7,11 +7,12 @@ authors = [
   {name = "Ivan Ogasawara", email = "ivan.ogasawara@gmail.com"}
 ]
 license = "BSD 3 Clause"
-requires-python = ">=3.10,<4"
+requires-python = ">=3.11,<4"
 dependencies = [
     "anamnesisai >=0.4.0",
     "fhir.resources >=8.1.0",
     "rago >=0.14.4",
+    "pydicom >=3.0.1",
     "pypdf >=5.4.0",
     "sqlalchemy >=2.0.41",
     "atpublic >=6",
@@ -19,11 +20,11 @@ dependencies = [
     "questionary >=2.1.0",
     "pillow >=11.3.0",
     "pytesseract >=0.3.13",
-    "python-magic >=0.4.27",
     "presidio-analyzer (>=2.2.359,<3.0.0)",
     "presidio-anonymizer (>=2.2.359,<3.0.0)",
     "uvicorn (>=0.38.0,<0.39.0)",
     "alembic (>=1.17.2,<2.0.0)",
+    "python-magic-bin (>=0.4.14,<0.5.0)",
 ]
 
 [build-system]
