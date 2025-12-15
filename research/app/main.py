@@ -347,10 +347,10 @@ def demographics(
 @app.post('/demographics')
 def demographics_post(
     patient_id: str,
-    age: int = Form(...),
+    age: int = Form(...,ge=0),
     gender: str = Form(...),
-    weight_kg: float = Form(...),
-    height_cm: float = Form(...),
+    weight_kg: float = Form(...,ge=0.1),
+    height_cm: float = Form(...,ge=1),
     repo: ResearchRepository = Depends(get_repository),
 ) -> RedirectResponse:
     """Save demographics data."""
@@ -386,7 +386,7 @@ def lifestyle(
 def lifestyle_post(
     patient_id: str,
     diet: str = Form(...),
-    sleep_hours: float = Form(...),
+    sleep_hours: float = Form(...,ge=0,le=24),
     physical_activity: str = Form(...),
     mental_exercises: str = Form(...),
     repo: ResearchRepository = Depends(get_repository),
