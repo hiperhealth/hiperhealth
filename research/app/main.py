@@ -100,7 +100,7 @@ def get_repository(
 
 # --- App Initialization ---
 _STATIC = StaticFiles(directory=APP_DIR / 'static')
-app = FastAPI(title='TeleHealthCareAI â€" Physician Portal')
+app = FastAPI(title='TeleHealthCareAI - Physician Portal')
 app.mount('/static', _STATIC, name='static')
 
 
