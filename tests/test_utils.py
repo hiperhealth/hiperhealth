@@ -12,11 +12,14 @@ def test_is_float():
     assert is_float('-3.00')
     assert is_float('1.52')
     assert is_float('0.02')
+    assert is_float('.5')      
+    assert is_float('0.')
     assert not is_float('1')
     assert not is_float('a')
     assert not is_float('')
     assert not is_float('-3:00')
-
+    assert not is_float('.')
+    assert not is_float('1.2.3')
 
 def test_make_json_serializable_date():
     """Test datetime.date and datetime.datetime objects are serialized."""
