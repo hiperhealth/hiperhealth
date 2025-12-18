@@ -1,6 +1,6 @@
 site_name: hiperhealth
 site_url: https://hiperhealth.com
-repo_url: https://github.com/MYORG/MYREPO
+repo_url: https://github.com/hiperhealth/hiperhealth
 docs_dir: ./docs/
 site_dir: ./build/
 # extra_css:
