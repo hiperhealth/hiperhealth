@@ -8,7 +8,6 @@ application.
 - Software License: BSD 3-Clause
 - Documentation: https://hiperhealth.github.io/hiperhealth/
 - Source code: https://github.com/hiperhealth/hiperhealth
-- Maintained by: [SciStitch](https://scistitch.com) and project contributors
 
 ## What this library provides
 
@@ -408,6 +407,24 @@ makim docs.preview
 
 (This will build the documentation and serve it locally at
 http://127.0.0.1:8000)
+
+## Support & Acknowledgments
+
+### Help keep open clinical AI infrastructure moving forward
+
+HiperHealth makes reusable building blocks for clinical AI workflows available for developers and researchers to inspect, test, and improve. Making these tools dependable takes careful engineering: privacy safeguards, reproducible tests, clear interfaces, documentation, and continued evaluation of limitations. Donations help sustain that essential work and support an open foundation others can build upon.
+
+**[Support HiperHealth development on Open Collective](https://opencollective.com/osl/projects/hiperhealth/donate?interval=month&amount=20&name=&legalName=&email=)**. Every contribution matters, whether it is one-time or recurring. Supporting software development does not imply that a tool has been clinically validated or approved for patient care.
+
+### The people and organizations behind the work
+
+HiperHealth is developed and maintained through [SciStitch](https://scistitch.com/) and its open-source contributor community. We thank [Open Science Labs (OSL)](https://opensciencelabs.org/) for its institutional support, and the developers, healthcare professionals, researchers, reviewers, and users who contribute expertise, feedback, code, and testing. Their participation helps us build more responsible and useful tools.
+
+<p>
+  <a href="https://scistitch.com/"><img src="https://scistitch.com/images/logo/wordmark-color.svg" alt="SciStitch" width="160"></a>
+  &nbsp;&nbsp;
+  <a href="https://opensciencelabs.org/"><img src="https://scistitch.com/assets/osl-logo.svg" alt="Open Science Labs" width="128"></a>
+</p>
 
 ## License
 
