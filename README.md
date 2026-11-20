@@ -421,9 +421,9 @@ HiperHealth makes reusable building blocks for clinical AI workflows available f
 HiperHealth is developed and maintained through [SciStitch](https://scistitch.com/) and its open-source contributor community. We thank [Open Science Labs (OSL)](https://opensciencelabs.org/) for its institutional support, and the developers, healthcare professionals, researchers, reviewers, and users who contribute expertise, feedback, code, and testing. Their participation helps us build more responsible and useful tools.
 
 <p>
-  <a href="https://scistitch.com/"><img src="https://scistitch.com/images/logo/wordmark-color.svg" alt="SciStitch" width="160"></a>
+  <a href="https://scistitch.com/"><img src="https://scistitch.com/images/logo/wordmark-color.svg" alt="SciStitch" width="160" style="background: #fff; border-radius: 6px; padding: 6px 8px;"></a>
   &nbsp;&nbsp;
-  <a href="https://opensciencelabs.org/"><img src="https://scistitch.com/assets/osl-logo.svg" alt="Open Science Labs" width="128"></a>
+  <a href="https://opensciencelabs.org/"><img src="https://scistitch.com/assets/osl-logo.svg" alt="Open Science Labs" width="128" style="background: #fff; border-radius: 6px; padding: 6px 8px;"></a>
 </p>
 
 ## License
