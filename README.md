@@ -8,6 +8,7 @@ application.
 - Software License: BSD 3-Clause
 - Documentation: https://hiperhealth.github.io/hiperhealth/
 - Source code: https://github.com/hiperhealth/hiperhealth
+- Maintained by: [SciStitch](https://scistitch.com) and project contributors
 
 ## What this library provides
 
