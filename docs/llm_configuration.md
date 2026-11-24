@@ -14,7 +14,7 @@ These are the provider names recognized by the library configuration layer:
 
 | Provider value          | Notes                                            | Default model | API key env fallback               |
 | ----------------------- | ------------------------------------------------ | ------------- | ---------------------------------- |
-| `openai`                | Default provider                                 | `o4-mini`     | `OPENAI_API_KEY`                   |
+| `openai`                | Default provider                                 | `gpt-4o-mini` | `OPENAI_API_KEY`                   |
 | `ollama`                | Local/self-hosted via OpenAI-compatible endpoint | `llama3.2:1b` | none                               |
 | `cohere`                | Hosted provider                                  | none          | `COHERE_API_KEY`                   |
 | `fireworks`             | Hosted provider                                  | none          | `FIREWORKS_API_KEY`                |
@@ -68,7 +68,7 @@ as `<provider>/<model>`.
 
 Examples:
 
-- provider `openai` + model `o4-mini` becomes `openai/o4-mini`
+- provider `openai` + model `gpt-4o-mini` becomes `openai/gpt-4o-mini`
 - provider `ollama` + model `llama3.2:3b` becomes `ollama/llama3.2:3b`
 
 If `HIPERHEALTH_DIAGNOSTICS_LLM_MODEL` already contains a slash, it is passed
@@ -88,7 +88,7 @@ Important limitation:
 
 ```bash
 export HIPERHEALTH_DIAGNOSTICS_LLM_PROVIDER="openai"
-export HIPERHEALTH_DIAGNOSTICS_LLM_MODEL="o4-mini"
+export HIPERHEALTH_DIAGNOSTICS_LLM_MODEL="gpt-4o-mini"
 export HIPERHEALTH_DIAGNOSTICS_LLM_API_KEY="your-openai-key"
 ```
 
