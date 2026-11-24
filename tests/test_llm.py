@@ -53,6 +53,34 @@ def test_load_diagnostics_llm_settings_prefers_specific_env(monkeypatch):
     assert settings.api_params['base_url'] == 'http://localhost:11434/v1'
 
 
+def test_load_diagnostics_llm_settings_defaults_to_valid_openai_model(
+    monkeypatch,
+):
+    """
+    title: Default OpenAI model should be a valid model name.
+    parameters:
+      monkeypatch:
+        description: Value for monkeypatch.
+    """
+    for name in (
+        'HIPERHEALTH_DIAGNOSTICS_LLM_PROVIDER',
+        'HIPERHEALTH_DIAGNOSTICS_LLM_MODEL',
+        'HIPERHEALTH_DIAGNOSTICS_LLM_API_KEY',
+        'HIPERHEALTH_DIAGNOSTICS_LLM_BASE_URL',
+        'HIPERHEALTH_LLM_PROVIDER',
+        'HIPERHEALTH_LLM_MODEL',
+        'HIPERHEALTH_LLM_API_KEY',
+        'OPENAI_MODEL',
+        'OPENAI_API_KEY',
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    settings = load_diagnostics_llm_settings()
+
+    assert settings.provider == 'openai'
+    assert settings.model == 'gpt-4o-mini'
+
+
 def test_litellm_structured_llm_builds_messages_and_kwargs():
     """
     title: Structured generation should map settings into LiteLLM kwargs.

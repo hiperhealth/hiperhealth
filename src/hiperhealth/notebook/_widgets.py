@@ -121,7 +121,7 @@ class NotebookUI:
         )
         self._model: widgets.Text = widgets.Text(
             description='Model',
-            placeholder='o4-mini, llama3.2:3b, ...',
+            placeholder='gpt-4o-mini, llama3.2:3b, ...',
             value=llm_settings.model if llm_settings else '',
         )
         self._api_key: widgets.Password = widgets.Password(

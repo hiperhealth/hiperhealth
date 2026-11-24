@@ -38,7 +38,7 @@ _PROVIDER_API_KEY_ENV = {
 
 _DEFAULT_PROVIDER_MODEL = {
     'ollama': 'llama3.2:1b',
-    'openai': 'o4-mini',
+    'openai': 'gpt-4o-mini',
 }
 
 

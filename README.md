@@ -118,7 +118,7 @@ fallbacks.
 
 Default models:
 
-- `openai`: `o4-mini`
+- `openai`: `gpt-4o-mini`
 - `ollama`: `llama3.2:1b`
 
 Example with OpenAI:
@@ -126,7 +126,7 @@ Example with OpenAI:
 ```bash
 export HIPERHEALTH_DIAGNOSTICS_LLM_PROVIDER="openai"
 export HIPERHEALTH_DIAGNOSTICS_LLM_API_KEY="your-key"
-export HIPERHEALTH_DIAGNOSTICS_LLM_MODEL="o4-mini"
+export HIPERHEALTH_DIAGNOSTICS_LLM_MODEL="gpt-4o-mini"
 ```
 
 Example with local Ollama:
@@ -137,7 +137,7 @@ export HIPERHEALTH_DIAGNOSTICS_LLM_MODEL="llama3.2:3b"
 export HIPERHEALTH_DIAGNOSTICS_LLM_BASE_URL="http://localhost:11434/v1"
 ```
 
-If you use a fully-qualified LiteLLM model name such as `openai/o4-mini` or
+If you use a fully-qualified LiteLLM model name such as `openai/gpt-4o-mini` or
 `groq/llama-3.3-70b-versatile`, the model string is passed through as-is. In
 that case, set `HIPERHEALTH_DIAGNOSTICS_LLM_API_KEY` explicitly unless your
 chosen provider also matches one of the recognized provider names above.
