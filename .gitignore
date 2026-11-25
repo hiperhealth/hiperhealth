@@ -152,5 +152,5 @@ cython_debug/
 docs/data
 
 # AI
-PLAN.md
+/PLAN.md
 .codex
