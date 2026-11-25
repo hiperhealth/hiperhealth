@@ -22,6 +22,24 @@ Use this guidance for any change inside the HiperHealth library/SDK repository:
 - documentation, examples, or MkDocs/Quarto updates
 - tests, typing, linting, release, and CI-related maintenance
 
+## Agent Skills Index
+
+Specialized task procedures live under `.agents/skills/`. Consult the matching
+skill when triggered:
+
+| Task Type                              | Trigger / When to Load                         | Skill                                                                      |
+| -------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- |
+| Scope discipline & surgical edits      | Modifying code, refactoring                    | [minimal-change](.agents/skills/minimal-change/SKILL.md)                   |
+| Multi-file or architectural planning   | "Plan feature", "design", multi-file proposals | [implementation-planning](.agents/skills/implementation-planning/SKILL.md) |
+| Bug fixing & test regressions          | Bug reports, test failures                     | [fix-issue](.agents/skills/fix-issue/SKILL.md)                             |
+| Writing or updating tests              | Pytest, LLM mocking, synthetic fixtures        | [testing-standards](.agents/skills/testing-standards/SKILL.md)             |
+| PR reviews & diff inspections          | "Review this PR", diff verification            | [pr-review](.agents/skills/pr-review/SKILL.md)                             |
+| Commit staging & PR creation           | Staging commits, CI check, opening PR          | [open-pr](.agents/skills/open-pr/SKILL.md)                                 |
+| Clinical pipeline & stages             | Pipeline stages, runner hooks, sessions        | [clinical-pipeline](.agents/skills/clinical-pipeline/SKILL.md)             |
+| Schemas & generated FHIR models        | Pydantic schemas, SQLAlchemy models            | [schema-and-models](.agents/skills/schema-and-models/SKILL.md)             |
+| Clinical privacy & LiteLLM integration | Presidio de-identification, LLM calls          | [privacy-and-llm](.agents/skills/privacy-and-llm/SKILL.md)                 |
+| Authoring or auditing skills           | Adding or updating skills in `.agents/`        | [agent-authoring](.agents/skills/agent-authoring/SKILL.md)                 |
+
 ## Core Objectives
 
 1. Protect patient privacy and avoid committing real PHI, secrets, or API keys.
